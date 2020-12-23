@@ -1,2 +1,2 @@
 # das
-das(database-autonomy-service) is a self-perception, repair, optimization, and security database service..
+das is shortcut for database autonomy service, it provides self-perception, repair, optimization, and security database service.
