@@ -21,21 +21,21 @@ import (
 
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/linux"
-	"github.com/romberli/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/romberli/das/config"
 )
 
-// stopCmd represents the stop command
-var stopCmd = &cobra.Command{
-	Use:   "stop",
-	Short: "stop command",
-	Long:  `stop the server.`,
+// statusCmd represents the status command
+var statusCmd = &cobra.Command{
+	Use:   "status",
+	Short: "status command",
+	Long:  `print server status.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
-			err error
+			err       error
+			isRunning bool
 		)
 
 		// init config
@@ -44,52 +44,53 @@ var stopCmd = &cobra.Command{
 			fmt.Println(fmt.Sprintf(config.ErrInitConfig, err.Error()))
 		}
 
-		// kill server with given pid
+		// check if given pid is running
 		if serverPid != constant.DefaultRandomInt {
-			err = linux.KillServer(serverPid)
+			isRunning, err = linux.IsRunningWithPid(serverPid)
 			if err != nil {
-				log.Errorf(config.ErrKillServerWithPid, serverPid, err.Error())
-				fmt.Println(fmt.Sprintf(config.ErrKillServerWithPid, serverPid))
+				fmt.Println(fmt.Sprintf(config.ErrCheckServerRunningStatus, err.Error()))
+				return
 			}
-
-			log.Infof(config.InfoServerStop, serverPid, serverPidFile)
-			fmt.Println(fmt.Sprintf(config.InfoServerStop, serverPid, serverPidFile))
+			if isRunning {
+				fmt.Println(fmt.Sprintf(config.InfoServerIsRunning, serverPid))
+			} else {
+				fmt.Println(fmt.Sprintf(config.InfoServerNotRunning, serverPid))
+			}
 
 			return
 		}
 
-		// get pid from pid file
+		// get pid
 		serverPidFile = viper.GetString(config.ServerPidFileKey)
 		serverPid, err = linux.GetPidFromPidFile(serverPidFile)
 		if err != nil {
-			log.Errorf(config.ErrGetPidFromPidFile, serverPidFile, err.Error())
 			fmt.Println(fmt.Sprintf(config.ErrGetPidFromPidFile, serverPidFile, err.Error()))
 			os.Exit(constant.DefaultAbnormalExitCode)
 		}
-
-		// kill server with pid and pid file
-		err = linux.KillServer(serverPid, serverPidFile)
+		isRunning, err = linux.IsRunningWithPid(serverPid)
 		if err != nil {
-			log.Errorf(config.ErrKillServerWithPidFile, serverPid, serverPidFile, err.Error())
-			fmt.Println(fmt.Sprintf(config.ErrKillServerWithPidFile, serverPidFile, serverPid))
+			fmt.Println(fmt.Sprintf(config.ErrCheckServerRunningStatus, err.Error()))
+			return
 		}
-
-		log.Infof(config.InfoServerStop, serverPid, serverPidFile)
-		fmt.Println(fmt.Sprintf(config.InfoServerStop, serverPid, serverPidFile))
+		if isRunning {
+			fmt.Println(fmt.Sprintf(config.InfoServerIsRunning, serverPid))
+		} else {
+			fmt.Println(fmt.Sprintf(config.InfoServerNotRunning, serverPid))
+		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(stopCmd)
+	rootCmd.AddCommand(statusCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// stopCmd.PersistentFlags().String("foo", "", "A help for foo")
-	stopCmd.PersistentFlags().IntVar(&serverPid, "server-pid", constant.DefaultRandomInt, fmt.Sprintf("specify the server pid"))
+	// statusCmd.PersistentFlags().String("foo", "", "A help for foo")
+	statusCmd.PersistentFlags().IntVar(&serverPid, "server-pid", constant.DefaultRandomInt, fmt.Sprintf("specify the server pid"))
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// stopCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// statusCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

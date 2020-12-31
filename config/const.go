@@ -19,6 +19,7 @@ import (
 	"github.com/romberli/go-util/constant"
 )
 
+// global constant
 const (
 	DefaultCommandName    = "das"
 	DefaultDaemon         = false
@@ -36,4 +37,18 @@ const (
 	DefaultServerPort     = 6090
 	DaemonArgTrue         = "--daemon=true"
 	DaemonArgFalse        = "--daemon=false"
+)
+
+// configuration constant
+const (
+	ConfKey          = "config"
+	DaemonKey        = "daemon"
+	LogFileNameKey   = "log.fileName"
+	LogLevelKey      = "log.level"
+	LogFormatKey     = "log.format"
+	LogMaxSizeKey    = "log.maxSize"
+	LogMaxDaysKey    = "log.maxDays"
+	LogMaxBackupsKey = "log.maxBackups"
+	ServerPortKey    = "server.port"
+	ServerPidFileKey = "server.pidFile"
 )

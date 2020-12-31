@@ -24,7 +24,6 @@ import (
 
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/log"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -43,6 +42,7 @@ var (
 	logMaxDays    int
 	logMaxBackups int
 	serverPort    int
+	serverPid     int
 	serverPidFile string
 )
 
@@ -56,7 +56,7 @@ var rootCmd = &cobra.Command{
 		if len(args) == 0 {
 			err := cmd.Help()
 			if err != nil {
-				fmt.Printf("got error when printing help information.\n%s", err.Error())
+				fmt.Println(fmt.Sprintf(config.ErrPrintHelpInfo, err.Error()))
 			}
 			return
 		}
@@ -64,7 +64,7 @@ var rootCmd = &cobra.Command{
 		// init config
 		err := initConfig()
 		if err != nil {
-			fmt.Println("init config failed.\n", err.Error())
+			fmt.Println(fmt.Sprintf(config.ErrInitConfig, err.Error()))
 		}
 	},
 }
@@ -112,41 +112,43 @@ func initConfig() error {
 	// init default config
 	err = initDefaultConfig()
 	if err != nil {
-		return errors.New(fmt.Sprintf("init default configuration failed.\n%s", err.Error()))
+		return errors.New(fmt.Sprintf(config.ErrInitDefaultConfig, err.Error()))
 	}
 
 	// read config with config file
 	err = ReadConfigFile()
 	if err != nil {
-		return errors.New(fmt.Sprintf("read config file failed.\n%s", err.Error()))
+		return errors.New(fmt.Sprintf(config.ErrReadConfigFile, err.Error()))
 	}
 
 	// override config with command line arguments
 	err = OverrideConfig()
 	if err != nil {
-		return errors.New(fmt.Sprintf("override command line arguments failed.\n%s", err.Error()))
+		return errors.New(fmt.Sprintf(config.ErrOverrideCommandLineArgs, err.Error()))
 	}
 
 	// init log
-	fileName := viper.GetString("log.fileName")
-	level := viper.GetString("log.level")
-	format := viper.GetString("log.format")
-	maxSize := viper.GetInt("log.maxSize")
-	maxDays := viper.GetInt("log.maxDays")
-	maxBackups := viper.GetInt("log.maxBackups")
+	fileName := viper.GetString(config.LogFileNameKey)
+	level := viper.GetString(config.LogLevelKey)
+	format := viper.GetString(config.LogFormatKey)
+	maxSize := viper.GetInt(config.LogMaxSizeKey)
+	maxDays := viper.GetInt(config.LogMaxDaysKey)
+	maxBackups := viper.GetInt(config.LogMaxBackupsKey)
 
 	fileNameAbs := fileName
 	isAbs := filepath.IsAbs(fileName)
 	if !isAbs {
 		fileNameAbs, err = filepath.Abs(fileName)
 		if err != nil {
-			return errors.New(fmt.Sprintf("get absolute path of log file failed. log file: %s\n%s", fileName, err.Error()))
+			return errors.New(fmt.Sprintf(config.ErrAbsoluteLogFilePath, fileName, err.Error()))
 		}
 	}
 	_, _, err = log.InitLogger(fileNameAbs, level, format, maxSize, maxDays, maxBackups)
 	if err != nil {
-		return errors.New(fmt.Sprintf("initialize logger failed.\n%s", err.Error()))
+		return errors.New(fmt.Sprintf(config.ErrInitLogger, err.Error()))
 	}
+	log.SetDisableDoubleQuotes(true)
+	log.SetDisableEscape(true)
 
 	return nil
 }
@@ -156,7 +158,7 @@ func initDefaultConfig() (err error) {
 	// get base dir
 	baseDir, err = filepath.Abs(config.DefaultBaseDir)
 	if err != nil {
-		return errors.New(fmt.Sprintf("get base dir of %s failed.\n%s", config.DefaultCommandName, err.Error()))
+		return errors.New(fmt.Sprintf(config.ErrBaseDir, config.DefaultCommandName, err.Error()))
 	}
 	// set default config value
 	config.SetDefaultConfig(baseDir)
@@ -174,7 +176,7 @@ func ReadConfigFile() (err error) {
 		viper.SetConfigFile(cfgFile)
 		err = config.ValidateConfig()
 		if err != nil {
-			return errors.New(fmt.Sprintf("validate config file configuration failed.\n%s", err.Error()))
+			return errors.New(fmt.Sprintf(config.ErrValidateConfig, err.Error()))
 		}
 	}
 
@@ -185,52 +187,48 @@ func ReadConfigFile() (err error) {
 func OverrideConfig() (err error) {
 	// override config
 	if cfgFile != constant.EmptyString && cfgFile != constant.DefaultRandomString {
-		viper.Set("config", cfgFile)
+		viper.Set(config.ConfKey, cfgFile)
 	}
 
 	// override daemon
 	if daemonStr != constant.DefaultRandomString {
-		daemon, err = cast.ToBoolE(daemonStr)
-		if err != nil {
-			return errors.New(fmt.Sprintf("override daemon failed.\n%s", fmt.Sprintf(config.ErrNotValidDaemon, daemonStr)))
-		}
-		viper.Set("daemon", daemon)
+		viper.Set(config.DaemonKey, daemonStr)
 	}
 
 	// override log
 	if logFileName != constant.DefaultRandomString {
-		viper.Set("log.fileName", logFileName)
+		viper.Set(config.LogFileNameKey, logFileName)
 	}
 	if logLevel != constant.DefaultRandomString {
 		logLevel = strings.ToLower(logLevel)
-		viper.Set("log.level", logLevel)
+		viper.Set(config.LogLevelKey, logLevel)
 	}
 	if logFormat != constant.DefaultRandomString {
 		logLevel = strings.ToLower(logFormat)
-		viper.Set("log.format", logFormat)
+		viper.Set(config.LogFormatKey, logFormat)
 	}
 	if logMaxSize != constant.DefaultRandomInt {
-		viper.Set("log.maxSize", logMaxSize)
+		viper.Set(config.LogMaxSizeKey, logMaxSize)
 	}
 	if logMaxDays != constant.DefaultRandomInt {
-		viper.Set("log.maxDays", logMaxDays)
+		viper.Set(config.LogMaxDaysKey, logMaxDays)
 	}
 	if logMaxBackups != constant.DefaultRandomInt {
-		viper.Set("log.maxBackups", logMaxBackups)
+		viper.Set(config.LogMaxBackupsKey, logMaxBackups)
 	}
 
 	// override server
 	if serverPort != constant.DefaultRandomInt {
-		viper.Set("server.port", serverPort)
+		viper.Set(config.ServerPortKey, serverPort)
 	}
 	if serverPidFile != constant.DefaultRandomString {
-		viper.Set("server.pidFile", serverPidFile)
+		viper.Set(config.ServerPidFileKey, serverPidFile)
 	}
 
 	// validate configuration
 	err = config.ValidateConfig()
 	if err != nil {
-		return errors.New(fmt.Sprintf("validate command line arguments failed.\n%s", err.Error()))
+		return errors.New(fmt.Sprintf(config.ErrValidateConfig, err.Error()))
 	}
 
 	return err

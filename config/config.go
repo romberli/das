@@ -38,21 +38,19 @@ var (
 // SetDefaultConfig set default configuration, it is the lowest priority
 func SetDefaultConfig(baseDir string) {
 	// daemon
-	viper.SetDefault("daemon", DefaultDaemon)
-	// mode
-	viper.SetDefault("mode", DefaultMode)
+	viper.SetDefault(DaemonKey, DefaultDaemon)
 	// log
 	defaultLogFile := filepath.Join(baseDir, DefaultLogDir, log.DefaultLogFileName)
-	viper.SetDefault("log.fileName", defaultLogFile)
-	viper.SetDefault("log.level", log.DefaultLogLevel)
-	viper.SetDefault("log.format", log.DefaultLogFormat)
-	viper.SetDefault("log.maxSize", log.DefaultLogMaxSize)
-	viper.SetDefault("log.maxDays", log.DefaultLogMaxDays)
-	viper.SetDefault("log.maxBackups", log.DefaultLogMaxBackups)
+	viper.SetDefault(LogFileNameKey, defaultLogFile)
+	viper.SetDefault(LogLevelKey, log.DefaultLogLevel)
+	viper.SetDefault(LogFormatKey, log.DefaultLogFormat)
+	viper.SetDefault(LogMaxSizeKey, log.DefaultLogMaxSize)
+	viper.SetDefault(LogMaxDaysKey, log.DefaultLogMaxDays)
+	viper.SetDefault(LogMaxBackupsKey, log.DefaultLogMaxBackups)
 	// server
-	viper.SetDefault("server.port", DefaultServerPort)
+	viper.SetDefault(ServerPortKey, DefaultServerPort)
 	defaultPidFile := filepath.Join(baseDir, fmt.Sprintf("%s.pid", DefaultCommandName))
-	viper.SetDefault("server.pidFile", defaultPidFile)
+	viper.SetDefault(ServerPidFileKey, defaultPidFile)
 }
 
 // ValidateConfig validates if the configuration is valid
@@ -80,7 +78,7 @@ func ValidateConfig() (err error) {
 
 // ValidateDaemon validates if daemon section is valid
 func ValidateDaemon() error {
-	_, err := cast.ToBoolE(viper.Get("daemon"))
+	_, err := cast.ToBoolE(viper.Get(DaemonKey))
 
 	return err
 }
@@ -90,12 +88,12 @@ func ValidateLog() error {
 	var valid bool
 
 	// validate log.FileName
-	logFileName, err := cast.ToStringE(viper.Get("log.fileName"))
+	logFileName, err := cast.ToStringE(viper.Get(LogFileNameKey))
 	if err != nil {
 		return err
 	}
 	logFileName = strings.TrimSpace(logFileName)
-	if logFileName == "" {
+	if logFileName == constant.EmptyString {
 		return errors.New(fmt.Sprintf(ErrEmptyLogFileName))
 	}
 	isAbs := filepath.IsAbs(logFileName)
@@ -111,7 +109,7 @@ func ValidateLog() error {
 	}
 
 	// validate log.level
-	logLevel, err := cast.ToStringE(viper.Get("log.level"))
+	logLevel, err := cast.ToStringE(viper.Get(LogLevelKey))
 	if err != nil {
 		return err
 	}
@@ -124,7 +122,7 @@ func ValidateLog() error {
 	}
 
 	// validate log.format
-	logFormat, err := cast.ToStringE(viper.Get("log.format"))
+	logFormat, err := cast.ToStringE(viper.Get(LogFormatKey))
 	if err != nil {
 		return err
 	}
@@ -137,7 +135,7 @@ func ValidateLog() error {
 	}
 
 	// validate log.maxSize
-	logMaxSize, err := cast.ToIntE(viper.Get("log.maxSize"))
+	logMaxSize, err := cast.ToIntE(viper.Get(LogMaxSizeKey))
 	if err != nil {
 		return err
 	}
@@ -146,7 +144,7 @@ func ValidateLog() error {
 	}
 
 	// validate log.maxDays
-	logMaxDays, err := cast.ToIntE(viper.Get("log.maxDays"))
+	logMaxDays, err := cast.ToIntE(viper.Get(LogMaxDaysKey))
 	if err != nil {
 		return err
 	}
@@ -155,7 +153,7 @@ func ValidateLog() error {
 	}
 
 	// validate log.maxBackups
-	logMaxBackups, err := cast.ToIntE(viper.Get("log.maxBackups"))
+	logMaxBackups, err := cast.ToIntE(viper.Get(LogMaxBackupsKey))
 	if err != nil {
 		return err
 	}
@@ -169,7 +167,7 @@ func ValidateLog() error {
 // ValidateServer validates if server section is valid
 func ValidateServer() error {
 	// validate server.port
-	serverPort, err := cast.ToIntE(viper.Get("server.port"))
+	serverPort, err := cast.ToIntE(viper.Get(ServerPortKey))
 	if err != nil {
 		return err
 	}
@@ -178,7 +176,7 @@ func ValidateServer() error {
 	}
 
 	// validate server.pidFile
-	serverPidFile, err := cast.ToStringE(viper.Get("server.pidFile"))
+	serverPidFile, err := cast.ToStringE(viper.Get(ServerPidFileKey))
 	if err != nil {
 		return err
 	}

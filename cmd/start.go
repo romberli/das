@@ -18,6 +18,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"syscall"
+	"time"
 
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/linux"
@@ -36,34 +39,39 @@ var startCmd = &cobra.Command{
 	Long:  `start the server.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
-			err       error
-			isRunning bool
-			command   string
-			pid       int
-			pidBytes  []byte
+			err           error
+			pidFileExists bool
+			isRunning     bool
 		)
 
 		// init config
 		err = initConfig()
 		if err != nil {
-			fmt.Println("init config failed.\n", err.Error())
+			fmt.Println(fmt.Sprintf(config.ErrInitConfig, err.Error()))
 		}
 
 		// check pid file
-		serverPidFile = viper.GetString("server.pidFile")
-		isRunning, err = linux.IsRunningWithPidFile(serverPidFile)
+		serverPidFile = viper.GetString(config.ServerPidFileKey)
+		pidFileExists, err = linux.PathExists(serverPidFile)
 		if err != nil {
-			log.Errorf("check if server is running failed when starting the server.\n%s", err.Error())
-			os.Exit(constant.DefaultAbnormalExitCode)
+			log.Errorf(config.ErrCheckServerPid, err.Error())
 		}
-		if isRunning {
-			log.Errorf("pid file exists or pid is still running, pid file: %s.", serverPidFile)
-			os.Exit(constant.DefaultAbnormalExitCode)
+		if pidFileExists {
+			isRunning, err = linux.IsRunningWithPidFile(serverPidFile)
+			if err != nil {
+				log.Errorf(config.ErrCheckServerRunningStatus, err.Error())
+				os.Exit(constant.DefaultAbnormalExitCode)
+			}
+			if isRunning {
+				log.Errorf(config.ErrServerIsRunning, serverPidFile)
+				os.Exit(constant.DefaultAbnormalExitCode)
+			}
 		}
 
 		// check if runs in daemon mode
-		daemon = viper.GetBool("daemon")
+		daemon = viper.GetBool(config.DaemonKey)
 		if daemon {
+			// set daemon to false
 			args = os.Args[1:]
 			for i, arg := range os.Args[1:] {
 				if config.TrimSpaceOfArg(arg) == config.DaemonArgTrue {
@@ -71,37 +79,44 @@ var startCmd = &cobra.Command{
 				}
 			}
 
-			for _, arg := range args {
-				command = fmt.Sprintf("%s %s", command, arg)
-			}
-			_, err = linux.ExecuteCommand(command)
+			// start server with new process
+			startCommand := exec.Command(os.Args[0], args...)
+			err = startCommand.Start()
 			if err != nil {
-				log.Errorf("got error when starting das as foreground.\n%s", err.Error())
-				os.Exit(constant.DefaultAbnormalExitCode)
-				// fmt.Printf("got error when starting agent as a daemon.\n%s", err.Error())
+				log.Errorf(config.ErrStartAsForeground, err.Error())
 			}
+
+			time.Sleep(time.Second)
 			os.Exit(constant.DefaultNormalExitCode)
 		} else {
-			if pid == 0 {
-				pid = os.Getpid()
+			// set sid
+			serverPid, err = syscall.Setsid()
+			if err != nil {
+				log.Errorf(config.ErrSetSid, err.Error())
 			}
 
-			err = linux.SavePid(pid, serverPidFile, constant.DefaultFileMode)
+			// get pid
+			if serverPid == constant.ZeroInt || serverPid == constant.DefaultRandomInt {
+				serverPid = os.Getpid()
+			}
+
+			// save pid
+			err = linux.SavePid(serverPid, serverPidFile, constant.DefaultFileMode)
 			if err != nil {
-				log.Errorf("got error when writing pid to file.\n%s", err.Error())
+				log.Errorf(config.ErrSavePidToFile, err.Error())
 				os.Exit(constant.DefaultAbnormalExitCode)
 			}
 
-			log.Infof("%s started successfully with pid %s, pid file: %s.",
-				config.DefaultCommandName, string(pidBytes), serverPidFile)
-
-			// handle signal
+			log.Infof(config.InfoServerStart, serverPid, serverPidFile)
+			fmt.Println(fmt.Sprintf(config.InfoServerStart, serverPid, serverPidFile))
 
 			// start server
-			serverPort = viper.GetInt("server.port")
-			serverPidFile = viper.GetString("server.pidFile")
+			serverPort = viper.GetInt(config.ServerPortKey)
+			serverPidFile = viper.GetString(config.ServerPidFileKey)
 			s := server.NewServer(serverPort, serverPidFile)
 			go s.Run()
+
+			// handle signal
 			linux.HandleSignalsWithPidFile(serverPidFile)
 		}
 	},
