@@ -107,8 +107,7 @@ var startCmd = &cobra.Command{
 				os.Exit(constant.DefaultAbnormalExitCode)
 			}
 
-			log.Infof(config.InfoServerStart, serverPid, serverPidFile)
-			fmt.Println(fmt.Sprintf(config.InfoServerStart, serverPid, serverPidFile))
+			log.CloneStdoutLogger().Infof(config.InfoServerStart, serverPid, serverPidFile)
 
 			// start server
 			serverPort = viper.GetInt(config.ServerPortKey)

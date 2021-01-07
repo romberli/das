@@ -48,12 +48,10 @@ var stopCmd = &cobra.Command{
 		if serverPid != constant.DefaultRandomInt {
 			err = linux.KillServer(serverPid)
 			if err != nil {
-				log.Errorf(config.ErrKillServerWithPid, serverPid, err.Error())
-				fmt.Println(fmt.Sprintf(config.ErrKillServerWithPid, serverPid))
+				log.CloneStdoutLogger().Errorf(config.ErrKillServerWithPid, serverPid, err.Error())
 			}
 
-			log.Infof(config.InfoServerStop, serverPid, serverPidFile)
-			fmt.Println(fmt.Sprintf(config.InfoServerStop, serverPid, serverPidFile))
+			log.CloneStdoutLogger().Infof(config.InfoServerStop, serverPid, serverPidFile)
 
 			return
 		}
@@ -62,20 +60,17 @@ var stopCmd = &cobra.Command{
 		serverPidFile = viper.GetString(config.ServerPidFileKey)
 		serverPid, err = linux.GetPidFromPidFile(serverPidFile)
 		if err != nil {
-			log.Errorf(config.ErrGetPidFromPidFile, serverPidFile, err.Error())
-			fmt.Println(fmt.Sprintf(config.ErrGetPidFromPidFile, serverPidFile, err.Error()))
+			log.CloneStdoutLogger().Errorf(config.ErrGetPidFromPidFile, serverPidFile, err.Error())
 			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 
 		// kill server with pid and pid file
 		err = linux.KillServer(serverPid, serverPidFile)
 		if err != nil {
-			log.Errorf(config.ErrKillServerWithPidFile, serverPid, serverPidFile, err.Error())
-			fmt.Println(fmt.Sprintf(config.ErrKillServerWithPidFile, serverPidFile, serverPid))
+			log.CloneStdoutLogger().Errorf(config.ErrKillServerWithPidFile, serverPid, serverPidFile, err.Error())
 		}
 
-		log.Infof(config.InfoServerStop, serverPid, serverPidFile)
-		fmt.Println(fmt.Sprintf(config.InfoServerStop, serverPid, serverPidFile))
+		log.CloneStdoutLogger().Infof(config.InfoServerStop, serverPid, serverPidFile)
 	},
 }
 
