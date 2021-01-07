@@ -1,0 +1,56 @@
+# configuration file path, if it's specified as relative path,
+# then directory of binary file will be the base directory of configuration file,
+# it is recommended to specify absolute path.
+config: das.yaml
+
+# specify whether das runs as daemon mode, if true, das will run as a daemon process.
+# type: bool
+# default: false
+daemon: false
+
+# log configuration
+log:
+  # log file path, if it's specified as relative path,
+  # then directory of binary file will be the base directory of log file,
+  # it is recommended to specify absolute path.
+  # type: string
+  # default: log/run.log
+  file: log/run.log
+  # log level
+  # type: string
+  # available: [debug, info, warn, error, fatal]
+  # default: info
+  level: info
+  # log format
+  # type: string
+  # available: [text, json]
+  # default: text
+  format: text
+  # log file max size, unit is MB
+  # type: int
+  # default: 100
+  max-size: 100 # MB
+  # specify how many days the log file will be kept after rotating,
+  # older than max-days files will be removed automatically.
+  # type: int
+  # default: 7
+  max-days: 7
+  # specify how many files will be kept after rotating,
+  # oldest log files will be removed automatically.
+  # type: int
+  # default: 5
+  max-backups: 5
+
+# server configuration
+server:
+  # specify the running port
+  # type: int
+  # available: 1 - 65535
+  # default: 6090
+  port: 6090
+  # pid file path, if it's specified as relative path,
+  # then directory of binary file will be the base directory of log file,
+  # it is recommended to specify absolute path.
+  # type: string
+  # default: das.pid
+  pid-file: das.pid
