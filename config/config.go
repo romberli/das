@@ -16,13 +16,13 @@ limitations under the License.
 package config
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/hashicorp/go-multierror"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/log"
@@ -55,25 +55,27 @@ func SetDefaultConfig(baseDir string) {
 
 // ValidateConfig validates if the configuration is valid
 func ValidateConfig() (err error) {
+	merr := &multierror.Error{}
+
 	// validate daemon section
 	err = ValidateDaemon()
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 
 	// validate log section
 	err = ValidateLog()
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 
 	// validate server section
 	err = ValidateServer()
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 
-	return nil
+	return merr.ErrorOrNil()
 }
 
 // ValidateDaemon validates if daemon section is valid
@@ -87,112 +89,116 @@ func ValidateDaemon() error {
 func ValidateLog() error {
 	var valid bool
 
+	merr := &multierror.Error{}
+
 	// validate log.FileName
 	logFileName, err := cast.ToStringE(viper.Get(LogFileNameKey))
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	logFileName = strings.TrimSpace(logFileName)
 	if logFileName == constant.EmptyString {
-		return errors.New(fmt.Sprintf(ErrEmptyLogFileName))
+		merr = multierror.Append(merr, Messages[ErrEmptyLogFileName])
 	}
 	isAbs := filepath.IsAbs(logFileName)
 	if !isAbs {
 		logFileName, err = filepath.Abs(logFileName)
 		if err != nil {
-			return err
+			merr = multierror.Append(merr, err)
 		}
 	}
 	valid, _ = govalidator.IsFilePath(logFileName)
 	if !valid {
-		return errors.New(fmt.Sprintf(ErrNotValidLogFileName, logFileName))
+		merr = multierror.Append(merr, Messages[ErrNotValidLogFileName].Renew(logFileName))
 	}
 
 	// validate log.level
 	logLevel, err := cast.ToStringE(viper.Get(LogLevelKey))
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	valid, err = common.ElementInSlice(logLevel, ValidLogLevels)
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	if !valid {
-		return errors.New(fmt.Sprintf(ErrNotValidLogLevel, logLevel))
+		merr = multierror.Append(merr, Messages[ErrNotValidLogLevel].Renew(logLevel))
 	}
 
 	// validate log.format
 	logFormat, err := cast.ToStringE(viper.Get(LogFormatKey))
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	valid, err = common.ElementInSlice(logFormat, ValidLogFormat)
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	if !valid {
-		return errors.New(fmt.Sprintf(ErrNotValidLogFormat, logFormat))
+		merr = multierror.Append(merr, Messages[ErrNotValidLogFormat].Renew(logFormat))
 	}
 
 	// validate log.maxSize
 	logMaxSize, err := cast.ToIntE(viper.Get(LogMaxSizeKey))
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	if logMaxSize < MinLogMaxSize || logMaxSize > MaxLogMaxSize {
-		return errors.New(fmt.Sprintf(ErrNotValidLogMaxSize, MinLogMaxSize, MaxLogMaxSize, logMaxSize))
+		merr = multierror.Append(merr, Messages[ErrNotValidLogMaxSize].Renew(MinLogMaxSize, MaxLogMaxSize, logMaxSize))
 	}
 
 	// validate log.maxDays
 	logMaxDays, err := cast.ToIntE(viper.Get(LogMaxDaysKey))
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	if logMaxDays < MinLogMaxDays || logMaxDays > MaxLogMaxDays {
-		return errors.New(fmt.Sprintf(ErrNotValidLogMaxDays, MinLogMaxDays, MaxLogMaxDays, logMaxDays))
+		merr = multierror.Append(merr, Messages[ErrNotValidLogMaxDays].Renew(MinLogMaxDays, MaxLogMaxDays, logMaxDays))
 	}
 
 	// validate log.maxBackups
 	logMaxBackups, err := cast.ToIntE(viper.Get(LogMaxBackupsKey))
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	if logMaxBackups < MinLogMaxDays || logMaxBackups > MaxLogMaxDays {
-		return errors.New(fmt.Sprintf(ErrNotValidLogMaxBackups, MinLogMaxBackups, MaxLogMaxBackups, logMaxDays))
+		merr = multierror.Append(merr, Messages[ErrNotValidLogMaxBackups].Renew(MinLogMaxBackups, MaxLogMaxBackups, logMaxBackups))
 	}
 
-	return nil
+	return merr.ErrorOrNil()
 }
 
 // ValidateServer validates if server section is valid
 func ValidateServer() error {
+	merr := &multierror.Error{}
+
 	// validate server.port
 	serverPort, err := cast.ToIntE(viper.Get(ServerPortKey))
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	if !govalidator.IsPort(strconv.Itoa(serverPort)) {
-		return errors.New(fmt.Sprintf(ErrNotValidServerPort, constant.MinPort, constant.MaxPort, serverPort))
+		merr = multierror.Append(merr, Messages[ErrNotValidServerPort].Renew(constant.MinPort, constant.MaxPort, serverPort))
 	}
 
 	// validate server.pidFile
 	serverPidFile, err := cast.ToStringE(viper.Get(ServerPidFileKey))
 	if err != nil {
-		return err
+		merr = multierror.Append(merr, err)
 	}
 	isAbs := filepath.IsAbs(serverPidFile)
 	if !isAbs {
 		serverPidFile, err = filepath.Abs(serverPidFile)
 		if err != nil {
-			return err
+			merr = multierror.Append(merr, err)
 		}
 	}
 	ok, _ := govalidator.IsFilePath(serverPidFile)
 	if !ok {
-		return errors.New(fmt.Sprintf(ErrNotValidPidFile, serverPidFile))
+		merr = multierror.Append(merr, Messages[ErrNotValidPidFile].Renew(serverPidFile))
 	}
 
-	return nil
+	return merr.ErrorOrNil()
 }
 
 // TrimSpaceOfArg trims spaces of given argument

@@ -53,7 +53,7 @@ func (s *Server) Run() {
 func (s *Server) Stop() {
 	err := linux.RemovePidFile(s.PidFile)
 	if err != nil {
-		log.Errorf(config.ErrRemovePidFile, err.Error())
+		log.Error(fmt.Sprintf("%s\n%s", config.Messages[config.ErrRemovePidFile].Error(), err.Error()))
 	}
 
 	os.Exit(constant.DefaultNormalExitCode)

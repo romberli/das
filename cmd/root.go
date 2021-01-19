@@ -16,12 +16,12 @@ limitations under the License.
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/log"
 	"github.com/spf13/cobra"
@@ -56,7 +56,7 @@ var rootCmd = &cobra.Command{
 		if len(args) == 0 {
 			err := cmd.Help()
 			if err != nil {
-				fmt.Println(fmt.Sprintf(config.ErrPrintHelpInfo, err.Error()))
+				fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrPrintHelpInfo].Error(), err.Error()))
 			}
 			return
 		}
@@ -64,7 +64,7 @@ var rootCmd = &cobra.Command{
 		// init config
 		err := initConfig()
 		if err != nil {
-			fmt.Println(fmt.Sprintf(config.ErrInitConfig, err.Error()))
+			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrInitConfig].Error(), err.Error()))
 		}
 	},
 }
@@ -112,19 +112,19 @@ func initConfig() error {
 	// init default config
 	err = initDefaultConfig()
 	if err != nil {
-		return errors.New(fmt.Sprintf(config.ErrInitDefaultConfig, err.Error()))
+		return multierror.Append(config.Messages[config.ErrInitDefaultConfig], err)
 	}
 
 	// read config with config file
 	err = ReadConfigFile()
 	if err != nil {
-		return errors.New(fmt.Sprintf(config.ErrReadConfigFile, err.Error()))
+		return multierror.Append(config.Messages[config.ErrReadConfigFile], err)
 	}
 
 	// override config with command line arguments
 	err = OverrideConfig()
 	if err != nil {
-		return errors.New(fmt.Sprintf(config.ErrOverrideCommandLineArgs, err.Error()))
+		return multierror.Append(config.Messages[config.ErrOverrideCommandLineArgs], err)
 	}
 
 	// init log
@@ -140,13 +140,14 @@ func initConfig() error {
 	if !isAbs {
 		fileNameAbs, err = filepath.Abs(fileName)
 		if err != nil {
-			return errors.New(fmt.Sprintf(config.ErrAbsoluteLogFilePath, fileName, err.Error()))
+			return multierror.Append(config.Messages[config.ErrAbsoluteLogFilePath], err)
 		}
 	}
 	_, _, err = log.InitLogger(fileNameAbs, level, format, maxSize, maxDays, maxBackups)
 	if err != nil {
-		return errors.New(fmt.Sprintf(config.ErrInitLogger, err.Error()))
+		return multierror.Append(config.Messages[config.ErrInitLogger], err)
 	}
+
 	log.SetDisableDoubleQuotes(true)
 	log.SetDisableEscape(true)
 
@@ -158,7 +159,7 @@ func initDefaultConfig() (err error) {
 	// get base dir
 	baseDir, err = filepath.Abs(config.DefaultBaseDir)
 	if err != nil {
-		return errors.New(fmt.Sprintf(config.ErrBaseDir, config.DefaultCommandName, err.Error()))
+		return multierror.Append(config.Messages[config.ErrBaseDir].Renew(config.DefaultCommandName), err)
 	}
 	// set default config value
 	config.SetDefaultConfig(baseDir)
@@ -176,7 +177,7 @@ func ReadConfigFile() (err error) {
 		viper.SetConfigFile(cfgFile)
 		err = config.ValidateConfig()
 		if err != nil {
-			return errors.New(fmt.Sprintf(config.ErrValidateConfig, err.Error()))
+			return multierror.Append(config.Messages[config.ErrValidateConfig], err)
 		}
 	}
 
@@ -228,7 +229,7 @@ func OverrideConfig() (err error) {
 	// validate configuration
 	err = config.ValidateConfig()
 	if err != nil {
-		return errors.New(fmt.Sprintf(config.ErrValidateConfig, err.Error()))
+		return multierror.Append(config.Messages[config.ErrValidateConfig], err)
 	}
 
 	return err

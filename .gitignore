@@ -5,6 +5,7 @@
 *.so
 *.dylib
 ./bin/*
+*.pid
 
 # Test binary, build with `go test -c`
 *.test
@@ -14,5 +15,6 @@
 .idea/
 */.idea/
 .DS_Store
+log/
 */*.log
 *.log

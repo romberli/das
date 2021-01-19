@@ -41,20 +41,20 @@ var statusCmd = &cobra.Command{
 		// init config
 		err = initConfig()
 		if err != nil {
-			fmt.Println(fmt.Sprintf(config.ErrInitConfig, err.Error()))
+			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrInitConfig].Error(), err.Error()))
 		}
 
 		// check if given pid is running
 		if serverPid != constant.DefaultRandomInt {
 			isRunning, err = linux.IsRunningWithPid(serverPid)
 			if err != nil {
-				fmt.Println(fmt.Sprintf(config.ErrCheckServerRunningStatus, err.Error()))
+				fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrCheckServerRunningStatus].Error(), err.Error()))
 				return
 			}
 			if isRunning {
-				fmt.Println(fmt.Sprintf(config.InfoServerIsRunning, serverPid))
+				fmt.Println(config.Messages[config.InfoServerIsRunning].Renew(serverPid).Error())
 			} else {
-				fmt.Println(fmt.Sprintf(config.InfoServerNotRunning, serverPid))
+				fmt.Println(config.Messages[config.InfoServerNotRunning].Renew(serverPid).Error())
 			}
 
 			return
@@ -64,18 +64,18 @@ var statusCmd = &cobra.Command{
 		serverPidFile = viper.GetString(config.ServerPidFileKey)
 		serverPid, err = linux.GetPidFromPidFile(serverPidFile)
 		if err != nil {
-			fmt.Println(fmt.Sprintf(config.ErrGetPidFromPidFile, serverPidFile, err.Error()))
+			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrGetPidFromPidFile].Renew(serverPidFile).Error(), err.Error()))
 			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 		isRunning, err = linux.IsRunningWithPid(serverPid)
 		if err != nil {
-			fmt.Println(fmt.Sprintf(config.ErrCheckServerRunningStatus, err.Error()))
+			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrCheckServerRunningStatus].Error(), err.Error()))
 			return
 		}
 		if isRunning {
-			fmt.Println(fmt.Sprintf(config.InfoServerIsRunning, serverPid))
+			fmt.Println(config.Messages[config.InfoServerIsRunning].Renew(serverPid).Error())
 		} else {
-			fmt.Println(fmt.Sprintf(config.InfoServerNotRunning, serverPid))
+			fmt.Println(config.Messages[config.InfoServerNotRunning].Renew(serverPid).Error())
 		}
 	},
 }

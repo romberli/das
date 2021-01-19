@@ -21,22 +21,20 @@ import (
 
 // global constant
 const (
-	DefaultCommandName    = "das"
-	DefaultDaemon         = false
-	DefaultMode           = "agent"
-	DefaultConfigFileName = "das.yaml"
-	DefaultBaseDir        = constant.CurrentDir
-	DefaultConfigDir      = "./config"
-	DefaultLogDir         = "./log"
-	MinLogMaxSize         = 1
-	MaxLogMaxSize         = constant.MaxInt
-	MinLogMaxDays         = 1
-	MaxLogMaxDays         = constant.MaxInt
-	MinLogMaxBackups      = 1
-	MaxLogMaxBackups      = constant.MaxInt
-	DefaultServerPort     = 6090
-	DaemonArgTrue         = "--daemon=true"
-	DaemonArgFalse        = "--daemon=false"
+	DefaultCommandName = "das"
+	DefaultErrorHeader = "DAS"
+	DefaultDaemon      = false
+	DefaultBaseDir     = constant.CurrentDir
+	DefaultLogDir      = "./log"
+	MinLogMaxSize      = 1
+	MaxLogMaxSize      = constant.MaxInt
+	MinLogMaxDays      = 1
+	MaxLogMaxDays      = constant.MaxInt
+	MinLogMaxBackups   = 1
+	MaxLogMaxBackups   = constant.MaxInt
+	DefaultServerPort  = 6090
+	DaemonArgTrue      = "--daemon=true"
+	DaemonArgFalse     = "--daemon=false"
 )
 
 // configuration constant

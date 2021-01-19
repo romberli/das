@@ -41,17 +41,19 @@ var stopCmd = &cobra.Command{
 		// init config
 		err = initConfig()
 		if err != nil {
-			fmt.Println(fmt.Sprintf(config.ErrInitConfig, err.Error()))
+			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrInitConfig].Error(), err.Error()))
 		}
 
 		// kill server with given pid
 		if serverPid != constant.DefaultRandomInt {
 			err = linux.KillServer(serverPid)
 			if err != nil {
-				log.CloneStdoutLogger().Errorf(config.ErrKillServerWithPid, serverPid, err.Error())
+				log.CloneStdoutLogger().Errorf(fmt.Sprintf("%s\n%s",
+					config.Messages[config.ErrKillServerWithPid].Renew(serverPid).Error(), err.Error()))
+				os.Exit(constant.DefaultAbnormalExitCode)
 			}
 
-			log.CloneStdoutLogger().Infof(config.InfoServerStop, serverPid, serverPidFile)
+			log.CloneStdoutLogger().Error(config.Messages[config.InfoServerStop].Renew(serverPid).Error())
 
 			return
 		}
@@ -60,17 +62,19 @@ var stopCmd = &cobra.Command{
 		serverPidFile = viper.GetString(config.ServerPidFileKey)
 		serverPid, err = linux.GetPidFromPidFile(serverPidFile)
 		if err != nil {
-			log.CloneStdoutLogger().Errorf(config.ErrGetPidFromPidFile, serverPidFile, err.Error())
+			log.CloneStdoutLogger().Error(fmt.Sprintf("%s\n%s",
+				config.Messages[config.ErrGetPidFromPidFile].Renew(serverPidFile).Error(), err.Error()))
 			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 
 		// kill server with pid and pid file
 		err = linux.KillServer(serverPid, serverPidFile)
 		if err != nil {
-			log.CloneStdoutLogger().Errorf(config.ErrKillServerWithPidFile, serverPid, serverPidFile, err.Error())
+			log.CloneStdoutLogger().Error(fmt.Sprintf("%s\n%s",
+				config.Messages[config.ErrKillServerWithPidFile].Renew(serverPid, serverPidFile).Error(), err.Error()))
 		}
 
-		log.CloneStdoutLogger().Infof(config.InfoServerStop, serverPid, serverPidFile)
+		log.CloneStdoutLogger().Info(config.Messages[config.InfoServerStop].Renew(serverPid, serverPidFile).Error())
 	},
 }
 
