@@ -21,32 +21,61 @@ import (
 
 // global constant
 const (
-	DefaultCommandName = "das"
-	DefaultErrorHeader = "DAS"
-	DefaultDaemon      = false
-	DefaultBaseDir     = constant.CurrentDir
-	DefaultLogDir      = "./log"
-	MinLogMaxSize      = 1
-	MaxLogMaxSize      = constant.MaxInt
-	MinLogMaxDays      = 1
-	MaxLogMaxDays      = constant.MaxInt
-	MinLogMaxBackups   = 1
-	MaxLogMaxBackups   = constant.MaxInt
-	DefaultServerPort  = 6090
-	DaemonArgTrue      = "--daemon=true"
-	DaemonArgFalse     = "--daemon=false"
+	DefaultCommandName          = "das"
+	DefaultDaemon               = false
+	DefaultBaseDir              = constant.CurrentDir
+	DefaultLogDir               = "./log"
+	MinLogMaxSize               = 1
+	MaxLogMaxSize               = constant.MaxInt
+	MinLogMaxDays               = 1
+	MaxLogMaxDays               = constant.MaxInt
+	MinLogMaxBackups            = 1
+	MaxLogMaxBackups            = constant.MaxInt
+	DefaultServerAddr           = "0.0.0.0:6090"
+	DefaultServerReadTimeout    = 5
+	DefaultServerWriteTimeout   = 10
+	MinServerReadTimeout        = 0
+	MaxServerReadTimeout        = 60
+	MinServerWriteTimeout       = 1
+	MaxServerWriteTimeout       = 60
+	DaemonArgTrue               = "--daemon=true"
+	DaemonArgFalse              = "--daemon=false"
+	DefaultDBName               = DefaultCommandName
+	DefaultDBUser               = "root"
+	DefaultDBPass               = "root"
+	MinDBPoolMaxConnections     = 1
+	MaxDBPoolMaxConnections     = constant.MaxInt
+	MinDBPoolInitConnections    = 1
+	MaxDBPoolInitConnections    = constant.MaxInt
+	MinDBPoolMaxIdleConnections = 1
+	MaxDBPoolMaxIdleConnections = constant.MaxInt
+	MinDBPoolMaxIdleTime        = 1
+	MaxDBPoolMaxIdleTime        = constant.MaxInt
+	MinDBPoolKeepAliveInterval  = 1
+	MaxDBPoolKeepAliveInterval  = constant.MaxInt
 )
 
 // configuration constant
 const (
-	ConfKey          = "config"
-	DaemonKey        = "daemon"
-	LogFileNameKey   = "log.fileName"
-	LogLevelKey      = "log.level"
-	LogFormatKey     = "log.format"
-	LogMaxSizeKey    = "log.maxSize"
-	LogMaxDaysKey    = "log.maxDays"
-	LogMaxBackupsKey = "log.maxBackups"
-	ServerPortKey    = "server.port"
-	ServerPidFileKey = "server.pidFile"
+	ConfKey                     = "config"
+	DaemonKey                   = "daemon"
+	LogFileKey                  = "log.file"
+	LogLevelKey                 = "log.level"
+	LogFormatKey                = "log.format"
+	LogMaxSizeKey               = "log.maxSize"
+	LogMaxDaysKey               = "log.maxDays"
+	LogMaxBackupsKey            = "log.maxBackups"
+	ServerAddrKey               = "server.addr"
+	ServerPidFileKey            = "server.pidFile"
+	ServerReadTimeoutKey        = "server.readTimeout"
+	ServerWriteTimeoutKey       = "server.writeTimeout"
+	DBMySQLAddrKey              = "db.mysql.addr"
+	DBMySQLNameKey              = "db.mysql.name"
+	DBMySQLUserKey              = "db.mysql.user"
+	DBMySQLPassKey              = "db.mysql.pass"
+	DBPoolMaxConnectionsKey     = "db.pool.maxConnections"
+	DBPoolInitConnectionsKey    = "db.pool.initConnections"
+	DBPoolMaxIdleConnectionsKey = "db.pool.maxIdleConnections"
+	DBPoolMaxIdleTimeKey        = "db.pool.maxIdleTime"
+	DBPoolKeepAliveIntervalKey  = "db.pool.keepAliveInterval"
 )

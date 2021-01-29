@@ -17,7 +17,7 @@ CREATE TABLE `t_meta_db_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `db_name` varchar(100) NOT NULL COMMENT '数据库名称',
   `cluster_id` int(11) DEFAULT NULL COMMENT '数据库集群ID',
-  `cluster_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '集群类型: 1-mysql, 2-middleware',
+  `cluster_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '集群类型: 1-entity, 2-middleware',
   `owner_id` int(11) NOT NULL COMMENT '数据库主要负责人ID',
   `owner_group` varchar(100) DEFAULT NULL COMMENT '其他数据库负责人ID, 以逗号分隔',
   `env_id` tinyint(4) NOT NULL COMMENT '环境: 1-online, 2-rel, 3-sit, 4-uat, 5-dev',
@@ -32,8 +32,8 @@ CREATE TABLE `t_meta_env_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `env_name` varchar(100) NOT NULL COMMENT '环境名称',
   `del_flag` tinyint(4) DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
-  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
-  `last_updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
+  `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx01_env_name` (`env_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='环境信息表';

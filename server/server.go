@@ -17,43 +17,100 @@ package server
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/linux"
 	"github.com/romberli/log"
 
-	"github.com/romberli/das/config"
+	"github.com/romberli/das/pkg/message"
+	"github.com/romberli/das/router"
 )
 
-type Server struct {
-	Port    int
-	PidFile string
+type Server interface {
+	// Addr returns listen address
+	Addr() string
+	// PidFile returns pid file path
+	PidFile() string
+	// Router returns router
+	Router() router.Router
+	// Register registers router path
+	Register()
+	// Run runs server
+	Run()
+	// Stop stops server
+	Stop()
 }
 
-func NewServer(port int, pidFile string) *Server {
-	return &Server{
-		port,
-		pidFile,
+var _ Server = (*server)(nil)
+
+type server struct {
+	*http.Server
+	addr    string
+	pidFile string
+	router  router.Router
+}
+
+// NewServer returns new *server
+func NewServer(addr string, pidFile string, readTimeout, writeTimeout int, router router.Router) *server {
+	return &server{
+		Server: &http.Server{
+			Addr:         addr,
+			Handler:      router,
+			ReadTimeout:  time.Duration(readTimeout) * time.Second,
+			WriteTimeout: time.Duration(writeTimeout) * time.Second,
+		},
+		addr:    addr,
+		pidFile: pidFile,
+		router:  router,
 	}
 }
 
-func (s *Server) Run() {
-	fmt.Println(fmt.Sprintf("server started. port: %d, pid file: %s", s.Port, s.PidFile))
+// NewServerWithDefaultRouter returns new *server with default gin router
+func NewServerWithDefaultRouter(addr string, pidFile string, readTimeout, writeTimeout int) *server {
+	r := router.NewGinRouter(gin.Default())
 
-	for i := 0; i < 30; i++ {
-		log.Infof("%d time", i)
-		time.Sleep(1 * time.Second)
-	}
-
-	s.Stop()
+	return NewServer(addr, pidFile, readTimeout, writeTimeout, r)
 }
 
-func (s *Server) Stop() {
-	err := linux.RemovePidFile(s.PidFile)
+// Addr returns listen address
+func (s *server) Addr() string {
+	return s.addr
+}
+
+// PidFile returns pid file path
+func (s *server) PidFile() string {
+	return s.pidFile
+}
+
+// Router returns router
+func (s *server) Router() router.Router {
+	return s.router
+}
+
+// Register registers router path
+func (s *server) Register() {
+	s.router.Register()
+}
+
+// Run runs server
+func (s *server) Run() {
+	fmt.Println(fmt.Sprintf("server started. addr: %s, pid file: %s", s.addr, s.pidFile))
+
+	err := s.router.Run(s.addr)
 	if err != nil {
-		log.Error(fmt.Sprintf("%s\n%s", config.Messages[config.ErrRemovePidFile].Error(), err.Error()))
+		log.Errorf("server run failed.\n%s", err.Error())
+	}
+}
+
+// Stop stops server
+func (s *server) Stop() {
+	err := linux.RemovePidFile(s.pidFile)
+	if err != nil {
+		log.Error(fmt.Sprintf("%s\n%s", message.Messages[message.ErrRemovePidFile].Error(), err.Error()))
 	}
 
 	os.Exit(constant.DefaultNormalExitCode)

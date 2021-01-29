@@ -26,6 +26,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/romberli/das/config"
+	"github.com/romberli/das/pkg/message"
 )
 
 // stopCmd represents the stop command
@@ -41,7 +42,8 @@ var stopCmd = &cobra.Command{
 		// init config
 		err = initConfig()
 		if err != nil {
-			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrInitConfig].Error(), err.Error()))
+			fmt.Println(fmt.Sprintf("%s\n%s", message.NewMessage(message.ErrInitConfig).Error(), err.Error()))
+			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 
 		// kill server with given pid
@@ -49,32 +51,33 @@ var stopCmd = &cobra.Command{
 			err = linux.KillServer(serverPid)
 			if err != nil {
 				log.CloneStdoutLogger().Errorf(fmt.Sprintf("%s\n%s",
-					config.Messages[config.ErrKillServerWithPid].Renew(serverPid).Error(), err.Error()))
+					message.NewMessage(message.ErrKillServerWithPid, serverPid).Error(), err.Error()))
 				os.Exit(constant.DefaultAbnormalExitCode)
 			}
 
-			log.CloneStdoutLogger().Error(config.Messages[config.InfoServerStop].Renew(serverPid).Error())
-
-			return
+			log.CloneStdoutLogger().Info(message.NewMessage(message.InfoServerStop, serverPid).Error())
+			os.Exit(constant.DefaultNormalExitCode)
 		}
 
 		// get pid from pid file
 		serverPidFile = viper.GetString(config.ServerPidFileKey)
 		serverPid, err = linux.GetPidFromPidFile(serverPidFile)
 		if err != nil {
-			log.CloneStdoutLogger().Error(fmt.Sprintf("%s\n%s",
-				config.Messages[config.ErrGetPidFromPidFile].Renew(serverPidFile).Error(), err.Error()))
+			log.CloneStdoutLogger().Errorf(fmt.Sprintf("%s\n%s",
+				message.NewMessage(message.ErrGetPidFromPidFile, serverPidFile).Error(), err.Error()))
 			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 
 		// kill server with pid and pid file
 		err = linux.KillServer(serverPid, serverPidFile)
 		if err != nil {
-			log.CloneStdoutLogger().Error(fmt.Sprintf("%s\n%s",
-				config.Messages[config.ErrKillServerWithPidFile].Renew(serverPid, serverPidFile).Error(), err.Error()))
+			log.CloneStdoutLogger().Errorf(fmt.Sprintf("%s\n%s",
+				message.NewMessage(message.ErrKillServerWithPidFile, serverPid, serverPidFile).Error(), err.Error()))
+			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 
-		log.CloneStdoutLogger().Info(config.Messages[config.InfoServerStop].Renew(serverPid, serverPidFile).Error())
+		log.CloneStdoutLogger().Info(message.NewMessage(message.InfoServerStop, serverPid, serverPidFile).Error())
+		os.Exit(constant.DefaultNormalExitCode)
 	},
 }
 

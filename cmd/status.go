@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/romberli/das/config"
+	"github.com/romberli/das/pkg/message"
 )
 
 // statusCmd represents the status command
@@ -41,42 +42,45 @@ var statusCmd = &cobra.Command{
 		// init config
 		err = initConfig()
 		if err != nil {
-			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrInitConfig].Error(), err.Error()))
+			fmt.Println(fmt.Sprintf("%s\n%s", message.NewMessage(message.ErrInitConfig).Error(), err.Error()))
+			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 
 		// check if given pid is running
 		if serverPid != constant.DefaultRandomInt {
 			isRunning, err = linux.IsRunningWithPid(serverPid)
 			if err != nil {
-				fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrCheckServerRunningStatus].Error(), err.Error()))
-				return
+				fmt.Println(fmt.Sprintf("%s\n%s", message.NewMessage(message.ErrCheckServerRunningStatus).Error(), err.Error()))
+				os.Exit(constant.DefaultAbnormalExitCode)
 			}
 			if isRunning {
-				fmt.Println(config.Messages[config.InfoServerIsRunning].Renew(serverPid).Error())
+				fmt.Println(message.NewMessage(message.InfoServerIsRunning, serverPid).Error())
 			} else {
-				fmt.Println(config.Messages[config.InfoServerNotRunning].Renew(serverPid).Error())
+				fmt.Println(message.NewMessage(message.InfoServerNotRunning, serverPid).Error())
 			}
 
-			return
+			os.Exit(constant.DefaultNormalExitCode)
 		}
 
 		// get pid
 		serverPidFile = viper.GetString(config.ServerPidFileKey)
 		serverPid, err = linux.GetPidFromPidFile(serverPidFile)
 		if err != nil {
-			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrGetPidFromPidFile].Renew(serverPidFile).Error(), err.Error()))
+			fmt.Println(fmt.Sprintf("%s\n%s", message.NewMessage(message.ErrGetPidFromPidFile, serverPidFile).Error(), err.Error()))
 			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 		isRunning, err = linux.IsRunningWithPid(serverPid)
 		if err != nil {
-			fmt.Println(fmt.Sprintf("%s\n%s", config.Messages[config.ErrCheckServerRunningStatus].Error(), err.Error()))
-			return
+			fmt.Println(fmt.Sprintf("%s\n%s", message.NewMessage(message.ErrCheckServerRunningStatus).Error(), err.Error()))
+			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 		if isRunning {
-			fmt.Println(config.Messages[config.InfoServerIsRunning].Renew(serverPid).Error())
+			fmt.Println(message.NewMessage(message.InfoServerIsRunning, serverPid).Error())
 		} else {
-			fmt.Println(config.Messages[config.InfoServerNotRunning].Renew(serverPid).Error())
+			fmt.Println(message.NewMessage(message.InfoServerNotRunning, serverPid).Error())
 		}
+
+		os.Exit(constant.DefaultNormalExitCode)
 	},
 }
 

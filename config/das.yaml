@@ -20,7 +20,7 @@ log:
   file: log/run.log
   # description: log level
   # type: string
-  # available: [debug, info, warn, error, fatal]
+  # available: [debug, info, warn, message, fatal]
   # default: info
   level: info
   # description: log format
@@ -28,31 +28,89 @@ log:
   # available: [text, json]
   # default: text
   format: text
-  # description: log file max size, unit is MB
+  # description: log file max size
+  # unit: MB
   # type: int
   # default: 100
-  max-size: 100 # MB
+  maxSize: 100
   # description: specify how many days the log file will be kept after rotating,
   # older than max-days files will be removed automatically.
   # type: int
   # default: 7
-  max-days: 7
+  maxDays: 7
   # description: specify how many files will be kept after rotating,
   # oldest log files will be removed automatically.
   # type: int
   # default: 5
-  max-backups: 5
+  maxBackups: 5
 
 # server configuration
 server:
-  # description: specify the running port
-  # type: int
-  # available: 1 - 65535
-  # default: 6090
-  port: 6090
+  # description: specify the server listening address, format: host:port
+  # type: string
+  # default: 0.0.0.0:6090
+  addr: "0.0.0.0:6090"
   # description: pid file path, if it's specified as relative path,
   # then directory of binary file will be the base directory of log file,
   # it is recommended to specify absolute path.
   # type: string
   # default: das.pid
-  pid-file: das.pid
+  pidFile: das.pid
+  # description: specify the read timeout of http request, 0 means no timeout
+  # unit: second
+  # type: int
+  # available: 0 - 60
+  # default: 5
+  readTimeout: 5
+  # description: specify the write timeout of http resp, 0 means no timeout
+  # unit: second
+  # type: int
+  # available: 0 - 60
+  # default: 10
+  writeTimeout: 10
+
+# database configuration
+db:
+  # mysql configuration
+  mysql:
+    # description: database address, format: host:port
+    # type: string
+    # default: 127.0.0.1:3306
+    addr: "127.0.0.1:3306"
+    # description: database name
+    # type: string
+    # default: das
+    name: das
+    # description: database user name
+    # type: string
+    # default: root
+    user: root
+    # description: database password
+    # type: string
+    # default: root
+    pass: root
+  # pool configuration
+  pool:
+    # description: connection pool could create up to this value of connections
+    # type: int
+    # default: 20
+    maxConnections: 20
+    # description: connection pool will create {init-connections} connections at the beginning,
+    # connection pool could grow up necessarily, up to db-max-connection
+    # type: int
+    # default: 5
+    initConnections: 5
+    # description: connections more than this value will be released soon to save database resource
+    # type: int
+    # default: 20
+    maxIdleConnections: 10
+    # description: connection pool will release connections more than {max-idle-connections} every this value of seconds
+    # unit: second
+    # type: int
+    # default: 1800
+    maxIdleTime: 1800
+    # description: connection pool keeps alive of connections in the pool every this value of seconds to avoid database connection timeout
+    # unit: second
+    # type: int
+    # default: 300
+    keepAliveInterval: 300
