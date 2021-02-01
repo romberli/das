@@ -20,7 +20,7 @@ log:
   file: log/run.log
   # description: log level
   # type: string
-  # available: [debug, info, warn, message, fatal]
+  # available: [debug, info, warn, error, fatal]
   # default: info
   level: info
   # description: log format
@@ -112,5 +112,5 @@ db:
     # description: connection pool keeps alive of connections in the pool every this value of seconds to avoid database connection timeout
     # unit: second
     # type: int
-    # default: 300
+    # das.yaml: 300
     keepAliveInterval: 300
