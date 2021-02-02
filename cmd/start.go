@@ -93,12 +93,8 @@ var startCmd = &cobra.Command{
 			time.Sleep(time.Second)
 			os.Exit(constant.DefaultNormalExitCode)
 		} else {
-			serverPid = os.Getpid()
-
 			// get pid
-			if serverPid == constant.ZeroInt || serverPid == constant.DefaultRandomInt {
-				serverPid = os.Getpid()
-			}
+			serverPid = os.Getpid()
 
 			// save pid
 			err = linux.SavePid(serverPid, serverPidFile, constant.DefaultFileMode)
