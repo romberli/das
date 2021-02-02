@@ -225,8 +225,10 @@ func OverrideConfig() (err error) {
 	}
 
 	// override daemon
-	if daemonStr != constant.DefaultRandomString {
-		viper.Set(config.DaemonKey, daemonStr)
+	if daemonStr == constant.TrueString {
+		viper.Set(config.DaemonKey, true)
+	} else {
+		viper.Set(config.DaemonKey, false)
 	}
 
 	// override log

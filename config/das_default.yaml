@@ -6,8 +6,9 @@
 config: das.yaml
 
 # specify whether das runs as daemon mode, if true, das will run as a daemon process.
-# type: bool
-# default: false
+# never set this argument to true in config file, always use command line argument by using --daemon=true,
+# das ignore this argument setting in the configuration file, because this may cause endless loop,
+# writing here only for describing purpose.
 daemon: false
 
 # log configuration

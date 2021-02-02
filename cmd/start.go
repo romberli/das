@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"syscall"
 	"time"
 
 	"github.com/romberli/go-util/constant"
@@ -94,12 +93,7 @@ var startCmd = &cobra.Command{
 			time.Sleep(time.Second)
 			os.Exit(constant.DefaultNormalExitCode)
 		} else {
-			// set sid
-			serverPid, err = syscall.Setsid()
-			if err != nil {
-				log.Error(fmt.Sprintf("%s\n%s", message.NewMessage(message.ErrSetSid).Error(), err.Error()))
-				os.Exit(constant.DefaultAbnormalExitCode)
-			}
+			serverPid = os.Getpid()
 
 			// get pid
 			if serverPid == constant.ZeroInt || serverPid == constant.DefaultRandomInt {
