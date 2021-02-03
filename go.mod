@@ -9,7 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/jinzhu/now v1.1.1
-	github.com/romberli/go-util v0.2.19
+	github.com/romberli/go-util v0.2.21
 	github.com/romberli/log v1.0.17
 	github.com/spf13/cast v1.3.0
 	github.com/spf13/cobra v1.1.1

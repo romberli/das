@@ -45,6 +45,10 @@ func NewEnvInfoWithGlobal(id int, envName string, delFlag int, createTime time.T
 	}
 }
 
+func NewEmptyEnvInfoWithGlobal() *EnvInfo {
+	return &EnvInfo{Repository: NewEnvRepoWithGlobal()}
+}
+
 // NewEnvInfoWithDefault returns a new EnvInfo with default EnvRepo
 func NewEnvInfoWithDefault(envName string) *EnvInfo {
 	return &EnvInfo{
