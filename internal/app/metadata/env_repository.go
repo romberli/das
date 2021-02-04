@@ -47,6 +47,10 @@ func (er *EnvRepo) Execute(command string, args ...interface{}) (middleware.Resu
 	return conn.Execute(command, args...)
 }
 
+func (er *EnvRepo) Transaction() (middleware.Transaction, error) {
+	return er.Database.Transaction()
+}
+
 // GetAll returns all available entities
 func (er *EnvRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `

@@ -13,11 +13,12 @@ import (
 
 const (
 	// modify these constants
-	addr       = "192.168.137.11:3306"
-	dbName     = "das"
-	dbUser     = "root"
-	dbPass     = "root"
-	newEnvName = "newTest"
+	addr          = "192.168.137.11:3306"
+	dbName        = "das"
+	dbUser        = "root"
+	dbPass        = "root"
+	newEnvName    = "newTest"
+	onlineEnvName = "online"
 )
 
 var envRepo = initEnvRepo()
@@ -68,6 +69,40 @@ func TestEnvRepo_Execute(t *testing.T) {
 	asst.Equal(1, int(r), "test Execute() failed")
 }
 
+func TestEnvRepo_Transaction(t *testing.T) {
+	asst := assert.New(t)
+
+	sql := `insert into t_meta_env_info(env_name) values(?);`
+	tx, err := envRepo.Transaction()
+	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+	err = tx.Begin()
+	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+	_, err = tx.Execute(sql, defaultEnvInfoEnvName)
+	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+	// check if inserted
+	sql = `select env_name from t_meta_env_info where env_name=?`
+	result, err := tx.Execute(sql, defaultEnvInfoEnvName)
+	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+	envName, err := result.GetString(0, 0)
+	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+	if envName != defaultEnvInfoEnvName {
+		asst.Fail("test Transaction() failed")
+	}
+	err = tx.Rollback()
+	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+	// check if rollbacked
+	entities, err := envRepo.GetAll()
+	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+	for _, entity := range entities {
+		envName, err := entity.Get(envNameStruct)
+		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+		if envName == defaultEnvInfoEnvName {
+			asst.Fail("test Transaction() failed")
+			break
+		}
+	}
+}
+
 func TestEnvRepo_GetAll(t *testing.T) {
 	asst := assert.New(t)
 
@@ -75,7 +110,7 @@ func TestEnvRepo_GetAll(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
 	envName, err := entities[0].Get("EnvName")
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal("online", envName.(string), "test GetAll() failed")
+	asst.Equal(onlineEnvName, envName.(string), "test GetAll() failed")
 }
 
 func TestEnvRepo_GetByID(t *testing.T) {
@@ -85,7 +120,7 @@ func TestEnvRepo_GetByID(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	envName, err := entity.Get(envNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal("online", envName.(string), "test GetByID() failed")
+	asst.Equal(onlineEnvName, envName.(string), "test GetByID() failed")
 }
 
 func TestEnvRepo_Create(t *testing.T) {

@@ -7,6 +7,8 @@ import (
 type Repository interface {
 	// Execute executes given command and placeholders on the middleware
 	Execute(command string, args ...interface{}) (middleware.Result, error)
+	// Transaction returns middleware.PoolConn, so it can run multiple statements in the same transaction
+	Transaction() (middleware.Transaction, error)
 	// SelectAll returns all entities
 	GetAll() ([]Entity, error)
 	// Select returns an entity of the given id
