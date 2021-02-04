@@ -115,6 +115,7 @@ CREATE TABLE `t_meta_mysql_server_info` (
   `host_ip` varchar(100) NOT NULL COMMENT '服务器IP',
   `port_num` int(11) NOT NULL COMMENT '端口',
   `deployment_type` tinyint(4) NOT NULL COMMENT '部署方式: 1-容器, 2-物理机, 3-虚拟机',
+  `version` varchar(100) NOT NULL COMMENT '版本, 示例: 5.7.21',
   `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
