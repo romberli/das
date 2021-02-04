@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/romberli/das/api/v1/metadata"
 )
 
 type Router interface {
@@ -31,14 +29,7 @@ func (gr *GinRouter) Register() {
 	v1 := api.Group("/v1")
 	{
 		// metadata
-		metadataGroup := v1.Group("/metadata")
-		{
-			// env
-			metadataGroup.GET("/env", metadata.GetEnv)
-			metadataGroup.GET("/env/:id", metadata.GetEnvByID)
-			metadataGroup.POST("/env", metadata.AddEnv)
-			metadataGroup.POST("/env/:id", metadata.UpdateEnvByID)
-		}
+		RegisterMetadata(v1)
 	}
 }
 

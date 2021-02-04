@@ -13,6 +13,18 @@ CREATE TABLE `t_meta_app_system_info` (
   KEY `idx03_owner_id` (`owner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='应用系统信息表';
 
+CREATE TABLE `t_meta_app_system_db_map` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `system_id` int(11) DEFAULT NULL COMMENT '应用系统ID',
+  `db_id` int(11) DEFAULT NULL COMMENT '数据库ID',
+  `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
+  `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx01_system_id_db_id` (`system_id`,`db_id`),
+  KEY `idx02_db_id` (`db_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='应用系统-数据库映射表';
+
 CREATE TABLE `t_meta_db_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `db_name` varchar(100) NOT NULL COMMENT '数据库名称',
@@ -60,8 +72,8 @@ CREATE TABLE `t_meta_middleware_server_info` (
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx02_host_ip_port_num` (`host_ip`,`port_num`),
-  KEY `idx01_cluster_id_middleware_middleware_role_env_id` (`cluster_id_middleware`,`middleware_role`)
+  UNIQUE KEY `idx01_host_ip_port_num` (`host_ip`,`port_num`),
+  KEY `idx02_cluster_id_middleware_middleware_role_env_id` (`cluster_id_middleware`,`middleware_role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='中间件服务器信息表';
 
 CREATE TABLE `t_meta_monitor_system_info` (
@@ -125,7 +137,7 @@ CREATE TABLE `t_meta_user_info` (
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx02_employee_id` (`employee_id`),
-  UNIQUE KEY `idx03_domain_account` (`domain_account`),
-  KEY `idx01_user_name` (`user_name`)
+  UNIQUE KEY `idx01_employee_id` (`employee_id`),
+  UNIQUE KEY `idx02_domain_account` (`domain_account`),
+  KEY `idx03_user_name` (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';

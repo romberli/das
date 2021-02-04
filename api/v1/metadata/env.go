@@ -15,11 +15,11 @@ import (
 
 const (
 	idJSON        = "id"
-	envNameStruct = "EnvName"
 	delFlagStruct = "DelFlag"
+	envNameStruct = "EnvName"
 )
 
-// @Tags env
+// @Tags environment
 // @Summary get all environments
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
@@ -45,11 +45,11 @@ func GetEnv(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetEnvAll)
 }
 
-// @Tags env
+// @Tags environment
 // @Summary get environment by id
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
-// @Router /api/v1/metadata/env [get]
+// @Router /api/v1/metadata/env/:id [get]
 func GetEnvByID(c *gin.Context) {
 	// get param
 	id := c.Param(idJSON)
@@ -77,11 +77,11 @@ func GetEnvByID(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetEnvByID, id)
 }
 
-// @Tags env
+// @Tags environment
 // @Summary add a new environment
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
-// @Router /api/v1/metadata/env [get]
+// @Router /api/v1/metadata/env [post]
 func AddEnv(c *gin.Context) {
 	var fields map[string]interface{}
 
@@ -122,11 +122,11 @@ func AddEnv(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddEnv, envNameStruct)
 }
 
-// @Tags env
-// @Summary update environment
+// @Tags environment
+// @Summary update environment by id
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
-// @Router /api/v1/metadata/env/:ID [post]
+// @Router /api/v1/metadata/env/:id [post]
 func UpdateEnvByID(c *gin.Context) {
 	var fields map[string]interface{}
 
