@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -48,7 +47,7 @@ func (gr *GinRouter) Run(addr ...string) error {
 func (gr *GinRouter) Swagger() {
 	swaggerGroup := gr.Engine.Group("/swagger")
 	{
-		url := ginSwagger.URL(fmt.Sprintf("%s/doc.json", swaggerGroup.BasePath()))
+		url := ginSwagger.URL("/swagger/doc.json")
 		swaggerGroup.GET("/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	}
 }
