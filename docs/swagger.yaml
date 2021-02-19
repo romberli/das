@@ -1,0 +1,528 @@
+basePath: /api/v1
+info:
+  contact:
+    email: romber2001@gmail.com
+    name: Romber Li
+    url: http://www.github.com/romberli/das
+  description: das is shortcut for Database Autonomy Service, it provides self-perception,
+    repair, optimization, and security database service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: DAS
+  version: "1.0"
+paths:
+  /api/v1/metadata/app-system:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all application systems
+      tags:
+      - application system
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new application system
+      tags:
+      - application system
+  /api/v1/metadata/app-system/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get application system by id
+      tags:
+      - application system
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update application system by id
+      tags:
+      - application system
+  /api/v1/metadata/db:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all databases
+      tags:
+      - database
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new database
+      tags:
+      - database
+  /api/v1/metadata/db/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get database by id
+      tags:
+      - database
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update database by id
+      tags:
+      - database
+  /api/v1/metadata/env:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all environments
+      tags:
+      - environment
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: environment name
+        in: body
+        name: env_name
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new environment
+      tags:
+      - environment
+  /api/v1/metadata/env/:id:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: environment id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get environment by id
+      tags:
+      - environment
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: environment id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update environment by id
+      tags:
+      - environment
+  /api/v1/metadata/middleware-cluster:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all middleware clusters
+      tags:
+      - middleware cluster
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new middleware cluster
+      tags:
+      - middleware cluster
+  /api/v1/metadata/middleware-cluster/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get middleware cluster by id
+      tags:
+      - middleware cluster
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update middleware cluster by id
+      tags:
+      - middleware cluster
+  /api/v1/metadata/middleware-server:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all middleware servers
+      tags:
+      - middleware server
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new middleware server
+      tags:
+      - middleware server
+  /api/v1/metadata/middleware-server/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get middleware server by id
+      tags:
+      - middleware server
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update middleware server by id
+      tags:
+      - middleware server
+  /api/v1/metadata/monitor-system:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all monitor systems
+      tags:
+      - monitor system
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new monitor system
+      tags:
+      - monitor system
+  /api/v1/metadata/monitor-system/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get monitor system by id
+      tags:
+      - monitor system
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update monitor system by id
+      tags:
+      - monitor system
+  /api/v1/metadata/mysql-cluster:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all mysql clusters
+      tags:
+      - mysql cluster
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new mysql cluster
+      tags:
+      - mysql cluster
+  /api/v1/metadata/mysql-cluster/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get mysql cluster by id
+      tags:
+      - mysql cluster
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update mysql cluster by id
+      tags:
+      - mysql cluster
+  /api/v1/metadata/mysql-server:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all mysql servers
+      tags:
+      - mysql server
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new mysql server
+      tags:
+      - mysql server
+  /api/v1/metadata/mysql-server/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get mysql server by id
+      tags:
+      - mysql server
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update mysql server by id
+      tags:
+      - mysql server
+  /api/v1/metadata/user:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get all users
+      tags:
+      - user
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: add a new user
+      tags:
+      - user
+  /api/v1/metadata/user/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: get user by id
+      tags:
+      - user
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag":
+            0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time":
+            "2021-01-22T09:59:21.379851+08:00"}]}'
+          schema:
+            type: string
+      summary: update user by id
+      tags:
+      - user
+swagger: "2.0"

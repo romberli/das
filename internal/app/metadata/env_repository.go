@@ -47,6 +47,10 @@ func (er *EnvRepo) Execute(command string, args ...interface{}) (middleware.Resu
 	return conn.Execute(command, args...)
 }
 
+func (er *EnvRepo) Transaction() (middleware.Transaction, error) {
+	return er.Database.Transaction()
+}
+
 // GetAll returns all available entities
 func (er *EnvRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
@@ -64,7 +68,7 @@ func (er *EnvRepo) GetAll() ([]dependency.Entity, error) {
 	// init []*EnvInfo
 	envInfoList := make([]*EnvInfo, result.RowNumber())
 	for i := range envInfoList {
-		envInfoList[i] = &EnvInfo{}
+		envInfoList[i] = NewEmptyEnvInfoWithGlobal()
 	}
 	// map to struct
 	err = result.MapToStructSlice(envInfoList, constant.DefaultMiddlewareTag)
@@ -97,7 +101,7 @@ func (er *EnvRepo) GetByID(id string) (dependency.Entity, error) {
 	case 0:
 		return nil, errors.New(fmt.Sprintf("metadata EnvInfo.GetByID(): data does not exists, id: %s", id))
 	case 1:
-		envInfo := &EnvInfo{}
+		envInfo := NewEmptyEnvInfoWithGlobal()
 		// map to struct
 		err = result.MapToStructByRowIndex(envInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
 		if err != nil {
@@ -144,7 +148,8 @@ func (er *EnvRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
 func (er *EnvRepo) Update(entity dependency.Entity) error {
 	sql := `update t_meta_env_info set env_name = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata EnvRepo.Update() update sql: %s", sql)
-	_, err := er.Execute(sql, entity.(*EnvInfo).EnvName, entity.(*EnvInfo).DelFlag, entity.(*EnvInfo).ID)
+	envInfo := entity.(*EnvInfo)
+	_, err := er.Execute(sql, envInfo.EnvName, envInfo.DelFlag, envInfo.ID)
 
 	return err
 }

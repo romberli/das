@@ -1,4 +1,4 @@
-# Binaries for programs and plugins
+# binary
 *.exe
 *.exe~
 *.dll
@@ -6,19 +6,22 @@
 *.dylib
 ./bin/*
 *.pid
-
-# Test binary, build with `go test -c`
 *.test
+das
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# config
 .idea/
 */.idea/
 .DS_Store
+config/das.yaml
 test/*.json
 
-# Log
+# output
 *.out
 log/
 */*.log
 *.log
+
+#other
+das.pid
 

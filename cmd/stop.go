@@ -46,9 +46,9 @@ var stopCmd = &cobra.Command{
 			os.Exit(constant.DefaultAbnormalExitCode)
 		}
 
-		// kill server with given pid
+		// shutdown server with given pid
 		if serverPid != constant.DefaultRandomInt {
-			err = linux.KillServer(serverPid)
+			err = linux.ShutdownServer(serverPid)
 			if err != nil {
 				log.CloneStdoutLogger().Errorf(fmt.Sprintf("%s\n%s",
 					message.NewMessage(message.ErrKillServerWithPid, serverPid).Error(), err.Error()))
