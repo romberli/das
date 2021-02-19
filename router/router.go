@@ -1,9 +1,12 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "github.com/romberli/das/docs"
 )
@@ -27,11 +30,12 @@ func (gr *GinRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (gr *GinRouter) Register() {
+	// swagger
+	gr.Swagger()
+
 	api := gr.Engine.Group("/api")
 	v1 := api.Group("/v1")
 	{
-		// swagger
-		RegisterSwagger(v1)
 		// metadata
 		RegisterMetadata(v1)
 	}
@@ -42,5 +46,9 @@ func (gr *GinRouter) Run(addr ...string) error {
 }
 
 func (gr *GinRouter) Swagger() {
-
+	swaggerGroup := gr.Engine.Group("/swagger")
+	{
+		url := ginSwagger.URL(fmt.Sprintf("%s/doc.json", swaggerGroup.BasePath()))
+		swaggerGroup.GET("/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	}
 }

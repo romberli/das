@@ -122,6 +122,8 @@ paths:
       - database
   /api/v1/metadata/env:
     get:
+      consumes:
+      - application/json
       produces:
       - application/json
       responses:
@@ -135,6 +137,15 @@ paths:
       tags:
       - environment
     post:
+      consumes:
+      - application/json
+      parameters:
+      - description: environment name
+        in: body
+        name: env_name
+        required: true
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -149,6 +160,14 @@ paths:
       - environment
   /api/v1/metadata/env/:id:
     get:
+      consumes:
+      - application/json
+      parameters:
+      - description: environment id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -162,6 +181,14 @@ paths:
       tags:
       - environment
     post:
+      consumes:
+      - application/json
+      parameters:
+      - description: environment id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
