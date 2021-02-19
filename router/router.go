@@ -4,6 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/romberli/das/docs"
 )
 
 type Router interface {
@@ -25,6 +29,9 @@ func (gr *GinRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (gr *GinRouter) Register() {
+	// swagger
+	gr.Swagger()
+
 	api := gr.Engine.Group("/api")
 	v1 := api.Group("/v1")
 	{
@@ -35,4 +42,12 @@ func (gr *GinRouter) Register() {
 
 func (gr *GinRouter) Run(addr ...string) error {
 	return gr.Engine.Run(addr...)
+}
+
+func (gr *GinRouter) Swagger() {
+	swaggerGroup := gr.Engine.Group("/swagger")
+	{
+		url := ginSwagger.URL("/swagger/doc.json")
+		swaggerGroup.GET("/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	}
 }
