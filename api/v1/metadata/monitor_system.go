@@ -13,12 +13,11 @@ import (
 )
 
 const (
-	mSNameStruct = "MSName"
-	hostIpStruct = "HostIp"
+	mSNameStruct  = "MSName"
+	hostIpStruct  = "HostIp"
 	baseUrlStruct = "BaseUrl"
 	portNumStruct = "PortNum"
 )
-
 
 // @Tags monitor system
 // @Summary get all monitor systems
@@ -108,7 +107,7 @@ func AddMonitorSystem(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMS,fmt.Sprintf("%s and %s and %s and %s", mSNameStruct, hostIpStruct, baseUrlStruct, portNumStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s", mSNameStruct, hostIpStruct, baseUrlStruct, portNumStruct), err.Error())
 		return
 	}
 	// marshal service

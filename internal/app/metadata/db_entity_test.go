@@ -14,12 +14,12 @@ import (
 
 const (
 	defaultDbInfoID                   = 1
-	defaultDbInfoDbName              = "das1"
-	defaultDbInfoClusterId = 1
-	defaultDbInfoClusterType = 1
-	defaultDbInfoOwnerId = "1"
-	defaultDbInfoOwnerGroup = "2,5,6"
-	defaultDbInfoEnvId = "2"
+	defaultDbInfoDbName               = "das1"
+	defaultDbInfoClusterId            = 1
+	defaultDbInfoClusterType          = 1
+	defaultDbInfoOwnerId              = "1"
+	defaultDbInfoOwnerGroup           = "2,5,6"
+	defaultDbInfoEnvId                = "2"
 	defaultDbInfoDelFlag              = 0
 	defaultDbInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
 	defaultDbInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"

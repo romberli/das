@@ -16,7 +16,6 @@ const (
 	dbNameStruct = "DbName"
 )
 
-
 // @Tags database
 // @Summary get all databases
 // @Produce  application/json

@@ -13,14 +13,13 @@ import (
 )
 
 const (
-	mSNameStruct = "MSName"
-	hostIpStruct = "HostIp"
+	mSNameStruct  = "MSName"
+	hostIpStruct  = "HostIp"
 	baseUrlStruct = "BaseUrl"
 	portNumStruct = "PortNum"
 )
 
 var _ dependency.Service = (*MSService)(nil)
-
 
 type MSService struct {
 	dependency.Repository
@@ -77,7 +76,7 @@ func (es *MSService) Create(fields map[string]interface{}) error {
 	if !mSNameExists && !hostIpExists && !baseUrlExists && !portNumExists {
 		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", mSNameStruct, hostIpStruct, baseUrlStruct, portNumStruct))
 	}
-	mSInfo := NewMSInfoWithDefault(mSName.(string),hostIp.(string),baseUrl.(string),portNum.(string))
+	mSInfo := NewMSInfoWithDefault(mSName.(string), hostIp.(string), baseUrl.(string), portNum.(string))
 	// insert into middleware
 	entity, err := es.Repository.Create(mSInfo)
 	if err != nil {
