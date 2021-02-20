@@ -12,13 +12,12 @@ import (
 )
 
 const (
-	defaultMSInfoMSName = "ms"
-	defaultMSInfoHostIp = "0.0.0.0"
+	defaultMSInfoMSName  = "ms"
+	defaultMSInfoHostIp  = "0.0.0.0"
 	defaultMSInfoPortNum = "3306"
 	defaultMSInfoBaseUrl = "http://127.0.0.1/prometheus/api/v1/"
-
-	newMSName    = "newMS"
-	onlineMSName = "pmm"
+	newMSName            = "newMS"
+	onlineMSName         = "pmm"
 )
 
 var mSRepo = initMSRepo()

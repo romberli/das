@@ -55,7 +55,7 @@ func TestDbService_Create(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewDbService(dbRepo)
-	err := s.Create(map[string]interface{}{dbNameStruct: defaultDbInfoDbName, ownerIdStruct:defaultDbInfoOwnerId, envIdStruct:defaultDbInfoEnvId})
+	err := s.Create(map[string]interface{}{dbNameStruct: defaultDbInfoDbName, ownerIdStruct: defaultDbInfoOwnerId, envIdStruct: defaultDbInfoEnvId})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteDbByID(s.Entities[0].Identity())

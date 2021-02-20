@@ -15,10 +15,10 @@ var _ dependency.Entity = (*MSInfo)(nil)
 type MSInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
-	MSName        string    `middleware:"system_name" json:"system_name"`
-	HostIp string `middleware:"host_ip" json:"host_ip"`
-	PortNum string `middleware:"port_num" json:"port_num"`
-	BaseUrl string `middleware:"base_url" json:"base_url"`
+	MSName         string    `middleware:"system_name" json:"system_name"`
+	HostIp         string    `middleware:"host_ip" json:"host_ip"`
+	PortNum        string    `middleware:"port_num" json:"port_num"`
+	BaseUrl        string    `middleware:"base_url" json:"base_url"`
 	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
 	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
 	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
@@ -62,10 +62,10 @@ func NewEmptyMSInfoWithGlobal() *MSInfo {
 func NewMSInfoWithDefault(mSName, hostIp, baseUrl string, portNum string) *MSInfo {
 	return &MSInfo{
 		Repository: NewMSRepoWithGlobal(),
-		MSName:    mSName,
-		HostIp:  hostIp,
-		PortNum: portNum,
-		BaseUrl: baseUrl,
+		MSName:     mSName,
+		HostIp:     hostIp,
+		PortNum:    portNum,
+		BaseUrl:    baseUrl,
 	}
 }
 

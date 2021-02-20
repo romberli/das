@@ -13,11 +13,10 @@ import (
 
 const (
 	// modify these connection information
-	addr   = "127.0.0.1:3306"
-	dbName = "das"
-	dbUser = "root"
-	dbPass = "mysql123"
-
+	addr          = "127.0.0.1:3306"
+	dbName        = "das"
+	dbUser        = "root"
+	dbPass        = "mysql123"
 	newEnvName    = "newTest"
 	onlineEnvName = "online"
 )

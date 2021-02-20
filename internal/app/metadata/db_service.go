@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	dbNameStruct = "DbName"
+	dbNameStruct  = "DbName"
 	ownerIdStruct = "OwnerId"
-	envIdStruct = "EnvId"
+	envIdStruct   = "EnvId"
 )
 
 var _ dependency.Service = (*DbService)(nil)

@@ -15,12 +15,12 @@ var _ dependency.Entity = (*DbInfo)(nil)
 type DbInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
-	DbName        string    `middleware:"db_name" json:"db_name"`
-	ClusterId int `middleware:"cluster_id" json:"cluster_id"`
-	ClusterType int `middleware:"cluster_type" json:"cluster_type"`
-	OwnerId string `middleware:"owner_id" json:"owner_id"`
-	OwnerGroup string `middleware:"owner_group" json:"owner_group"`
-	EnvId string `middleware:"env_id" json:"env_id"`
+	DbName         string    `middleware:"db_name" json:"db_name"`
+	ClusterId      int       `middleware:"cluster_id" json:"cluster_id"`
+	ClusterType    int       `middleware:"cluster_type" json:"cluster_type"`
+	OwnerId        string    `middleware:"owner_id" json:"owner_id"`
+	OwnerGroup     string    `middleware:"owner_group" json:"owner_group"`
+	EnvId          string    `middleware:"env_id" json:"env_id"`
 	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
 	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
 	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
@@ -68,9 +68,9 @@ func NewEmptyDbInfoWithGlobal() *DbInfo {
 func NewDbInfoWithDefault(dbName, ownerId, envId string) *DbInfo {
 	return &DbInfo{
 		Repository: NewDbRepoWithGlobal(),
-		DbName:    dbName,
-		OwnerId:   ownerId,
-		EnvId:     envId,
+		DbName:     dbName,
+		OwnerId:    ownerId,
+		EnvId:      envId,
 	}
 }
 
