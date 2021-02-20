@@ -12,31 +12,30 @@ import (
 )
 
 const (
-	// modify these connection information
-	addr   = "127.0.0.1:3306"
-	dbName = "das"
-	dbUser = "root"
-	dbPass = "mysql123"
+	defaultMSInfoMSName = "ms"
+	defaultMSInfoHostIp = "0.0.0.0"
+	defaultMSInfoPortNum = "3306"
+	defaultMSInfoBaseUrl = "http://127.0.0.1/prometheus/api/v1/"
 
-	newEnvName    = "newTest"
-	onlineEnvName = "online"
+	newMSName    = "newMS"
+	onlineMSName = "pmm"
 )
 
-var envRepo = initEnvRepo()
+var mSRepo = initMSRepo()
 
-func initEnvRepo() *EnvRepo {
+func initMSRepo() *MSRepo {
 	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
 	if err != nil {
-		log.Error(common.CombineMessageWithError("initEnvRepo() failed", err))
+		log.Error(common.CombineMessageWithError("initMSRepo() failed", err))
 		return nil
 	}
 
-	return NewEnvRepo(pool)
+	return NewMSRepo(pool)
 }
 
-func createEnv() (dependency.Entity, error) {
-	envInfo := NewEnvInfoWithDefault(defaultMSInfoMSName)
-	entity, err := envRepo.Create(envInfo)
+func createMS() (dependency.Entity, error) {
+	mSInfo := NewMSInfoWithDefault(defaultMSInfoMSName, defaultMSInfoHostIp, defaultMSInfoBaseUrl, defaultMSInfoPortNum)
+	entity, err := mSRepo.Create(mSInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -44,121 +43,121 @@ func createEnv() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteEnvByID(id string) error {
-	sql := `delete from t_meta_env_info where id = ?`
-	_, err := envRepo.Execute(sql, id)
+func deleteMSByID(id string) error {
+	sql := `delete from t_meta_monitor_system_info where id = ?`
+	_, err := mSRepo.Execute(sql, id)
 	return err
 }
 
-func TestEnvRepoAll(t *testing.T) {
-	TestEnvRepo_Execute(t)
-	TestEnvRepo_GetAll(t)
-	TestEnvRepo_GetByID(t)
-	TestEnvRepo_Create(t)
-	TestEnvRepo_Update(t)
-	TestEnvRepo_Delete(t)
+func TestMSRepoAll(t *testing.T) {
+	TestMSRepo_Execute(t)
+	TestMSRepo_GetAll(t)
+	TestMSRepo_GetByID(t)
+	TestMSRepo_Create(t)
+	TestMSRepo_Update(t)
+	TestMSRepo_Delete(t)
 }
 
-func TestEnvRepo_Execute(t *testing.T) {
+func TestMSRepo_Execute(t *testing.T) {
 	asst := assert.New(t)
 
 	sql := `select 1;`
-	result, err := envRepo.Execute(sql)
+	result, err := mSRepo.Execute(sql)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	asst.Equal(1, int(r), "test Execute() failed")
 }
 
-func TestEnvRepo_Transaction(t *testing.T) {
+func TestMSRepo_Transaction(t *testing.T) {
 	asst := assert.New(t)
 
-	sql := `insert into t_meta_env_info(env_name) values(?);`
-	tx, err := envRepo.Transaction()
+	sql := `insert into t_meta_monitor_system_info(system_name, host_ip, port_num, base_url) values(?,?,?,?);`
+	tx, err := mSRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	_, err = tx.Execute(sql, defaultMSInfoMSName)
+	_, err = tx.Execute(sql, defaultMSInfoMSName, defaultMSInfoHostIp, defaultMSInfoPortNum, defaultMSInfoBaseUrl)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
-	sql = `select env_name from t_meta_env_info where env_name=?`
+	sql = `select system_name from t_meta_monitor_system_info where system_name=?`
 	result, err := tx.Execute(sql, defaultMSInfoMSName)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	envName, err := result.GetString(0, 0)
+	mSName, err := result.GetString(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	if envName != defaultMSInfoMSName {
+	if mSName != defaultMSInfoMSName {
 		asst.Fail("test Transaction() failed")
 	}
 	err = tx.Rollback()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if rollbacked
-	entities, err := envRepo.GetAll()
+	entities, err := mSRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		envName, err := entity.Get(mSNameStruct)
+		mSName, err := entity.Get(mSNameStruct)
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-		if envName == defaultMSInfoMSName {
+		if mSName == defaultMSInfoMSName {
 			asst.Fail("test Transaction() failed")
 			break
 		}
 	}
 }
 
-func TestEnvRepo_GetAll(t *testing.T) {
+func TestMSRepo_GetAll(t *testing.T) {
 	asst := assert.New(t)
 
-	entities, err := envRepo.GetAll()
+	entities, err := mSRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	envName, err := entities[0].Get("EnvName")
+	mSName, err := entities[0].Get("MSName")
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(onlineEnvName, envName.(string), "test GetAll() failed")
+	asst.Equal(onlineMSName, mSName.(string), "test GetAll() failed")
 }
 
-func TestEnvRepo_GetByID(t *testing.T) {
+func TestMSRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := envRepo.GetByID("1")
+	entity, err := mSRepo.GetByID("1")
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	envName, err := entity.Get(mSNameStruct)
+	mSName, err := entity.Get(mSNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(onlineEnvName, envName.(string), "test GetByID() failed")
+	asst.Equal(onlineMSName, mSName.(string), "test GetByID() failed")
 }
 
-func TestEnvRepo_Create(t *testing.T) {
+func TestMSRepo_Create(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	entity, err := createMS()
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteMSByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
-func TestEnvRepo_Update(t *testing.T) {
+func TestMSRepo_Update(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	entity, err := createMS()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	err = entity.Set(map[string]interface{}{mSNameStruct: newEnvName})
+	err = entity.Set(map[string]interface{}{mSNameStruct: newMSName})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	err = envRepo.Update(entity)
+	err = mSRepo.Update(entity)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	entity, err = envRepo.GetByID(entity.Identity())
+	entity, err = mSRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	envName, err := entity.Get(mSNameStruct)
+	mSName, err := entity.Get(mSNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	asst.Equal(newEnvName, envName, "test Update() failed")
+	asst.Equal(newMSName, mSName, "test Update() failed")
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteMSByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
-func TestEnvRepo_Delete(t *testing.T) {
+func TestMSRepo_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	entity, err := createMS()
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteMSByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }

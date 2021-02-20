@@ -57,6 +57,16 @@ const (
 	ErrMetadataGetEnvByID = 400202
 	ErrMetadataAddEnv     = 400203
 	ErrMetadataUpdateEnv  = 400204
+
+	ErrMetadataGetDbAll  = 400401
+	ErrMetadataGetDbByID = 400402
+	ErrMetadataAddDb     = 400403
+	ErrMetadataUpdateDb  = 400404
+
+	ErrMetadataGetMSAll  = 400601
+	ErrMetadataGetMSByID = 400602
+	ErrMetadataAddMS     = 400603
+	ErrMetadataUpdateMS  = 400604
 )
 
 func initErrorMessage() {
@@ -113,4 +123,14 @@ func initErrorMessage() {
 	Messages[ErrMetadataGetEnvByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetEnvByID, "metadata: get environment by id failed. id: %s\n%s")
 	Messages[ErrMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddEnv, "metadata: add new environment failed. env_name: %s\n%s")
 	Messages[ErrMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateEnv, "metadata: update environment failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetDbAll, "metadata: get all databases failed.\n%s")
+	Messages[ErrMetadataGetDbByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetDbByID, "metadata: get database by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddDb] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddDb, "metadata: add new databases failed. db_name: %s\n%s")
+	Messages[ErrMetadataUpdateDb] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateDb, "metadata: update database failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetMSAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMSAll, "metadata: get all monitor systems failed.\n%s")
+	Messages[ErrMetadataGetMSByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMSByID, "metadata: get monitor system by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddMS] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMS, "metadata: add new monitor system failed. system_name: %s\n%s")
+	Messages[ErrMetadataUpdateMS] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMS, "metadata: update monitor system failed. id: %s\n%s")
 }
