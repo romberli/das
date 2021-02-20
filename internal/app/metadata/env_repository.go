@@ -25,7 +25,7 @@ func NewEnvRepo(db middleware.Pool) *EnvRepo {
 	return &EnvRepo{db}
 }
 
-// NewEnvRepo returns *EnvRepo with global mysql pool
+// NewEnvRepoWithGlobal returns *EnvRepo with global mysql pool
 func NewEnvRepoWithGlobal() *EnvRepo {
 	return NewEnvRepo(global.MySQLPool)
 }

@@ -15,6 +15,7 @@ const envNameStruct = "EnvName"
 
 var _ dependency.Service = (*EnvService)(nil)
 
+// EnvService implements Service interface
 type EnvService struct {
 	dependency.Repository
 	Entities []dependency.Entity
@@ -105,7 +106,7 @@ func (es *EnvService) Marshal() ([]byte, error) {
 	return json.Marshal(es.Entities)
 }
 
-// Marshal marshals service.Entities with given fields
+// MarshalWithFields marshals service.Entities with given fields
 func (es *EnvService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(es.Entities))
 	for i := range interfaceList {
