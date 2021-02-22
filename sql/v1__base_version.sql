@@ -112,7 +112,7 @@ CREATE TABLE `t_meta_mysql_cluster_info` (
 CREATE TABLE `t_meta_mysql_server_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_id` varchar(100) NOT NULL COMMENT '集群ID',
-  `host_ip` varchar(100) NOT NULL COMMENT '服务器IP',
+  `host_ip` int(11) NOT NULL COMMENT '服务器IP',
   `port_num` int(11) NOT NULL COMMENT '端口',
   `deployment_type` tinyint(4) NOT NULL COMMENT '部署方式: 1-容器, 2-物理机, 3-虚拟机',
   `version` varchar(100) NOT NULL COMMENT '版本, 示例: 5.7.21',
