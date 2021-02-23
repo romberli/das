@@ -25,11 +25,11 @@ func initNewMSInfo() *MSInfo {
 
 	createTime, _ := now.Parse(defaultMSInfoCreateTimeString)
 	lastUpdateTime, _ := now.Parse(defaultMSInfoLastUpdateTimeString)
-	return NewMSInfoWithGlobal(defaultMSInfoID, defaultMSInfoMSName, defaultMSInfoHostIp, defaultMSInfoPortNum, defaultMSInfoBaseUrl, defaultMSInfoDelFlag, createTime, lastUpdateTime)
+	return NewMSInfoWithGlobal(defaultMSInfoID, defaultMSInfoMSName, defaultMSInfoSystemType, defaultMSInfoHostIp, defaultMSInfoPortNum, defaultMSInfoPortNumSlow, defaultMSInfoBaseUrl, defaultMSInfoDelFlag, createTime, lastUpdateTime)
 }
 
 func mSEqual(a, b *MSInfo) bool {
-	return a.ID == b.ID && a.MSName == b.MSName && a.HostIp == b.HostIp && a.PortNum == b.PortNum && a.BaseUrl == b.BaseUrl && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
+	return a.ID == b.ID && a.MSName == b.MSName && a.SystemType == b.SystemType && a.HostIp == b.HostIp && a.PortNum == b.PortNum && a.PortNumSlow == b.PortNumSlow && a.BaseUrl == b.BaseUrl && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
 }
 
 func TestMSEntityAll(t *testing.T) {
@@ -118,7 +118,7 @@ func TestMSInfo_MarshalJSONWithFields(t *testing.T) {
 	mSInfo := initNewMSInfo()
 	data, err := mSInfo.MarshalJSONWithFields(mSNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
-	expect, err := json.Marshal(map[string]interface{}{mSNameJSON: "pmm"})
+	expect, err := json.Marshal(map[string]interface{}{mSNameJSON: "ms"})
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	asst.Equal(string(expect), string(data), "test MarshalJSONWithFields() failed")
 }

@@ -13,7 +13,9 @@ import (
 )
 
 const (
-	dbNameStruct = "DbName"
+	dbNameStruct  = "DbName"
+	ownerIdStruct = "OwnerId"
+	envIdStruct   = "EnvId"
 )
 
 // @Tags database
@@ -104,19 +106,19 @@ func AddDB(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddDb, dbNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddDb, fmt.Sprintf("%s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct), err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, dbNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct), err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddDb, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddDb, dbNameStruct)
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddDb, fmt.Sprintf("%s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct))
 }
 
 // @Tags database
@@ -143,10 +145,12 @@ func UpdateDBByID(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, envNameExists := fields[dbNameStruct]
+	_, dbNameExists := fields[dbNameStruct]
+	_, ownerIdExists := fields[ownerIdStruct]
+	_, envIdExists := fields[envIdStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !envNameExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", dbNameStruct, delFlagStruct))
+	if !dbNameExists && !ownerIdExists && !envIdExists && !delFlagExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct, delFlagStruct))
 		return
 	}
 	// init service

@@ -50,7 +50,7 @@ Accept: application/json
 POST http://{{baseURL}}/api/v1/metadata/monitor-system
 Content-Type: application/json
 
-{"system_name": "ms8", "host_ip": "127.0.0.1", "port_num": "3313", "base_url": "http://127.0.0.1/prometheus/api/v1/"}
+{"system_name": "ms6", "system_type":"1","host_ip": "127.0.0.1", "port_num": "3313","port_num_slow": "3314", "base_url": "http://127.0.0.1/prometheus/api/v1/"}
 
 ### get monitor system by id
 POST http://{{baseURL}}/api/v1/metadata/monitor-system/5

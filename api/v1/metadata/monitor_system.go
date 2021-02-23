@@ -13,16 +13,18 @@ import (
 )
 
 const (
-	mSNameStruct  = "MSName"
-	hostIpStruct  = "HostIp"
-	baseUrlStruct = "BaseUrl"
-	portNumStruct = "PortNum"
+	mSNameStruct      = "MSName"
+	systemTypeStruct  = "SystemType"
+	hostIpStruct      = "HostIp"
+	portNumStruct     = "PortNum"
+	portNumSlowStruct = "PortNumSlow"
+	baseUrlStruct     = "BaseUrl"
 )
 
 // @Tags monitor system
 // @Summary get all monitor systems
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "host_ip": "127.0.0.1", "port_num": 3306, "base_url": "http://127.0.0.1/prometheus/api/v1/", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "system_type": 1, "host_ip": "127.0.0.1", "port_num": 3306, "port_num_slow": 3307, "base_url": "http://127.0.0.1/prometheus/api/v1/", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
 // @Router /api/v1/metadata/monitor-system [get]
 func GetMonitorSystem(c *gin.Context) {
 	// init service
@@ -48,7 +50,7 @@ func GetMonitorSystem(c *gin.Context) {
 // @Tags monitor system
 // @Summary get monitor system by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "host_ip": "127.0.0.1", "port_num": 3306, "base_url": "http://127.0.0.1/prometheus/api/v1/", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "system_type": 1, "host_ip": "127.0.0.1", "port_num": 3306, "port_num_slow": 3307, "base_url": "http://127.0.0.1/prometheus/api/v1/", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
 // @Router /api/v1/metadata/monitor-system/:id [get]
 func GetMonitorSystemByID(c *gin.Context) {
 	// get param
@@ -80,7 +82,7 @@ func GetMonitorSystemByID(c *gin.Context) {
 // @Tags monitor system
 // @Summary add a new monitor system
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "host_ip": "127.0.0.1", "port_num": 3306, "base_url": "http://127.0.0.1/prometheus/api/v1/", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "system_type": 1, "host_ip": "127.0.0.1", "port_num": 3306, "port_num_slow": 3307, "base_url": "http://127.0.0.1/prometheus/api/v1/", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
 // @Router /api/v1/metadata/monitor-system [post]
 func AddMonitorSystem(c *gin.Context) {
 	var fields map[string]interface{}
@@ -107,25 +109,25 @@ func AddMonitorSystem(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s", mSNameStruct, hostIpStruct, baseUrlStruct, portNumStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct), err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s", mSNameStruct, hostIpStruct, baseUrlStruct, portNumStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct), err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddMS, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s", mSNameStruct, hostIpStruct, baseUrlStruct, portNumStruct))
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct))
 }
 
 // @Tags monitor system
 // @Summary update monitor system by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "host_ip": "127.0.0.1", "port_num": 3306, "base_url": "http://127.0.0.1/prometheus/api/v1/", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "system_type": 1, "host_ip": "127.0.0.1", "port_num": 3306, "port_num_slow": 3307, "base_url": "http://127.0.0.1/prometheus/api/v1/", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
 // @Router /api/v1/metadata/monitor-system/:id [post]
 func UpdateMonitorSystemByID(c *gin.Context) {
 	var fields map[string]interface{}
@@ -147,9 +149,14 @@ func UpdateMonitorSystemByID(c *gin.Context) {
 		return
 	}
 	_, mSNameExists := fields[mSNameStruct]
+	_, systemTypeExists := fields[systemTypeStruct]
+	_, hostIpExists := fields[hostIpStruct]
+	_, portNumExists := fields[portNumStruct]
+	_, portNumSlowExists := fields[portNumSlowStruct]
+	_, baseUrlExists := fields[baseUrlStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !mSNameExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", mSNameStruct, delFlagStruct))
+	if !mSNameExists && !systemTypeExists && !hostIpExists && !portNumExists && !portNumSlowExists && !baseUrlExists && !delFlagExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct, delFlagStruct))
 		return
 	}
 	// init service

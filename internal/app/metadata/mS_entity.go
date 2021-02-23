@@ -16,8 +16,10 @@ type MSInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
 	MSName         string    `middleware:"system_name" json:"system_name"`
+	SystemType     string    `middleware:"system_type" json:"system_type"`
 	HostIp         string    `middleware:"host_ip" json:"host_ip"`
 	PortNum        string    `middleware:"port_num" json:"port_num"`
+	PortNumSlow    string    `middleware:"port_num_slow" json:"port_num_slow"`
 	BaseUrl        string    `middleware:"base_url" json:"base_url"`
 	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
 	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
@@ -25,13 +27,15 @@ type MSInfo struct {
 }
 
 // NewMSInfo returns a new MSInfo
-func NewMSInfo(repo *MSRepo, id int, systemName string, hostIp string, portNum string, baseUrl string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MSInfo {
+func NewMSInfo(repo *MSRepo, id int, systemName string, systemType string, hostIp string, portNum string, portNumSlow string, baseUrl string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MSInfo {
 	return &MSInfo{
 		repo,
 		id,
 		systemName,
+		systemType,
 		hostIp,
 		portNum,
+		portNumSlow,
 		baseUrl,
 		delFlag,
 		createTime,
@@ -40,13 +44,15 @@ func NewMSInfo(repo *MSRepo, id int, systemName string, hostIp string, portNum s
 }
 
 // NewMSInfo returns a new MSInfo with default MSRepo
-func NewMSInfoWithGlobal(id int, systemName string, hostIp string, portNum string, baseUrl string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MSInfo {
+func NewMSInfoWithGlobal(id int, mSName, systemType, hostIp, portNum, portNumSlow, baseUrl string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MSInfo {
 	return &MSInfo{
 		NewMSRepoWithGlobal(),
 		id,
-		systemName,
+		mSName,
+		systemType,
 		hostIp,
 		portNum,
+		portNumSlow,
 		baseUrl,
 		delFlag,
 		createTime,
@@ -59,13 +65,15 @@ func NewEmptyMSInfoWithGlobal() *MSInfo {
 }
 
 // NewMSInfoWithDefault returns a new MSInfo with default MSRepo
-func NewMSInfoWithDefault(mSName, hostIp, baseUrl string, portNum string) *MSInfo {
+func NewMSInfoWithDefault(mSName, systemType, hostIp, portNum, portNumSlow, baseUrl string) *MSInfo {
 	return &MSInfo{
-		Repository: NewMSRepoWithGlobal(),
-		MSName:     mSName,
-		HostIp:     hostIp,
-		PortNum:    portNum,
-		BaseUrl:    baseUrl,
+		Repository:  NewMSRepoWithGlobal(),
+		MSName:      mSName,
+		SystemType:  systemType,
+		HostIp:      hostIp,
+		PortNum:     portNum,
+		PortNumSlow: portNumSlow,
+		BaseUrl:     baseUrl,
 	}
 }
 

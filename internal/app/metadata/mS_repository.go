@@ -54,7 +54,7 @@ func (er *MSRepo) Transaction() (middleware.Transaction, error) {
 // GetAll returns all available entities
 func (er *MSRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
-		select id, system_name, host_ip, port_num, base_url, del_flag, create_time, last_update_time
+		select id, system_name, system_type, host_ip, port_num, port_num_slow, base_url, del_flag, create_time, last_update_time
 		from t_meta_monitor_system_info
 		where del_flag = 0
 		order by id;
@@ -86,7 +86,7 @@ func (er *MSRepo) GetAll() ([]dependency.Entity, error) {
 
 func (er *MSRepo) GetByID(id string) (dependency.Entity, error) {
 	sql := `
-		select id, system_name, host_ip, port_num, base_url, del_flag, create_time, last_update_time
+		select id, system_name, system_type, host_ip, port_num, port_num_slow, base_url, del_flag, create_time, last_update_time
 		from t_meta_monitor_system_info
 		where del_flag = 0
 		and id = ?;
@@ -128,10 +128,10 @@ func (er *MSRepo) GetID(entity dependency.Entity) (string, error) {
 
 // Create creates data with given entity in the middleware
 func (er *MSRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
-	sql := `insert into t_meta_monitor_system_info(system_name, host_ip, port_num, base_url) values(?,?,?,?);`
+	sql := `insert into t_meta_monitor_system_info(system_name, system_type, host_ip, port_num, port_num_slow, base_url) values(?,?,?,?,?,?);`
 	log.Debugf("metadata MSRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := er.Execute(sql, entity.(*MSInfo).MSName, entity.(*MSInfo).HostIp, entity.(*MSInfo).PortNum, entity.(*MSInfo).BaseUrl)
+	_, err := er.Execute(sql, entity.(*MSInfo).MSName, entity.(*MSInfo).SystemType, entity.(*MSInfo).HostIp, entity.(*MSInfo).PortNum, entity.(*MSInfo).PortNumSlow, entity.(*MSInfo).BaseUrl)
 	if err != nil {
 		return nil, err
 	}

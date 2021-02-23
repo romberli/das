@@ -12,12 +12,14 @@ import (
 )
 
 const (
-	defaultMSInfoMSName  = "ms"
-	defaultMSInfoHostIp  = "0.0.0.0"
-	defaultMSInfoPortNum = "3306"
-	defaultMSInfoBaseUrl = "http://127.0.0.1/prometheus/api/v1/"
-	newMSName            = "newMS"
-	onlineMSName         = "pmm"
+	defaultMSInfoMSName      = "ms"
+	defaultMSInfoSystemType  = "1"
+	defaultMSInfoHostIp      = "0.0.0.0"
+	defaultMSInfoPortNum     = "3306"
+	defaultMSInfoPortNumSlow = "3307"
+	defaultMSInfoBaseUrl     = "http://127.0.0.1/prometheus/api/v1/"
+	newMSName                = "newMS"
+	onlineMSName             = "pmm"
 )
 
 var mSRepo = initMSRepo()
@@ -33,7 +35,7 @@ func initMSRepo() *MSRepo {
 }
 
 func createMS() (dependency.Entity, error) {
-	mSInfo := NewMSInfoWithDefault(defaultMSInfoMSName, defaultMSInfoHostIp, defaultMSInfoBaseUrl, defaultMSInfoPortNum)
+	mSInfo := NewMSInfoWithDefault(defaultMSInfoMSName, defaultMSInfoSystemType, defaultMSInfoHostIp, defaultMSInfoPortNum, defaultMSInfoPortNumSlow, defaultMSInfoBaseUrl)
 	entity, err := mSRepo.Create(mSInfo)
 	if err != nil {
 		return nil, err
@@ -71,12 +73,12 @@ func TestMSRepo_Execute(t *testing.T) {
 func TestMSRepo_Transaction(t *testing.T) {
 	asst := assert.New(t)
 
-	sql := `insert into t_meta_monitor_system_info(system_name, host_ip, port_num, base_url) values(?,?,?,?);`
+	sql := `insert into t_meta_monitor_system_info(system_name, system_type, host_ip, port_num, port_num_slow, base_url) values(?,?,?,?,?,?);`
 	tx, err := mSRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	_, err = tx.Execute(sql, defaultMSInfoMSName, defaultMSInfoHostIp, defaultMSInfoPortNum, defaultMSInfoBaseUrl)
+	_, err = tx.Execute(sql, defaultMSInfoMSName, defaultMSInfoSystemType, defaultMSInfoHostIp, defaultMSInfoPortNum, defaultMSInfoPortNumSlow, defaultMSInfoBaseUrl)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
 	sql = `select system_name from t_meta_monitor_system_info where system_name=?`
