@@ -29,7 +29,7 @@ CREATE TABLE `t_meta_db_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `db_name` varchar(100) NOT NULL COMMENT '数据库名称',
   `cluster_id` int(11) DEFAULT NULL COMMENT '数据库集群ID',
-  `cluster_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '集群类型: 1-entity, 2-middleware',
+  `cluster_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '集群类型: 1-normal, 2-shard',
   `owner_id` int(11) NOT NULL COMMENT '数据库主要负责人ID',
   `owner_group` varchar(100) DEFAULT NULL COMMENT '其他数据库负责人ID, 以逗号分隔',
   `env_id` tinyint(4) NOT NULL COMMENT '环境: 1-online, 2-rel, 3-sit, 4-uat, 5-dev',
