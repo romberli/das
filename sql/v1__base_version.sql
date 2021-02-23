@@ -79,8 +79,10 @@ CREATE TABLE `t_meta_middleware_server_info` (
 CREATE TABLE `t_meta_monitor_system_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `system_name` varchar(100) NOT NULL COMMENT '监控系统名称',
+  `system_type` tinyint(4) NOT NULL COMMENT '监控系统类型: 1-pmm1.x, 2-pmm2.x',
   `host_ip` varchar(100) NOT NULL COMMENT '监控系统服务器IP',
   `port_num` int(11) NOT NULL COMMENT '监控系统服务器端口',
+  `port_num_slow` int(11) NOT NULL COMMENT '监控系统服务器慢查询日志端口',
   `base_url` varchar(200) NOT NULL COMMENT '监控系统API入口地址',
   `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
@@ -109,8 +111,8 @@ CREATE TABLE `t_meta_mysql_cluster_info` (
 
 CREATE TABLE `t_meta_mysql_server_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `cluster_id` varchar(100) NOT NULL COMMENT '集群ID',
-  `host_ip` int(11) NOT NULL COMMENT '服务器IP',
+  `cluster_id` int(11) NOT NULL COMMENT '集群ID',
+  `host_ip` varchar(100) NOT NULL COMMENT '服务器IP',
   `port_num` int(11) NOT NULL COMMENT '端口',
   `deployment_type` tinyint(4) NOT NULL COMMENT '部署方式: 1-容器, 2-物理机, 3-虚拟机',
   `version` varchar(100) NOT NULL COMMENT '版本, 示例: 5.7.21',
