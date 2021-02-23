@@ -24,4 +24,5 @@ log/
 
 #other
 das.pid
+internal/app/env_repository_test.go
 
