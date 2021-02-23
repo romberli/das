@@ -32,12 +32,12 @@ CREATE TABLE `t_meta_db_info` (
   `cluster_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '集群类型: 1-normal, 2-shard',
   `owner_id` int(11) NOT NULL COMMENT '数据库主要负责人ID',
   `owner_group` varchar(100) DEFAULT NULL COMMENT '其他数据库负责人ID, 以逗号分隔',
-  `env_id` tinyint(4) NOT NULL COMMENT '环境: 1-online, 2-rel, 3-sit, 4-uat, 5-dev',
+  `env_id` int(11) NOT NULL COMMENT '环境: 1-online, 2-rel, 3-sit, 4-uat, 5-dev',
   `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
-  KEY `idx01_db_name_cluster_id_cluster_type` (`db_name`,`cluster_id`,`cluster_type`)
+  UNIQUE KEY `idx01_db_name_cluster_id_cluster_type` (`db_name`,`cluster_id`,`cluster_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据库信息表';
 
 CREATE TABLE `t_meta_env_info` (
@@ -53,12 +53,12 @@ CREATE TABLE `t_meta_env_info` (
 CREATE TABLE `t_meta_middleware_cluster_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_name` varchar(100) DEFAULT NULL COMMENT '中间件集群名称',
-  `env_id` tinyint(4) NOT NULL COMMENT '环境: 1-online, 2-rel, 3-sit, 4-uat, 5-dev',
+  `env_id` int(11) NOT NULL COMMENT '环境: 1-online, 2-rel, 3-sit, 4-uat, 5-dev',
   `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx01_cluster_name` (`cluster_name`)
+  UNIQUE KEY `idx01_cluster_name_env_id` (`cluster_name`, `env_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='中间件集群信息表';
 
 CREATE TABLE `t_meta_middleware_server_info` (
@@ -99,7 +99,7 @@ CREATE TABLE `t_meta_mysql_cluster_info` (
   `monitor_system_id` int(11) NOT NULL COMMENT '监控系统ID',
   `owner_id` int(11) NOT NULL COMMENT '数据库集群主要负责人ID',
   `owner_group` varchar(100) DEFAULT NULL COMMENT '其他数据库集群负责人ID, 以逗号分隔',
-  `env_id` int(11) NOT NULL COMMENT '环境ID',
+  `env_id` int(11) NOT NULL COMMENT '环境: 1-online, 2-rel, 3-sit, 4-uat, 5-dev',
   `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
