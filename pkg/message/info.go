@@ -41,11 +41,11 @@ func initInfoMessage() {
 
 	Messages[InfoMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetDbAll, "metadata: get database all completed")
 	Messages[InfoMetadataGetDbByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetDbByID, "metadata: get database by id completed. id: %s")
-	Messages[InfoMetadataAddDb] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddDb, "metadata: add new database completed. env_name: %s")
+	Messages[InfoMetadataAddDb] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddDb, "metadata: add new database completed. db_name and owner_id and env_id: %s")
 	Messages[InfoMetadataUpdateDb] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateDb, "metadata: update database completed. id: %s")
 
 	Messages[InfoMetadataGetMSAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMSAll, "metadata: get monitor systems all completed")
 	Messages[InfoMetadataGetMSByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMSByID, "metadata: get monitor system by id completed. id: %s")
-	Messages[InfoMetadataAddMS] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMS, "metadata: add new monitor system completed. env_name: %s")
+	Messages[InfoMetadataAddMS] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMS, "metadata: add new monitor system completed. system_name and system_type and host_ip and port_num and port_num_slow and base_url: %s")
 	Messages[InfoMetadataUpdateMS] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMS, "metadata: update monitor system completed. id: %s")
 }

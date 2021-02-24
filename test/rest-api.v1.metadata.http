@@ -33,7 +33,7 @@ Content-Type: application/json
 {"db_name": "db2","owner_id": "1", "env_id": "5"}
 
 ### get database by id
-POST http://{{baseURL}}/api/v1/metadata/db/14
+POST http://{{baseURL}}/api/v1/metadata/db/4
 Content-Type: application/json
 
 {"db_name": "db3", "del_flag": 1}
@@ -50,7 +50,7 @@ Accept: application/json
 POST http://{{baseURL}}/api/v1/metadata/monitor-system
 Content-Type: application/json
 
-{"system_name": "ms6", "system_type":"1","host_ip": "127.0.0.1", "port_num": "3313","port_num_slow": "3314", "base_url": "http://127.0.0.1/prometheus/api/v1/"}
+{"system_name": "ms7", "system_type":"1","host_ip": "127.0.0.1", "port_num": "3314","port_num_slow": "3315", "base_url": "http://127.0.0.1/prometheus/api/v1/"}
 
 ### get monitor system by id
 POST http://{{baseURL}}/api/v1/metadata/monitor-system/5

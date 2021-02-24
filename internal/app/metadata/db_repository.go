@@ -116,9 +116,9 @@ func (er *DbRepo) GetByID(id string) (dependency.Entity, error) {
 
 // GetID checks identity of given entity from the middleware
 func (er *DbRepo) GetID(entity dependency.Entity) (string, error) {
-	sql := `select id from t_meta_db_info where del_flag = 0 and db_name = ?;`
+	sql := `select id from t_meta_db_info where del_flag = 0 and db_name = ? and owner_id = ? and env_id = ? order by id desc;`
 	log.Debugf("metadata DbRepo.GetID() select sql: %s", sql)
-	result, err := er.Execute(sql, entity.(*DbInfo).DbName)
+	result, err := er.Execute(sql, entity.(*DbInfo).DbName, entity.(*DbInfo).OwnerId, entity.(*DbInfo).EnvId)
 	if err != nil {
 		return constant.EmptyString, err
 	}
