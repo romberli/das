@@ -15,6 +15,16 @@ const (
 	InfoMetadataGetEnvByID = 200202
 	InfoMetadataAddEnv     = 200203
 	InfoMetadataUpdateEnv  = 200204
+
+	InfoMetadataGetMYSQLClusterAll  = 200701
+	InfoMetadataGetMYSQLClusterByID = 200702
+	InfoMetadataAddMYSQLCluster     = 200703
+	InfoMetadataUpdateMYSQLCluster  = 200704
+
+	InfoMetadataGetMYSQLServerAll  = 200801
+	InfoMetadataGetMYSQLServerByID = 200802
+	InfoMetadataAddMYSQLServer     = 200803
+	InfoMetadataUpdateMYSQLServer  = 200804
 )
 
 func initInfoMessage() {
@@ -28,4 +38,14 @@ func initInfoMessage() {
 	Messages[InfoMetadataGetEnvByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetEnvByID, "metadata: get environment by id completed. id: %s")
 	Messages[InfoMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddEnv, "metadata: add new environment completed. env_name: %s")
 	Messages[InfoMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateEnv, "metadata: update environment completed. id: %s")
+
+	Messages[InfoMetadataGetMYSQLClusterAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMYSQLClusterAll, "metadata: get mysql cluster all completed")
+	Messages[InfoMetadataGetMYSQLClusterByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMYSQLClusterByID, "metadata: get mysql cluster by id completed. id: %s")
+	Messages[InfoMetadataAddMYSQLCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMYSQLCluster, "metadata: add new mysql cluster completed. env_name: %s")
+	Messages[InfoMetadataUpdateMYSQLCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMYSQLCluster, "metadata: update mysql cluster completed. id: %s")
+
+	Messages[InfoMetadataGetMYSQLServerAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMYSQLServerAll, "metadata: get mysql server all completed")
+	Messages[InfoMetadataGetMYSQLServerByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMYSQLServerByID, "metadata: get mysql server by id completed. id: %s")
+	Messages[InfoMetadataAddMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMYSQLServer, "metadata: add new mysql server completed. env_name: %s")
+	Messages[InfoMetadataUpdateMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMYSQLServer, "metadata: update mysql server completed. id: %s")
 }

@@ -94,7 +94,6 @@ CREATE TABLE `t_meta_mysql_cluster_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_name` varchar(100) NOT NULL COMMENT '集群名称',
   `middleware_cluster_id` int(11) DEFAULT NULL COMMENT '中间件集群名称',
-  `app_system_id` int(11) NOT NULL COMMENT '应用系统ID',
   `monitor_system_id` int(11) NOT NULL COMMENT '监控系统ID',
   `owner_id` int(11) NOT NULL COMMENT '数据库集群主要负责人ID',
   `owner_group` varchar(100) DEFAULT NULL COMMENT '其他数据库集群负责人ID, 以逗号分隔',
@@ -104,14 +103,13 @@ CREATE TABLE `t_meta_mysql_cluster_info` (
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
   KEY `idx01_cluster_name` (`cluster_name`),
-  KEY `idx02_app_system_id` (`app_system_id`),
   KEY `idx03_monitor_system_id` (`monitor_system_id`),
   KEY `idx04_owner_id` (`owner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='MySQL集群信息表';
 
 CREATE TABLE `t_meta_mysql_server_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `cluster_id` varchar(100) NOT NULL COMMENT '集群ID',
+  `cluster_id` int(11) NOT NULL COMMENT '集群ID',
   `host_ip` varchar(100) NOT NULL COMMENT '服务器IP',
   `port_num` int(11) NOT NULL COMMENT '端口',
   `deployment_type` tinyint(4) NOT NULL COMMENT '部署方式: 1-容器, 2-物理机, 3-虚拟机',
