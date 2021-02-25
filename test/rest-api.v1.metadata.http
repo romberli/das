@@ -1,20 +1,19 @@
 ### get all environments
-GET http://{{baseURL}}/api/v1/metadata/env
+GET http://127.0.0.1:6090/api/v1/metadata/env
 Accept: application/json
 
 ### get environment by id
-GET http://{{baseURL}}/api/v1/metadata/env/1
+GET http://127.0.0.1:6090/api/v1/metadata/env/1
 Accept: application/json
 
 ### add new environment
-POST http://{{baseURL}}/api/v1/metadata/env
+POST http://127.0.0.1:6090/api/v1/metadata/env
 Content-Type: application/json
 
-{"env_name": "test"}
+{"env_name": "test123123123"}
 
 ### get environment by id
-POST http://{{baseURL}}/api/v1/metadata/env/21
+POST http://127.0.0.1:6090/api/v1/metadata/env/1
 Content-Type: application/json
 
-{"env_name": "test123", "del_flag": 1}
-z
+{"env_name": "test", "del_flag":0}
