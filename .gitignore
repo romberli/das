@@ -26,3 +26,4 @@ log/
 das.pid
 http-client.env.json
 .vscode/
+.test
