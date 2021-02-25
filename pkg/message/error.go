@@ -57,6 +57,16 @@ const (
 	ErrMetadataGetEnvByID = 400202
 	ErrMetadataAddEnv     = 400203
 	ErrMetadataUpdateEnv  = 400204
+
+	ErrMetadataGetAppSystemAll  = 400301
+	ErrMetadataGetAppSystemByID = 400302
+	ErrMetadataAddAppSystem     = 400303
+	ErrMetadataUpdateAppSystem  = 400304
+
+	ErrMetadataGetUserAll  = 400901
+	ErrMetadataGetUserByID = 400902
+	ErrMetadataAddUser     = 400903
+	ErrMetadataUpdateUser  = 400904
 )
 
 func initErrorMessage() {
@@ -113,4 +123,14 @@ func initErrorMessage() {
 	Messages[ErrMetadataGetEnvByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetEnvByID, "metadata: get environment by id failed. id: %s\n%s")
 	Messages[ErrMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddEnv, "metadata: add new environment failed. env_name: %s\n%s")
 	Messages[ErrMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateEnv, "metadata: update environment failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetAppSystemAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetAppSystemAll, "metadata: get all app_system failed.\n%s")
+	Messages[ErrMetadataGetAppSystemByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetAppSystemByID, "metadata: get app_system by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddAppSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddAppSystem, "metadata: add new app_system failed. env_name: %s\n%s")
+	Messages[ErrMetadataUpdateAppSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateAppSystem, "metadata: update app_system failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetUserAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetUserAll, "metadata: get all user failed.\n%s")
+	Messages[ErrMetadataGetUserByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetUserByID, "metadata: get user by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddUser, "metadata: add new user failed. env_name: %s\n%s")
+	Messages[ErrMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateUser, "metadata: update user failed. id: %s\n%s")
 }

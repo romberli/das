@@ -15,6 +15,16 @@ const (
 	InfoMetadataGetEnvByID = 200202
 	InfoMetadataAddEnv     = 200203
 	InfoMetadataUpdateEnv  = 200204
+
+	InfoMetadataGetAppSystemAll  = 200301
+	InfoMetadataGetAppSystemByID = 200302
+	InfoMetadataAddAppSystem     = 200303
+	InfoMetadataUpdateAppSystem  = 200304
+
+	InfoMetadataGetUserAll  = 200901
+	InfoMetadataGetUserByID = 200902
+	InfoMetadataAddUser     = 200903
+	InfoMetadataUpdateUser  = 200904
 )
 
 func initInfoMessage() {
@@ -28,4 +38,14 @@ func initInfoMessage() {
 	Messages[InfoMetadataGetEnvByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetEnvByID, "metadata: get environment by id completed. id: %s")
 	Messages[InfoMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddEnv, "metadata: add new environment completed. env_name: %s")
 	Messages[InfoMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateEnv, "metadata: update environment completed. id: %s")
+
+	Messages[InfoMetadataGetAppSystemAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetAppSystemAll, "metadata: get appsystem all completed")
+	Messages[InfoMetadataGetAppSystemByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetAppSystemByID, "metadata: get appsystem by id completed. id: %s")
+	Messages[InfoMetadataAddAppSystem] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddAppSystem, "metadata: add new appsystem completed. system_name: %s")
+	Messages[InfoMetadataUpdateAppSystem] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateAppSystem, "metadata: update appsystem completed. id: %s")
+
+	Messages[InfoMetadataGetUserAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetUserAll, "metadata: get user all completed")
+	Messages[InfoMetadataGetUserByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetUserByID, "metadata: get user by id completed. id: %s")
+	Messages[InfoMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddUser, "metadata: add new user completed. env_name: %s")
+	Messages[InfoMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateUser, "metadata: update user completed. id: %s")
 }

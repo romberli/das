@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	defaultEnvInfoID                   = 1
-	defaultEnvInfoEnvName              = "test"
+	defaultEnvInfoID                   = 2
+	defaultEnvInfoEnvName              = "test2"
 	defaultEnvInfoDelFlag              = 0
 	defaultEnvInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
 	defaultEnvInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"

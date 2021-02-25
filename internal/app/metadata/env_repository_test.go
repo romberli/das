@@ -13,13 +13,13 @@ import (
 
 const (
 	// modify these connection information
-	addr   = "192.168.137.11:3306"
-	dbName = "das"
-	dbUser = "root"
-	dbPass = "root"
+	addr   = "192.168.171.154:3306"
+	dbName = "testlab"
+	dbUser = "tester"
+	dbPass = "1"
 
 	newEnvName    = "newTest"
-	onlineEnvName = "online"
+	onlineEnvName = "test"
 )
 
 var envRepo = initEnvRepo()
@@ -128,6 +128,7 @@ func TestEnvRepo_Create(t *testing.T) {
 	asst := assert.New(t)
 
 	entity, err := createEnv()
+
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteEnvByID(entity.Identity())

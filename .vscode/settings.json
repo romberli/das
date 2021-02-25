@@ -1,0 +1,19 @@
+{
+    "go.inferGopath": false,
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "192.168.171.154",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "test",
+            "group": "test",
+            "database": "testlab",
+            "username": "tester",
+            "password": "1"
+        }
+    ]
+}
