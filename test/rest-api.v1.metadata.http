@@ -17,3 +17,4 @@ POST http://{{baseURL}}/api/v1/metadata/env/21
 Content-Type: application/json
 
 {"env_name": "test123", "del_flag": 1}
+z

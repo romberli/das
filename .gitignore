@@ -25,4 +25,4 @@ log/
 #other
 das.pid
 http-client.env.json
-
+.vscode/
