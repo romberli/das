@@ -119,7 +119,7 @@ func TestEnvInfo_MarshalJSONWithFields(t *testing.T) {
 	envInfo := initNewEnvInfo()
 	data, err := envInfo.MarshalJSONWithFields(envNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
-	expect, err := json.Marshal(map[string]interface{}{envNameJSON: "test"})
+	expect, err := json.Marshal(map[string]interface{}{envNameJSON: "test2"})
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	asst.Equal(string(expect), string(data), "test MarshalJSONWithFields() failed")
 }
