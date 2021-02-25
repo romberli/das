@@ -54,7 +54,7 @@ func (ur *UserRepo) Transaction() (middleware.Transaction, error) {
 // GetAll returns all available entities
 func (ur *UserRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
-		select id, user_name, del_flag, create_time, last_update_time ,department_name,employee_id,domin_account,email,telephone,mobile,role
+		select id, user_name, del_flag, create_time, last_update_time ,department_name,employee_id,domain_account,email,telephone,mobile,role
 		from t_meta_user_info
 		where del_flag = 0
 		order by id;
@@ -86,7 +86,7 @@ func (ur *UserRepo) GetAll() ([]dependency.Entity, error) {
 
 func (ur *UserRepo) GetByID(id string) (dependency.Entity, error) {
 	sql := `
-		select id, user_name, del_flag, create_time, last_update_time, department_name,employee_id,domin_account,email,telephone,mobile,role
+		select id, user_name, del_flag, create_time, last_update_time, department_name,employee_id,domain_account,email,telephone,mobile,role
 		from t_meta_user_info
 		where del_flag = 0
 		and id = ?;
@@ -149,7 +149,7 @@ func (ur *UserRepo) Update(entity dependency.Entity) error {
 	sql := `update t_meta_user_info set user_name = ?, del_flag = ?, department_name = ?, employee_id = ?, domain_account = ?, email = ?, telephone = ?, mobile = ?, role = ? where id = ?;`
 	log.Debugf("metadata UserRepo.Update() update sql: %s", sql)
 	userInfo := entity.(*UserInfo)
-	_, err := ur.Execute(sql, userInfo.UserName, userInfo.DelFlag, userInfo.DepartmentName, userInfo.EmployeeID, userInfo.DomainAccount, userInfo.Email, userInfo.Telephone, userInfo.Mobile, userInfo.ID)
+	_, err := ur.Execute(sql, userInfo.UserName, userInfo.DelFlag, userInfo.DepartmentName, userInfo.EmployeeID, userInfo.DomainAccount, userInfo.Email, userInfo.Telephone, userInfo.Mobile, userInfo.Role, userInfo.ID)
 
 	return err
 }

@@ -13,18 +13,15 @@ import (
 )
 
 const (
-	defaultUserInfoID       = 1
-	defaultUserInfoUserName = "un"
-	// defaultUserInfoLevel                = 8
-	// defaultUserInfoOwnerID              = 8
-	// defaultUserInfoOwnerGroup           = "k"
-	defaultUserInfoDepartmentName       = "dn"
-	defaultUserInfoEmployeeID           = 1
-	defaultUserInfoDomainAccount        = "da"
-	defaultUserInfoEmail                = "e"
-	defaultUserInfoTelephone            = "t"
-	defaultUserInfoMobile               = "m"
-	defaultUserInfoRole                 = 1
+	defaultUserInfoID                   = 11
+	defaultUserInfoUserName             = "nun"
+	defaultUserInfoDepartmentName       = "dn1"
+	defaultUserInfoEmployeeID           = 11
+	defaultUserInfoDomainAccount        = "da1"
+	defaultUserInfoEmail                = "e1"
+	defaultUserInfoTelephone            = "t1"
+	defaultUserInfoMobile               = "m1"
+	defaultUserInfoRole                 = 11
 	defaultUserInfoDelFlag              = 0
 	defaultUserInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
 	defaultUserInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"
@@ -142,7 +139,7 @@ func TestUserInfo_MarshalJSONWithFields(t *testing.T) {
 	userInfo := initNewUserInfo()
 	data, err := userInfo.MarshalJSONWithFields(userNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
-	expect, err := json.Marshal(map[string]interface{}{userNameJSON: "un"})
+	expect, err := json.Marshal(map[string]interface{}{userNameJSON: "nun"})
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	asst.Equal(string(expect), string(data), "test MarshalJSONWithFields() failed")
 }

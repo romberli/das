@@ -11,7 +11,16 @@ import (
 	"github.com/romberli/das/internal/dependency"
 )
 
-const userNameStruct = "UserName"
+const (
+	userNameStruct       = "UserName"
+	departmentNameStruct = "DepartmentName"
+	employeeIDStruct     = "EmployeeID"
+	domainAccountStruct  = "DomainAccount"
+	emailStruct          = "Email"
+	telephoneStruct      = "Telephone"
+	mobileStruct         = "Mobile"
+	roleStruct           = "Role"
+)
 
 var _ dependency.Service = (*UserService)(nil)
 
@@ -64,16 +73,38 @@ func (us *UserService) GetByID(id string) error {
 func (us *UserService) Create(fields map[string]interface{}) error {
 	// generate new map
 	userName, ok := fields[userNameStruct]
-	departmentName, ok := fields[userNameStruct]
-	employeeID, ok := fields[userNameStruct]
-	domainAccount, ok := fields[userNameStruct]
-	email, ok := fields[userNameStruct]
-	telephone, ok := fields[userNameStruct]
-	mobile, ok := fields[userNameStruct]
-	role, ok := fields[userNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, userNameStruct)
 	}
+	departmentName, ok := fields[departmentNameStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, departmentName)
+	}
+	employeeID, ok := fields[employeeIDStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, employeeIDStruct)
+	}
+	domainAccount, ok := fields[domainAccountStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, domainAccountStruct)
+	}
+	email, ok := fields[emailStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, emailStruct)
+	}
+	telephone, ok := fields[telephoneStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, telephoneStruct)
+	}
+	mobile, ok := fields[mobileStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, mobileStruct)
+	}
+	role, ok := fields[roleStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, roleStruct)
+	}
+
 	userInfo := NewUserInfoWithDefault(userName.(string), departmentName.(string), employeeID.(int), domainAccount.(string), email.(string), telephone.(string), mobile.(string), role.(int))
 	// insert into middleware
 	entity, err := us.Repository.Create(userInfo)
