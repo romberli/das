@@ -17,3 +17,7 @@ POST http://127.0.0.1:6090/api/v1/metadata/env/1
 Content-Type: application/json
 
 {"env_name": "test", "del_flag":0}
+
+
+
+

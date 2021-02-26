@@ -22,7 +22,7 @@ const (
 // @Tags application system
 // @Summary get all application systems
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 66, "system_name": "kkk", "del_flag": 0, "create_time": "2021-01-21T10:00:00+08:00", "last_update_time": "2021-01-21T10:00:00+08:00", "level": 8,"owner_id": 8,"owner_group": "k"}]}"
 // @Router /api/v1/metadata/app-system [get]
 func GetAppSystem(c *gin.Context) {
 	// init service
@@ -48,7 +48,7 @@ func GetAppSystem(c *gin.Context) {
 // @Tags application system
 // @Summary get application system by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{// @Success 200 {string} string "{"code": 200, "data": [{"id": 66, "system_name": "kkk", "del_flag": 0, "create_time": "2021-01-21T10:00:00+08:00", "last_update_time": "2021-01-21T10:00:00+08:00", "level": 8,"owner_id": 8,"owner_group": "k"}]}"
 // @Router /api/v1/metadata/app-system/:id [get]
 func GetAppSystemByID(c *gin.Context) {
 	// get param
@@ -80,7 +80,7 @@ func GetAppSystemByID(c *gin.Context) {
 // @Tags application system
 // @Summary add a new application system
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 66, "system_name": "kkk", "del_flag": 0, "create_time": "2021-01-21T10:00:00+08:00", "last_update_time": "2021-01-21T10:00:00+08:00", "level": 8,"owner_id": 8,"owner_group": "k"}]}"
 // @Router /api/v1/metadata/app-system [post]
 func AddAppSystem(c *gin.Context) {
 	var fields map[string]interface{}
@@ -125,7 +125,7 @@ func AddAppSystem(c *gin.Context) {
 // @Tags application system
 // @Summary update application system by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 66, "system_name": "kkk", "del_flag": 0, "create_time": "2021-01-21T10:00:00+08:00", "last_update_time": "2021-01-21T10:00:00+08:00", "level": 8,"owner_id": 8,"owner_group": "k"}]}"
 // @Router /api/v1/metadata/app-system/:id [post]
 func UpdateAppSystemByID(c *gin.Context) {
 	var fields map[string]interface{}
