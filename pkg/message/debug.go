@@ -10,6 +10,17 @@ const (
 	DebugMetadataAddEnv     = 100203
 	DebugMetadataUpdateEnv  = 100204
 
+
+	DebugMetadataGetAppSystemAll  = 100301
+	DebugMetadataGetAppSystemByID = 100302
+	DebugMetadataAddAppSystem     = 100303
+	DebugMetadataUpdateAppSystem  = 100304
+
+	DebugMetadataGetUserAll  = 100901
+	DebugMetadataGetUserByID = 100902
+	DebugMetadataAddUser     = 100903
+	DebugMetadataUpdateUser  = 100904
+
 	DebugMetadataGetDbAll  = 100401
 	DebugMetadataGetDbByID = 100402
 	DebugMetadataAddDb     = 100403
@@ -27,7 +38,17 @@ func initDebugMessage() {
 	Messages[DebugMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddEnv, "metadata: add new environment message: %s")
 	Messages[DebugMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateEnv, "metadata: update environment message: %s")
 
-	Messages[DebugMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetDbAll, "metadata: get all databases message: %s")
+	Messages[DebugMetadataGetAppSystemAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetAppSystemAll, "metadata: get all appsystem message: %s")
+	Messages[DebugMetadataGetAppSystemByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetAppSystemByID, "metadata: get appsystem by id message: %s")
+	Messages[DebugMetadataAddAppSystem] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddAppSystem, "metadata: add new appsystem message: %s")
+	Messages[DebugMetadataUpdateAppSystem] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateAppSystem, "metadata: update appsystem message: %s")
+
+	Messages[DebugMetadataGetUserAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetUserAll, "metadata: get all user message: %s")
+	Messages[DebugMetadataGetUserByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetUserByID, "metadata: get user by id message: %s")
+	Messages[DebugMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddUser, "metadata: add new user message: %s")
+	Messages[DebugMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateUser, "metadata: update user message: %s")
+
+  Messages[DebugMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetDbAll, "metadata: get all databases message: %s")
 	Messages[DebugMetadataGetDbByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetDbByID, "metadata: get database by id message: %s")
 	Messages[DebugMetadataAddDb] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddDb, "metadata: add new database message: %s")
 	Messages[DebugMetadataUpdateDb] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateDb, "metadata: update database message: %s")
