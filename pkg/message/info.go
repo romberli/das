@@ -16,7 +16,17 @@ const (
 	InfoMetadataAddEnv     = 200203
 	InfoMetadataUpdateEnv  = 200204
 
-	InfoMetadataGetAppSystemAll  = 200301
+	InfoMetadataGetMiddlewareClusterAll  = 200501
+	InfoMetadataGetMiddlewareClusterByID = 200502
+	InfoMetadataAddMiddlewareCluster     = 200503
+	InfoMetadataUpdateMiddlewareCluster  = 200504
+
+	InfoMetadataGetMiddlewareServerAll  = 200601
+	InfoMetadataGetMiddlewareServerByID = 200602
+	InfoMetadataAddMiddlewareServer     = 200603
+	InfoMetadataUpdateMiddlewareServer  = 200604
+
+  InfoMetadataGetAppSystemAll  = 200301
 	InfoMetadataGetAppSystemByID = 200302
 	InfoMetadataAddAppSystem     = 200303
 	InfoMetadataUpdateAppSystem  = 200304
@@ -48,6 +58,16 @@ func initInfoMessage() {
 	Messages[InfoMetadataGetEnvByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetEnvByID, "metadata: get environment by id completed. id: %s")
 	Messages[InfoMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddEnv, "metadata: add new environment completed. env_name: %s")
 	Messages[InfoMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateEnv, "metadata: update environment completed. id: %s")
+
+	Messages[InfoMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareClusterAll, "metadata: get middleware cluster all completed. id: %s")
+	Messages[InfoMetadataGetMiddlewareClusterByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareClusterByID, "metadata: get middleware cluster by id completed. id: %s")
+	Messages[InfoMetadataAddMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMiddlewareCluster, "metadata: add new middleware cluster completed. env_name: %s")
+	Messages[InfoMetadataUpdateMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster completed. id: %s")
+
+	Messages[InfoMetadataGetMiddlewareServerAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareServerAll, "metadata: get middleware server all completed. id: %s")
+	Messages[InfoMetadataGetMiddlewareServerByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareServerByID, "metadata: get middleware server by id completed. id: %s")
+	Messages[InfoMetadataAddMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMiddlewareServer, "metadata: add new middleware server completed. env_name: %s")
+	Messages[InfoMetadataUpdateMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMiddlewareServer, "metadata: update middleware server completed. id: %s")
 
 	Messages[InfoMetadataGetAppSystemAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetAppSystemAll, "metadata: get appsystem all completed")
 	Messages[InfoMetadataGetAppSystemByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetAppSystemByID, "metadata: get appsystem by id completed. id: %s")

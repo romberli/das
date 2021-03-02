@@ -167,6 +167,7 @@ func UpdateEnvByID(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrMetadataUpdateEnv, id, err.Error())
 		return
 	}
+
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {

@@ -28,7 +28,3 @@ http-client.env.json
 .vscode/
 .test
 das.yaml
-rest-api.v1.metadata.http
-rest-api.v1.metadata.appsystem.http
-rest-api.v1.metadata.user.http
-*.http
