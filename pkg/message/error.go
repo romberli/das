@@ -67,6 +67,36 @@ const (
 	ErrMetadataGetMYSQLServerByID = 400802
 	ErrMetadataAddMYSQLServer     = 400803
 	ErrMetadataUpdateMYSQLServer  = 400804
+
+  ErrMetadataGetMiddlewareClusterAll  = 400501
+	ErrMetadataGetMiddlewareClusterByID = 400502
+	ErrMetadataAddMiddlewareCluster     = 400503
+	ErrMetadataUpdateMiddlewareCluster  = 400504
+
+	ErrMetadataGetMiddlewareServerAll  = 400601
+	ErrMetadataGetMiddlewareServerByID = 400602
+	ErrMetadataAddMiddlewareServer     = 400603
+	ErrMetadataUpdateMiddlewareServer  = 400604
+
+  ErrMetadataGetAppSystemAll  = 400301
+	ErrMetadataGetAppSystemByID = 400302
+	ErrMetadataAddAppSystem     = 400303
+	ErrMetadataUpdateAppSystem  = 400304
+
+	ErrMetadataGetUserAll  = 400901
+	ErrMetadataGetUserByID = 400902
+	ErrMetadataAddUser     = 400903
+	ErrMetadataUpdateUser  = 400904
+
+	ErrMetadataGetDbAll  = 400401
+	ErrMetadataGetDbByID = 400402
+	ErrMetadataAddDb     = 400403
+	ErrMetadataUpdateDb  = 400404
+
+	ErrMetadataGetMSAll  = 400601
+	ErrMetadataGetMSByID = 400602
+	ErrMetadataAddMS     = 400603
+	ErrMetadataUpdateMS  = 400604
 )
 
 func initErrorMessage() {
@@ -133,4 +163,34 @@ func initErrorMessage() {
 	Messages[ErrMetadataGetMYSQLServerByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMYSQLServerByID, "metadata: get mysql server by id failed. id: %s\n%s")
 	Messages[ErrMetadataAddMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMYSQLServer, "metadata: add new mysql server failed. env_name: %s\n%s")
 	Messages[ErrMetadataUpdateMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMYSQLServer, "metadata: update mysql server failed. id: %s\n%s")
+
+  Messages[ErrMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterAll, "metadata: get all middleware cluster failed.\n%s")
+	Messages[ErrMetadataGetMiddlewareClusterByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterByID, "metadata: get middleware cluster by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMiddlewareCluster, "metadata: add new middleware cluster failed. env_name: %s\n%s")
+	Messages[ErrMetadataUpdateMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetMiddlewareServerAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareServerAll, "metadata: get all middleware server failed.\n%s")
+	Messages[ErrMetadataGetMiddlewareServerByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareServerByID, "metadata: get middleware server by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMiddlewareServer, "metadata: add new middleware server failed. env_name: %s\n%s")
+	Messages[ErrMetadataUpdateMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMiddlewareServer, "metadata: update middleware server failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetAppSystemAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetAppSystemAll, "metadata: get all app_system failed.\n%s")
+	Messages[ErrMetadataGetAppSystemByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetAppSystemByID, "metadata: get app_system by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddAppSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddAppSystem, "metadata: add new app_system failed. env_name: %s\n%s")
+	Messages[ErrMetadataUpdateAppSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateAppSystem, "metadata: update app_system failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetUserAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetUserAll, "metadata: get all user failed.\n%s")
+	Messages[ErrMetadataGetUserByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetUserByID, "metadata: get user by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddUser, "metadata: add new user failed. env_name: %s\n%s")
+	Messages[ErrMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateUser, "metadata: update user failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetDbAll, "metadata: get all databases failed.\n%s")
+	Messages[ErrMetadataGetDbByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetDbByID, "metadata: get database by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddDb] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddDb, "metadata: add new databases failed. db_name: %s\n%s")
+	Messages[ErrMetadataUpdateDb] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateDb, "metadata: update database failed. id: %s\n%s")
+
+	Messages[ErrMetadataGetMSAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMSAll, "metadata: get all monitor systems failed.\n%s")
+	Messages[ErrMetadataGetMSByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMSByID, "metadata: get monitor system by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddMS] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMS, "metadata: add new monitor system failed. system_name: %s\n%s")
+	Messages[ErrMetadataUpdateMS] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMS, "metadata: update monitor system failed. id: %s\n%s")
 }
