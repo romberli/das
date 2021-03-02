@@ -1,0 +1,65 @@
+@baseURL = 127.0.0.1:6090
+
+### get all environments
+GET http://{{baseURL}}/api/v1/metadata/env
+Accept: application/json
+
+### get environment by id
+GET http://{{baseURL}}/api/v1/metadata/env/1
+Accept: application/json
+
+### add new environment
+POST http://{{baseURL}}/api/v1/metadata/env
+Content-Type: application/json
+
+{"env_name": "test"}
+
+### update environment by id
+POST http://{{baseURL}}/api/v1/metadata/env/21
+Content-Type: application/json
+
+{"env_name": "test123", "del_flag": 1}
+
+### =============== mysql-cluster ===================
+
+### get all mysql clusters
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster
+Accept: application/json
+
+### get mysql cluster by id
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster/1
+Accept: application/json
+
+### add new mysql cluster
+POST http://{{baseURL}}/api/v1/metadata/mysql-cluster
+Content-Type: application/json
+
+{"cluster_name": "api_test"}
+
+### update mysql cluster by id
+POST http://{{baseURL}}/api/v1/metadata/mysql-cluster/154
+Content-Type: application/json
+
+{"cluster_name": "api_test", "del_flag": 1}
+
+### =============== mysql-server ===================
+
+### get all mysql servers
+GET http://{{baseURL}}/api/v1/metadata/mysql-server
+Accept: application/json
+
+### get mysql server by id
+GET http://{{baseURL}}/api/v1/metadata/mysql-server/1
+Accept: application/json
+
+### add new mysql server
+POST http://{{baseURL}}/api/v1/metadata/mysql-server
+Content-Type: application/json
+
+{"host_ip": "192.168.1.1", "port_num": 3306}
+
+### update mysql server by id
+POST http://{{baseURL}}/api/v1/metadata/mysql-server/93
+Content-Type: application/json
+
+{"host_ip": "192.168.1.1", "port_num": 3306, "del_flag": 1}

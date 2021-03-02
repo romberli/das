@@ -16,7 +16,17 @@ const (
 	InfoMetadataAddEnv     = 200203
 	InfoMetadataUpdateEnv  = 200204
 
-	InfoMetadataGetMiddlewareClusterAll  = 200501
+	InfoMetadataGetMYSQLClusterAll  = 200701
+	InfoMetadataGetMYSQLClusterByID = 200702
+	InfoMetadataAddMYSQLCluster     = 200703
+	InfoMetadataUpdateMYSQLCluster  = 200704
+
+	InfoMetadataGetMYSQLServerAll  = 200801
+	InfoMetadataGetMYSQLServerByID = 200802
+	InfoMetadataAddMYSQLServer     = 200803
+	InfoMetadataUpdateMYSQLServer  = 200804
+
+  InfoMetadataGetMiddlewareClusterAll  = 200501
 	InfoMetadataGetMiddlewareClusterByID = 200502
 	InfoMetadataAddMiddlewareCluster     = 200503
 	InfoMetadataUpdateMiddlewareCluster  = 200504
@@ -59,7 +69,17 @@ func initInfoMessage() {
 	Messages[InfoMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddEnv, "metadata: add new environment completed. env_name: %s")
 	Messages[InfoMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateEnv, "metadata: update environment completed. id: %s")
 
-	Messages[InfoMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareClusterAll, "metadata: get middleware cluster all completed. id: %s")
+	Messages[InfoMetadataGetMYSQLClusterAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMYSQLClusterAll, "metadata: get mysql cluster all completed")
+	Messages[InfoMetadataGetMYSQLClusterByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMYSQLClusterByID, "metadata: get mysql cluster by id completed. id: %s")
+	Messages[InfoMetadataAddMYSQLCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMYSQLCluster, "metadata: add new mysql cluster completed. env_name: %s")
+	Messages[InfoMetadataUpdateMYSQLCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMYSQLCluster, "metadata: update mysql cluster completed. id: %s")
+
+	Messages[InfoMetadataGetMYSQLServerAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMYSQLServerAll, "metadata: get mysql server all completed")
+	Messages[InfoMetadataGetMYSQLServerByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMYSQLServerByID, "metadata: get mysql server by id completed. id: %s")
+	Messages[InfoMetadataAddMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMYSQLServer, "metadata: add new mysql server completed. env_name: %s")
+	Messages[InfoMetadataUpdateMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMYSQLServer, "metadata: update mysql server completed. id: %s")
+
+  Messages[InfoMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareClusterAll, "metadata: get middleware cluster all completed. id: %s")
 	Messages[InfoMetadataGetMiddlewareClusterByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareClusterByID, "metadata: get middleware cluster by id completed. id: %s")
 	Messages[InfoMetadataAddMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMiddlewareCluster, "metadata: add new middleware cluster completed. env_name: %s")
 	Messages[InfoMetadataUpdateMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster completed. id: %s")

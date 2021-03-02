@@ -11,28 +11,35 @@ import (
 	"github.com/romberli/das/internal/dependency"
 )
 
-const envNameStruct = "EnvName"
+const (
+	clusterNameStruct         = "ClusterName"
+	middlewareClusterIDStruct = "MiddlewareClusterID"
+	monitorSystemIDStruct     = "MonitorSystemID"
+	ownerIDStruct             = "OwnerID"
+	ownerGroupStruct          = "OwnerGroup"
+	envIDStruct               = "EnvID"
+)
 
-var _ dependency.Service = (*EnvService)(nil)
+var _ dependency.Service = (*MYSQLClusterService)(nil)
 
-// EnvService implements Service interface
-type EnvService struct {
+// MYSQLClusterService implements Service interface
+type MYSQLClusterService struct {
 	dependency.Repository
 	Entities []dependency.Entity
 }
 
-// NewEnvService returns a new *EnvService
-func NewEnvService(repo dependency.Repository) *EnvService {
-	return &EnvService{repo, []dependency.Entity{}}
+// NewMYSQLClusterService returns a new *MYSQLClusterService
+func NewMYSQLClusterService(repo dependency.Repository) *MYSQLClusterService {
+	return &MYSQLClusterService{repo, []dependency.Entity{}}
 }
 
-// NewEnvServiceWithDefault returns a new *EnvService with default repository
-func NewEnvServiceWithDefault() *EnvService {
-	return NewEnvService(NewEnvRepoWithGlobal())
+// NewMYSQLClusterServiceWithDefault returns a new *MYSQLClusterService with default repository
+func NewMYSQLClusterServiceWithDefault() *MYSQLClusterService {
+	return NewMYSQLClusterService(NewMYSQLClusterRepoWithGlobal())
 }
 
 // GetEntities returns entities of the service
-func (es *EnvService) GetEntities() []dependency.Entity {
+func (es *MYSQLClusterService) GetEntities() []dependency.Entity {
 	entityList := make([]dependency.Entity, len(es.Entities))
 	for i := range entityList {
 		entityList[i] = es.Entities[i]
@@ -42,7 +49,7 @@ func (es *EnvService) GetEntities() []dependency.Entity {
 }
 
 // GetAll gets all environment entities from the middleware
-func (es *EnvService) GetAll() error {
+func (es *MYSQLClusterService) GetAll() error {
 	var err error
 	es.Entities, err = es.Repository.GetAll()
 
@@ -50,7 +57,7 @@ func (es *EnvService) GetAll() error {
 }
 
 // GetByID gets an environment entity that contains the given id from the middleware
-func (es *EnvService) GetByID(id string) error {
+func (es *MYSQLClusterService) GetByID(id string) error {
 	entity, err := es.Repository.GetByID(id)
 	if err != nil {
 		return err
@@ -62,15 +69,15 @@ func (es *EnvService) GetByID(id string) error {
 }
 
 // Create creates a new environment entity and insert it into the middleware
-func (es *EnvService) Create(fields map[string]interface{}) error {
+func (es *MYSQLClusterService) Create(fields map[string]interface{}) error {
 	// generate new map
-	envName, ok := fields[envNameStruct]
+	clusterName, ok := fields[clusterNameStruct]
 	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, envNameStruct)
+		return message.NewMessage(message.ErrFieldNotExists, clusterNameStruct)
 	}
-	envInfo := NewEnvInfoWithDefault(envName.(string))
+	mysqlClusterInfo := NewMYSQLClusterInfoWithDefault(clusterName.(string))
 	// insert into middleware
-	entity, err := es.Repository.Create(envInfo)
+	entity, err := es.Repository.Create(mysqlClusterInfo)
 	if err != nil {
 		return err
 	}
@@ -83,7 +90,7 @@ func (es *EnvService) Create(fields map[string]interface{}) error {
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (es *EnvService) Update(id string, fields map[string]interface{}) error {
+func (es *MYSQLClusterService) Update(id string, fields map[string]interface{}) error {
 	err := es.GetByID(id)
 	if err != nil {
 		return err
@@ -97,17 +104,17 @@ func (es *EnvService) Update(id string, fields map[string]interface{}) error {
 }
 
 // Delete deletes the environment entity that contains the given id in the middleware
-func (es *EnvService) Delete(id string) error {
+func (es *MYSQLClusterService) Delete(id string) error {
 	return es.Repository.Delete(id)
 }
 
 // Marshal marshals service.Entities
-func (es *EnvService) Marshal() ([]byte, error) {
+func (es *MYSQLClusterService) Marshal() ([]byte, error) {
 	return json.Marshal(es.Entities)
 }
 
 // MarshalWithFields marshals service.Entities with given fields
-func (es *EnvService) MarshalWithFields(fields ...string) ([]byte, error) {
+func (es *MYSQLClusterService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(es.Entities))
 	for i := range interfaceList {
 		entity, err := common.CopyStructWithFields(es.Entities[i], fields...)
