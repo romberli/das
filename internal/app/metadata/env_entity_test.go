@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	defaultEnvInfoID                   = 1
-	defaultEnvInfoEnvName              = "test"
+	defaultEnvInfoID                   = 2
+	defaultEnvInfoEnvName              = "test2"
 	defaultEnvInfoDelFlag              = 0
 	defaultEnvInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
 	defaultEnvInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"
@@ -119,7 +119,7 @@ func TestEnvInfo_MarshalJSONWithFields(t *testing.T) {
 	envInfo := initNewEnvInfo()
 	data, err := envInfo.MarshalJSONWithFields(envNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
-	expect, err := json.Marshal(map[string]interface{}{envNameJSON: "test"})
+	expect, err := json.Marshal(map[string]interface{}{envNameJSON: "test2"})
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	asst.Equal(string(expect), string(data), "test MarshalJSONWithFields() failed")
 }

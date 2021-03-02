@@ -10,95 +10,95 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEnvServiceAll(t *testing.T) {
-	TestEnvService_GetEntities(t)
-	TestEnvService_GetAll(t)
-	TestEnvService_GetByID(t)
-	TestEnvService_Create(t)
-	TestEnvService_Update(t)
-	TestEnvService_Delete(t)
-	TestEnvService_Marshal(t)
-	TestEnvService_MarshalWithFields(t)
+func TestMSServiceAll(t *testing.T) {
+	TestMSService_GetEntities(t)
+	TestMSService_GetAll(t)
+	TestMSService_GetByID(t)
+	TestMSService_Create(t)
+	TestMSService_Update(t)
+	TestMSService_Delete(t)
+	TestMSService_Marshal(t)
+	TestMSService_MarshalWithFields(t)
 }
 
-func TestEnvService_GetEntities(t *testing.T) {
+func TestMSService_GetEntities(t *testing.T) {
 	asst := assert.New(t)
 
-	s := NewEnvService(envRepo)
+	s := NewMSService(mSRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEntities() failed")
 	entities := s.GetEntities()
 	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
 }
 
-func TestEnvService_GetAll(t *testing.T) {
+func TestMSService_GetAll(t *testing.T) {
 	asst := assert.New(t)
 
-	s := NewEnvService(envRepo)
+	s := NewMSService(mSRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEntities() failed")
 	entities := s.GetEntities()
 	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
 }
 
-func TestEnvService_GetByID(t *testing.T) {
+func TestMSService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	s := NewEnvService(envRepo)
+	s := NewMSService(mSRepo)
 	err := s.GetByID("1")
 	asst.Nil(err, "test GetByID() failed")
 	id := s.Entities[constant.ZeroInt].Identity()
 	asst.Equal("1", id, "test GetByID() failed")
 }
 
-func TestEnvService_Create(t *testing.T) {
+func TestMSService_Create(t *testing.T) {
 	asst := assert.New(t)
 
-	s := NewEnvService(envRepo)
-	err := s.Create(map[string]interface{}{envNameStruct: defaultEnvInfoEnvName})
+	s := NewMSService(mSRepo)
+	err := s.Create(map[string]interface{}{mSNameStruct: defaultMSInfoMSName, systemTypeStruct: defaultMSInfoSystemType, hostIpStruct: defaultMSInfoHostIp, portNumStruct: defaultMSInfoPortNum, portNumSlowStruct: defaultMSInfoPortNumSlow, baseUrlStruct: defaultMSInfoBaseUrl})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteMSByID(s.Entities[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
-func TestEnvService_Update(t *testing.T) {
+func TestMSService_Update(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	entity, err := createMS()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	s := NewEnvService(envRepo)
-	err = s.Update(entity.Identity(), map[string]interface{}{envNameStruct: newEnvName})
+	s := NewMSService(mSRepo)
+	err = s.Update(entity.Identity(), map[string]interface{}{mSNameStruct: newMSName})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	envName, err := s.GetEntities()[constant.ZeroInt].Get(envNameStruct)
+	mSName, err := s.GetEntities()[constant.ZeroInt].Get(mSNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	asst.Equal(newEnvName, envName)
+	asst.Equal(newMSName, mSName)
 	// delete
-	err = deleteEnvByID(s.Entities[0].Identity())
+	err = deleteMSByID(s.Entities[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
-func TestEnvService_Delete(t *testing.T) {
+func TestMSService_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	entity, err := createMS()
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
-	s := NewEnvService(envRepo)
+	s := NewMSService(mSRepo)
 	err = s.Delete(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteMSByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }
 
-func TestEnvService_Marshal(t *testing.T) {
-	var entitiesUnmarshal []*EnvInfo
+func TestMSService_Marshal(t *testing.T) {
+	var entitiesUnmarshal []*MSInfo
 
 	asst := assert.New(t)
 
-	s := NewEnvService(envRepo)
+	s := NewMSService(mSRepo)
 	err := s.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
 	data, err := s.Marshal()
@@ -109,23 +109,23 @@ func TestEnvService_Marshal(t *testing.T) {
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(equal(entity.(*EnvInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(mSEqual(entity.(*MSInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 
-func TestEnvService_MarshalWithFields(t *testing.T) {
+func TestMSService_MarshalWithFields(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	entity, err := createMS()
 	asst.Nil(err, common.CombineMessageWithError("test MarshalWithFields() failed", err))
-	s := NewEnvService(envRepo)
+	s := NewMSService(mSRepo)
 	err = s.GetByID(entity.Identity())
-	dataService, err := s.MarshalWithFields(envNameStruct)
+	dataService, err := s.MarshalWithFields(mSNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalWithFields() failed", err))
-	dataEntity, err := entity.MarshalJSONWithFields(envNameStruct)
+	dataEntity, err := entity.MarshalJSONWithFields(mSNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalWithFields() failed", err))
 	asst.Equal(string(dataService), fmt.Sprintf("[%s]", string(dataEntity)))
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteMSByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }
