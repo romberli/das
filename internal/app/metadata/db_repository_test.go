@@ -12,30 +12,25 @@ import (
 )
 
 const (
-	// modify these connection information
-	addr   = "192.168.171.154:3306"
-	dbName = "testlab"
-	dbUser = "tester"
-	dbPass = "1"
-	newEnvName    = "newTest"
-	onlineEnvName = "test"
+	newDbName    = "newDb"
+	onlineDbName = "db1"
 )
 
-var envRepo = initEnvRepo()
+var dbRepo = initDbRepo()
 
-func initEnvRepo() *EnvRepo {
+func initDbRepo() *DbRepo {
 	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initEnvRepo() failed", err))
 		return nil
 	}
 
-	return NewEnvRepo(pool)
+	return NewDbRepo(pool)
 }
 
-func createEnv() (dependency.Entity, error) {
-	envInfo := NewEnvInfoWithDefault(defaultMSInfoMSName)
-	entity, err := envRepo.Create(envInfo)
+func createDb() (dependency.Entity, error) {
+	dbInfo := NewDbInfoWithDefault(defaultDbInfoDbName, defaultDbInfoOwnerId, defaultDbInfoEnvId)
+	entity, err := dbRepo.Create(dbInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -43,122 +38,121 @@ func createEnv() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteEnvByID(id string) error {
-	sql := `delete from t_meta_env_info where id = ?`
-	_, err := envRepo.Execute(sql, id)
+func deleteDbByID(id string) error {
+	sql := `delete from t_meta_db_info where id = ?`
+	_, err := dbRepo.Execute(sql, id)
 	return err
 }
 
-func TestEnvRepoAll(t *testing.T) {
-	TestEnvRepo_Execute(t)
-	TestEnvRepo_GetAll(t)
-	TestEnvRepo_GetByID(t)
-	TestEnvRepo_Create(t)
-	TestEnvRepo_Update(t)
-	TestEnvRepo_Delete(t)
+func TestDbRepoAll(t *testing.T) {
+	TestDbRepo_Execute(t)
+	TestDbRepo_GetAll(t)
+	TestDbRepo_GetByID(t)
+	TestDbRepo_Create(t)
+	TestDbRepo_Update(t)
+	TestDbRepo_Delete(t)
 }
 
-func TestEnvRepo_Execute(t *testing.T) {
+func TestDbRepo_Execute(t *testing.T) {
 	asst := assert.New(t)
 
 	sql := `select 1;`
-	result, err := envRepo.Execute(sql)
+	result, err := dbRepo.Execute(sql)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	asst.Equal(1, int(r), "test Execute() failed")
 }
 
-func TestEnvRepo_Transaction(t *testing.T) {
+func TestDbRepo_Transaction(t *testing.T) {
 	asst := assert.New(t)
 
-	sql := `insert into t_meta_env_info(env_name) values(?);`
-	tx, err := envRepo.Transaction()
+	sql := `insert into t_meta_db_info(db_name, owner_id, env_id) values(?,?,?);`
+	tx, err := dbRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	_, err = tx.Execute(sql, defaultMSInfoMSName)
+	_, err = tx.Execute(sql, defaultDbInfoDbName, defaultDbInfoOwnerId, defaultDbInfoEnvId)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
-	sql = `select env_name from t_meta_env_info where env_name=?`
-	result, err := tx.Execute(sql, defaultMSInfoMSName)
+	sql = `select db_name from t_meta_db_info where db_name=?`
+	result, err := tx.Execute(sql, defaultDbInfoDbName)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	envName, err := result.GetString(0, 0)
+	dbName, err := result.GetString(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	if envName != defaultMSInfoMSName {
+	if dbName != defaultDbInfoDbName {
 		asst.Fail("test Transaction() failed")
 	}
 	err = tx.Rollback()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if rollbacked
-	entities, err := envRepo.GetAll()
+	entities, err := dbRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		envName, err := entity.Get(mSNameStruct)
+		dbName, err := entity.Get(dbNameStruct)
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-		if envName == defaultMSInfoMSName {
+		if dbName == defaultDbInfoDbName {
 			asst.Fail("test Transaction() failed")
 			break
 		}
 	}
 }
 
-func TestEnvRepo_GetAll(t *testing.T) {
+func TestDbRepo_GetAll(t *testing.T) {
 	asst := assert.New(t)
 
-	entities, err := envRepo.GetAll()
+	entities, err := dbRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	envName, err := entities[0].Get("EnvName")
+	dbName, err := entities[0].Get("DbName")
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(onlineEnvName, envName.(string), "test GetAll() failed")
+	asst.Equal(onlineDbName, dbName.(string), "test GetAll() failed")
 }
 
-func TestEnvRepo_GetByID(t *testing.T) {
+func TestDbRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := envRepo.GetByID("1")
+	entity, err := dbRepo.GetByID("1")
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	envName, err := entity.Get(mSNameStruct)
+	dbName, err := entity.Get(dbNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(onlineEnvName, envName.(string), "test GetByID() failed")
+	asst.Equal(onlineDbName, dbName.(string), "test GetByID() failed")
 }
 
-func TestEnvRepo_Create(t *testing.T) {
+func TestDbRepo_Create(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
-
+	entity, err := createDb()
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteDbByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
-func TestEnvRepo_Update(t *testing.T) {
+func TestDbRepo_Update(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	entity, err := createDb()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	err = entity.Set(map[string]interface{}{mSNameStruct: newEnvName})
+	err = entity.Set(map[string]interface{}{dbNameStruct: newDbName})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	err = envRepo.Update(entity)
+	err = dbRepo.Update(entity)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	entity, err = envRepo.GetByID(entity.Identity())
+	entity, err = dbRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	envName, err := entity.Get(mSNameStruct)
+	dbName, err := entity.Get(dbNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	asst.Equal(newEnvName, envName, "test Update() failed")
+	asst.Equal(newDbName, dbName, "test Update() failed")
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteDbByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
-func TestEnvRepo_Delete(t *testing.T) {
+func TestDbRepo_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	entity, err := createDb()
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteDbByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }

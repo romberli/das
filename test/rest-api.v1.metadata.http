@@ -18,6 +18,42 @@ Content-Type: application/json
 
 {"env_name": "test", "del_flag":0}
 
+### get all databases
+GET http://{{baseURL}}/api/v1/metadata/db
+Accept: application/json
 
+### get database by id
+GET http://{{baseURL}}/api/v1/metadata/db/1
+Accept: application/json
 
+### add new database
+POST http://{{baseURL}}/api/v1/metadata/db
+Content-Type: application/json
 
+{"db_name": "db2","owner_id": "1", "env_id": "5"}
+
+### get database by id
+POST http://{{baseURL}}/api/v1/metadata/db/4
+Content-Type: application/json
+
+{"db_name": "db3", "del_flag": 1}
+
+### get all monitor systems
+GET http://{{baseURL}}/api/v1/metadata/monitor-system
+Accept: application/json
+
+### get monitor system by id
+GET http://{{baseURL}}/api/v1/metadata/monitor-system/1
+Accept: application/json
+
+### add new monitor system
+POST http://{{baseURL}}/api/v1/metadata/monitor-system
+Content-Type: application/json
+
+{"system_name": "ms7", "system_type":"1","host_ip": "127.0.0.1", "port_num": "3314","port_num_slow": "3315", "base_url": "http://127.0.0.1/prometheus/api/v1/"}
+
+### get monitor system by id
+POST http://{{baseURL}}/api/v1/metadata/monitor-system/5
+Content-Type: application/json
+
+{"system_name": "ms9", "del_flag": 1}
