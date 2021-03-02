@@ -2,13 +2,14 @@ package metadata
 
 import (
 	"encoding/json"
+	"reflect"
+	"strconv"
+	"testing"
+
 	"github.com/jinzhu/now"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/stretchr/testify/assert"
-	"reflect"
-	"strconv"
-	"testing"
 )
 
 const (

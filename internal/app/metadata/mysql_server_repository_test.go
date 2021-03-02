@@ -112,7 +112,7 @@ func TestMYSQLServerRepo_Transaction(t *testing.T) {
 	for _, entity := range entities {
 		hostIP, err := entity.Get(hostIPStruct)
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-		portNum, err := entity.Get(portNumStruct)
+		portNum, err := entity.Get(mSPortNumStruct)
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 		if hostIP == testTransactionHostIP && portNum == testTransactionPortNum {
 			asst.Fail("test Transaction() failed")
@@ -156,7 +156,7 @@ func TestMYSQLServerRepo_GetByID(t *testing.T) {
 	hostIP, err := entity.Get(hostIPStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	asst.Equal(testInitHostIP, hostIP.(string), "test GetByID() failed")
-	portNum, err := entity.Get(portNumStruct)
+	portNum, err := entity.Get(mSPortNumStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	asst.Equal(testInitPortNum, portNum.(int), "test GetByID() failed")
 }
@@ -177,8 +177,8 @@ func TestMYSQLServerRepo_Update(t *testing.T) {
 	entity, err := createMYSQLServer()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = entity.Set(map[string]interface{}{
-		hostIPStruct:  testUpdateHostIP,
-		portNumStruct: testUpdatePortNum})
+		hostIPStruct:    testUpdateHostIP,
+		mSPortNumStruct: testUpdatePortNum})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = mysqlServerRepo.Update(entity)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
@@ -187,7 +187,7 @@ func TestMYSQLServerRepo_Update(t *testing.T) {
 	hostIP, err := entity.Get(hostIPStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(testUpdateHostIP, hostIP, "test Update() failed")
-	portNum, err := entity.Get(portNumStruct)
+	portNum, err := entity.Get(mSPortNumStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(testUpdatePortNum, portNum, "test Update() failed")
 	// delete

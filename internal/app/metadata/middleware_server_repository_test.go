@@ -1,17 +1,19 @@
 package metadata
 
 import (
-	"github.com/romberli/das/internal/dependency"
+	"testing"
+
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
-	"testing"
+
+	"github.com/romberli/das/internal/dependency"
 )
 
 const (
 	newMiddlewareServerName    = "test"
-	onlineMiddlewareServerName = "online"
+	onlineMiddlewareServerName = "ccc"
 )
 
 var middlewareServerRepo = initMiddlewareServerRepo()

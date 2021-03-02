@@ -1,28 +1,65 @@
+### ========== environment ==========
+### get all environments
+GET http://{{baseURL}}/api/v1/metadata/env
+Content-Type: application/json
+
 ### get environment by id
-POST http://{{baseURL}}/api/v1/metadata/env/6
+GET http://{{baseURL}}/api/v1/metadata/env/1
+Content-Type: application/json
+
+### add new environment
+POST http://{{baseURL}}/api/v1/metadata/env
+Content-Type: application/json
+
+{"env_name": "new_environment"}
+
+### update environment by id
+POST http://{{baseURL}}/api/v1/metadata/env/1
 Content-Type: application/json
 
 {"env_name": "test123", "del_flag": 1}
 
+### ========== middleware ==========
 ### get all middleware cluster
 GET http://{{baseURL}}/api/v1/metadata/middleware-cluster
 Accept: application/json
 
 ### get middleware cluster by id
-GET http://{{baseURL}}/api/v1/metadata/middleware-cluster/1
+GET http://{{baseURL}}/api/v1/metadata/middleware-cluster/2
 Accept: application/json
 
 ### add new middleware cluster
 POST http://{{baseURL}}/api/v1/metadata/middleware-cluster
 Content-Type: application/json
 
-{"cluster_name": "connection_test", "env_id": 1}
+{"cluster_name": "test", "env_id": 1}
 
-### update environment by id
-POST http://{{baseURL}}/api/v1/metadata/env/21
+### update middleware-cluster by id
+POST http://{{baseURL}}/api/v1/metadata/middleware-cluster/2
 Content-Type: application/json
 
-{"env_name": "test123", "del_flag": 1}
+{"cluster_name": "new_middleware_cluster", "del_flag": 1}
+
+### get all middleware server
+GET http://{{baseURL}}/api/v1/metadata/middleware-server
+Accept: application/json
+
+### get middleware server by id
+GET http://{{baseURL}}/api/v1/metadata/middleware-server/1
+Accept: application/json
+
+### add new middleware server
+POST http://{{baseURL}}/api/v1/metadata/middleware-server
+Content-Type: application/json
+
+{"cluster_id_middleware": 1, "server_name": "middleware_server", "middleware_role": 1, "host_ip": "123.123.123.1", "port_num": 12}
+
+### update middleware-cluster by id
+POST http://{{baseURL}}/api/v1/metadata/middleware-server/1
+Content-Type: application/json
+
+{"server_name": "ccc", "del_flag": 1}
+
 
 ### =============== mysql-cluster ===================
 
@@ -46,6 +83,8 @@ Content-Type: application/json
 
 {"cluster_name": "api_test", "del_flag": 1}
 
+
+
 ### =============== mysql-server ===================
 
 ### get all mysql servers
@@ -68,31 +107,9 @@ Content-Type: application/json
 
 {"host_ip": "192.168.1.1", "port_num": 3306, "del_flag": 1}
 
-### update middleware-cluster by id
-POST http://{{baseURL}}/api/v1/metadata/middleware-cluster/29
-Content-Type: application/json
 
-{"cluster_name": "ccc", "del_flag": 1}
 
-### get all middleware server
-GET http://{{baseURL}}/api/v1/metadata/middleware-server
-Accept: application/json
 
-### get middleware server by id
-GET http://{{baseURL}}/api/v1/metadata/middleware-server/1
-Accept: application/json
-
-### add new middleware server
-POST http://{{baseURL}}/api/v1/metadata/middleware-server
-Content-Type: application/json
-
-{"cluster_id_middleware": 3, "server_name": "connection_test", "middleware_role": 1, "host_ip": "123.123.123.1", "port_num": 12}
-
-### update middleware-cluster by id
-POST http://{{baseURL}}/api/v1/metadata/middleware-server/30
-Content-Type: application/json
-
-{"server_name": "ccc", "del_flag": 1}
 
 ### get all databases
 GET http://{{baseURL}}/api/v1/metadata/db

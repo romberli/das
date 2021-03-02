@@ -55,7 +55,7 @@ func TestMSService_Create(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMSService(mSRepo)
-	err := s.Create(map[string]interface{}{mSNameStruct: defaultMSInfoMSName, systemTypeStruct: defaultMSInfoSystemType, hostIpStruct: defaultMSInfoHostIp, portNumStruct: defaultMSInfoPortNum, portNumSlowStruct: defaultMSInfoPortNumSlow, baseUrlStruct: defaultMSInfoBaseUrl})
+	err := s.Create(map[string]interface{}{mSNameStruct: defaultMSInfoMSName, systemTypeStruct: defaultMSInfoSystemType, mSHostIpStruct: defaultMSInfoHostIp, mSPortNumStruct: defaultMSInfoPortNum, portNumSlowStruct: defaultMSInfoPortNumSlow, baseUrlStruct: defaultMSInfoBaseUrl})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteMSByID(s.Entities[0].Identity())

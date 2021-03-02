@@ -3,12 +3,14 @@ package metadata
 import (
 	"errors"
 	"fmt"
-	"github.com/romberli/das/global"
-	"github.com/romberli/das/internal/dependency"
+	"strconv"
+
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware"
 	"github.com/romberli/log"
-	"strconv"
+
+	"github.com/romberli/das/global"
+	"github.com/romberli/das/internal/dependency"
 )
 
 var _ dependency.Repository = (*MiddlewareServerRepo)(nil)
@@ -51,7 +53,7 @@ func (msr *MiddlewareServerRepo) Transaction() (middleware.Transaction, error) {
 // GetAll returns all available entities
 func (msr *MiddlewareServerRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
-      select id, cluster_id_middleware, server_name, middleware_role, host_ip, port_num, del_flag, create_time, last_update_time
+      select id, cluster_id, server_name, middleware_role, host_ip, port_num, del_flag, create_time, last_update_time
       from t_meta_middleware_server_info
       where del_flag = 0
       order by id;
@@ -83,7 +85,7 @@ func (msr *MiddlewareServerRepo) GetAll() ([]dependency.Entity, error) {
 
 func (msr *MiddlewareServerRepo) GetByID(id string) (dependency.Entity, error) {
 	sql := `
-      select id, cluster_id_middleware, server_name, middleware_role, host_ip, port_num, del_flag, create_time, last_update_time
+      select id, cluster_id, server_name, middleware_role, host_ip, port_num, del_flag, create_time, last_update_time
       from t_meta_middleware_server_info
       where del_flag = 0
       and id = ?;
@@ -125,10 +127,10 @@ func (msr *MiddlewareServerRepo) GetID(entity dependency.Entity) (string, error)
 
 // Create creates data with given entity in the middleware
 func (msr *MiddlewareServerRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
-	sql := `insert into t_meta_middleware_server_info(cluster_id_middleware, server_name, middleware_role, host_ip, port_num) values(?, ?, ?, ?, ?);`
+	sql := `insert into t_meta_middleware_server_info(cluster_id, server_name, middleware_role, host_ip, port_num) values(?, ?, ?, ?, ?);`
 	log.Debugf("metadata MiddlewareServerRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := msr.Execute(sql, entity.(*MiddlewareServerInfo).ClusterIDMiddleware, entity.(*MiddlewareServerInfo).ServerName, entity.(*MiddlewareServerInfo).MiddlewareRole, entity.(*MiddlewareServerInfo).HostIP, entity.(*MiddlewareServerInfo).PortNum)
+	_, err := msr.Execute(sql, entity.(*MiddlewareServerInfo).ClusterID, entity.(*MiddlewareServerInfo).ServerName, entity.(*MiddlewareServerInfo).MiddlewareRole, entity.(*MiddlewareServerInfo).HostIP, entity.(*MiddlewareServerInfo).PortNum)
 	if err != nil {
 		return nil, err
 	}
@@ -143,10 +145,10 @@ func (msr *MiddlewareServerRepo) Create(entity dependency.Entity) (dependency.En
 
 // Update updates data with given entity in the middleware
 func (msr *MiddlewareServerRepo) Update(entity dependency.Entity) error {
-	sql := `update t_meta_middleware_server_info set cluster_id_middleware = ?, server_name = ?, middleware_role = ?, host_ip = ?, port_num = ? where id = ?;`
+	sql := `update t_meta_middleware_server_info set cluster_id = ?, server_name = ?, middleware_role = ?, host_ip = ?, port_num = ? where id = ?;`
 	log.Debugf("metadata MiddlewareServerRepo.Update() update sql: %s", sql)
 	middlewareServerInfo := entity.(*MiddlewareServerInfo)
-	_, err := msr.Execute(sql, middlewareServerInfo.ClusterIDMiddleware, middlewareServerInfo.ServerName, middlewareServerInfo.MiddlewareRole, middlewareServerInfo.HostIP, middlewareServerInfo.PortNum, middlewareServerInfo.ID)
+	_, err := msr.Execute(sql, middlewareServerInfo.ClusterID, middlewareServerInfo.ServerName, middlewareServerInfo.MiddlewareRole, middlewareServerInfo.HostIP, middlewareServerInfo.PortNum, middlewareServerInfo.ID)
 
 	return err
 }

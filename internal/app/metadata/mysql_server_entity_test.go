@@ -108,7 +108,7 @@ func TestMYSQLServerInfo_Get(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
 	asst.Equal(mysqlServerInfo.HostIP, hostIP, "test Get() failed")
 
-	portNum, err := mysqlServerInfo.Get(portNumStruct)
+	portNum, err := mysqlServerInfo.Get(mSPortNumStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
 	asst.Equal(mysqlServerInfo.PortNum, portNum, "test Get() failed")
 

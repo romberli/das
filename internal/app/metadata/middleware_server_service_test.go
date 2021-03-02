@@ -3,10 +3,11 @@ package metadata
 import (
 	"encoding/json"
 	"fmt"
+	"testing"
+
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestMiddlewareServerServiceAll(t *testing.T) {

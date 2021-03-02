@@ -1,11 +1,13 @@
 package metadata
 
 import (
-	"github.com/romberli/das/internal/dependency"
-	"github.com/romberli/go-util/common"
-	"github.com/romberli/go-util/constant"
 	"strconv"
 	"time"
+
+	"github.com/romberli/go-util/common"
+	"github.com/romberli/go-util/constant"
+
+	"github.com/romberli/das/internal/dependency"
 )
 
 var _ dependency.Entity = (*MiddlewareClusterInfo)(nil)

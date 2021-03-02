@@ -3,12 +3,14 @@ package metadata
 import (
 	"errors"
 	"fmt"
-	"github.com/romberli/das/global"
-	"github.com/romberli/das/internal/dependency"
+	"strconv"
+
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware"
 	"github.com/romberli/log"
-	"strconv"
+
+	"github.com/romberli/das/global"
+	"github.com/romberli/das/internal/dependency"
 )
 
 var _ dependency.Repository = (*MiddlewareClusterRepo)(nil)

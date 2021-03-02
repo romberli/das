@@ -29,7 +29,7 @@ CREATE TABLE `t_meta_db_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `db_name` varchar(100) NOT NULL COMMENT '数据库名称',
   `cluster_id` int(11) DEFAULT NULL COMMENT '数据库集群ID',
-  `cluster_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '集群类型: 1-normal, 2-shard',
+  `cluster_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '集群类型: 1-单库, 2-分库分表',
   `owner_id` int(11) NOT NULL COMMENT '数据库主要负责人ID',
   `owner_group` varchar(100) DEFAULT NULL COMMENT '其他数据库负责人ID, 以逗号分隔',
   `env_id` int(11) NOT NULL COMMENT '环境: 1-online, 2-rel, 3-sit, 4-uat, 5-dev',
@@ -63,7 +63,7 @@ CREATE TABLE `t_meta_middleware_cluster_info` (
 
 CREATE TABLE `t_meta_middleware_server_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `cluster_id_middleware` int(11) DEFAULT NULL COMMENT '中间件集群ID',
+  `cluster_id` int(11) DEFAULT NULL COMMENT '中间件集群ID',
   `server_name` varchar(100) DEFAULT NULL COMMENT '中间件服务名称',
   `middleware_role` tinyint(4) DEFAULT NULL COMMENT '中间件角色: 1-rw, 2-ro, 3-das',
   `host_ip` varchar(100) NOT NULL COMMENT '中间件服务器ip',
@@ -73,7 +73,7 @@ CREATE TABLE `t_meta_middleware_server_info` (
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx01_host_ip_port_num` (`host_ip`,`port_num`),
-  KEY `idx02_cluster_id_middleware_middleware_role_env_id` (`cluster_id_middleware`,`middleware_role`)
+  KEY `idx02_cluster_id_middleware_role_env_id` (`cluster_id`,`middleware_role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='中间件服务器信息表';
 
 CREATE TABLE `t_meta_monitor_system_info` (
@@ -95,7 +95,7 @@ CREATE TABLE `t_meta_monitor_system_info` (
 CREATE TABLE `t_meta_mysql_cluster_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_name` varchar(100) NOT NULL COMMENT '集群名称',
-  `middleware_cluster_id` int(11) DEFAULT NULL COMMENT '中间件集群名称',
+  `middleware_cluster_id` int(11) DEFAULT NULL COMMENT '中间件集群ID',
   `monitor_system_id` int(11) NOT NULL COMMENT '监控系统ID',
   `owner_id` int(11) NOT NULL COMMENT '数据库集群主要负责人ID',
   `owner_group` varchar(100) DEFAULT NULL COMMENT '其他数据库集群负责人ID, 以逗号分隔',

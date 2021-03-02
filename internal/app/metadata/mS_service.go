@@ -15,8 +15,8 @@ import (
 const (
 	mSNameStruct      = "MSName"
 	systemTypeStruct  = "SystemType"
-	hostIpStruct      = "HostIp"
-	portNumStruct     = "PortNum"
+	mSHostIpStruct    = "HostIp"
+	mSPortNumStruct   = "PortNum"
 	portNumSlowStruct = "PortNumSlow"
 	baseUrlStruct     = "BaseUrl"
 )
@@ -73,13 +73,13 @@ func (es *MSService) Create(fields map[string]interface{}) error {
 	// generate new map
 	mSName, mSNameExists := fields[mSNameStruct]
 	systemType, systemTypeExists := fields[systemTypeStruct]
-	hostIp, hostIpExists := fields[hostIpStruct]
-	portNum, portNumExists := fields[portNumStruct]
+	hostIp, hostIpExists := fields[mSHostIpStruct]
+	portNum, portNumExists := fields[mSPortNumStruct]
 	portNumSlow, portNumSlowExists := fields[portNumSlowStruct]
 	baseUrl, baseUrlExists := fields[baseUrlStruct]
 
 	if !mSNameExists && !systemTypeExists && !hostIpExists && !portNumExists && !portNumSlowExists && !baseUrlExists {
-		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct))
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSPortNumStruct, portNumSlowStruct, baseUrlStruct))
 	}
 	mSInfo := NewMSInfoWithDefault(mSName.(string), systemType.(string), hostIp.(string), portNum.(string), portNumSlow.(string), baseUrl.(string))
 	// insert into middleware

@@ -2,14 +2,16 @@ package metadata
 
 import (
 	"encoding/json"
-	"github.com/romberli/das/internal/dependency"
-	"github.com/romberli/das/pkg/message"
+
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
+
+	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/pkg/message"
 )
 
 const (
-	middlewareServerClusterIDStruct      = "ClusterIDMiddleware"
+	middlewareServerClusterIDStruct      = "ClusterID"
 	middlewareServerNameStruct           = "ServerName"
 	middlewareServerMiddlewareRoleStruct = "MiddlewareRole"
 	middlewareServerHostIPStruct         = "HostIP"
@@ -97,7 +99,7 @@ func (mss *MiddlewareServerService) Create(fields map[string]interface{}) error 
 	return nil
 }
 
-// Update gets an middlewareServerironment entity that contains the given id from the middleware,
+// Update gets an middleware Serverironment entity that contains the given id from the middleware,
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware

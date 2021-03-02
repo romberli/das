@@ -15,8 +15,8 @@ import (
 const (
 	mSNameStruct      = "MSName"
 	systemTypeStruct  = "SystemType"
-	hostIpStruct      = "HostIp"
-	portNumStruct     = "PortNum"
+	mSHostIpStruct    = "HostIp"
+	mSportNumStruct   = "PortNum"
 	portNumSlowStruct = "PortNumSlow"
 	baseUrlStruct     = "BaseUrl"
 )
@@ -109,19 +109,19 @@ func AddMonitorSystem(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSportNumStruct, portNumSlowStruct, baseUrlStruct), err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSportNumStruct, portNumSlowStruct, baseUrlStruct), err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddMS, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct))
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSportNumStruct, portNumSlowStruct, baseUrlStruct))
 }
 
 // @Tags monitor system
@@ -150,13 +150,13 @@ func UpdateMonitorSystemByID(c *gin.Context) {
 	}
 	_, mSNameExists := fields[mSNameStruct]
 	_, systemTypeExists := fields[systemTypeStruct]
-	_, hostIpExists := fields[hostIpStruct]
-	_, portNumExists := fields[portNumStruct]
+	_, hostIpExists := fields[mSHostIpStruct]
+	_, portNumExists := fields[mSportNumStruct]
 	_, portNumSlowExists := fields[portNumSlowStruct]
 	_, baseUrlExists := fields[baseUrlStruct]
 	_, delFlagExists := fields[delFlagStruct]
 	if !mSNameExists && !systemTypeExists && !hostIpExists && !portNumExists && !portNumSlowExists && !baseUrlExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, hostIpStruct, portNumStruct, portNumSlowStruct, baseUrlStruct, delFlagStruct))
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSportNumStruct, portNumSlowStruct, baseUrlStruct, delFlagStruct))
 		return
 	}
 	// init service

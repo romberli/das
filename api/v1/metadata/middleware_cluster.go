@@ -136,7 +136,7 @@ func UpdateMiddlewareClusterByID(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrGetRawData, err.Error())
 		return
 	}
-	// unmarshal data=
+	// unmarshal data
 	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MiddlewareClusterInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())

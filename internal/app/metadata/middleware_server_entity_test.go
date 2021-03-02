@@ -2,13 +2,14 @@ package metadata
 
 import (
 	"encoding/json"
+	"reflect"
+	"strconv"
+	"testing"
+
 	"github.com/jinzhu/now"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/stretchr/testify/assert"
-	"reflect"
-	"strconv"
-	"testing"
 )
 
 const (
@@ -42,7 +43,7 @@ func initNewMiddlewareServerInfo() *MiddlewareServerInfo {
 }
 
 func middlewareServerStuctEqual(a, b *MiddlewareServerInfo) bool {
-	return a.ID == b.ID && a.ClusterIDMiddleware == b.ClusterIDMiddleware && a.ServerName == b.ServerName && a.MiddlewareRole == b.MiddlewareRole && a.HostIP == b.HostIP && a.PortNum == b.PortNum && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
+	return a.ID == b.ID && a.ClusterID == b.ClusterID && a.ServerName == b.ServerName && a.MiddlewareRole == b.MiddlewareRole && a.HostIP == b.HostIP && a.PortNum == b.PortNum && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
 }
 
 func TestMiddlewareServerEntityAll(t *testing.T) {

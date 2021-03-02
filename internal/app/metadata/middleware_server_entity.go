@@ -1,34 +1,36 @@
 package metadata
 
 import (
-	"github.com/romberli/das/internal/dependency"
-	"github.com/romberli/go-util/common"
-	"github.com/romberli/go-util/constant"
 	"strconv"
 	"time"
+
+	"github.com/romberli/go-util/common"
+	"github.com/romberli/go-util/constant"
+
+	"github.com/romberli/das/internal/dependency"
 )
 
 var _ dependency.Entity = (*MiddlewareServerInfo)(nil)
 
 type MiddlewareServerInfo struct {
 	dependency.Repository
-	ID                  int       `middleware:"id" json:"id"`
-	ClusterIDMiddleware int       `middleware:"cluster_id_middleware" json:"cluster_id_middleware"`
-	ServerName          string    `middleware:"server_name" json:"server_name"`
-	MiddlewareRole      int       `middleware:"middleware_role" json:"middleware_role"`
-	HostIP              string    `middleware:"host_ip" json:"host_ip"`
-	PortNum             int       `middleware:"port_num" json:"port_num"`
-	DelFlag             int       `middleware:"del_flag" json:"del_flag"`
-	CreateTime          time.Time `middleware:"create_time" json:"create_time"`
-	LastUpdateTime      time.Time `middleware:"last_update_time" json:"last_update_time"`
+	ID             int       `middleware:"id" json:"id"`
+	ClusterID      int       `middleware:"cluster_id" json:"cluster_id"`
+	ServerName     string    `middleware:"server_name" json:"server_name"`
+	MiddlewareRole int       `middleware:"middleware_role" json:"middleware_role"`
+	HostIP         string    `middleware:"host_ip" json:"host_ip"`
+	PortNum        int       `middleware:"port_num" json:"port_num"`
+	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
+	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
+	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
 // NewMiddlewareServerInfo returns a new MiddlewareServerInfo
-func NewMiddlewareServerInfo(repo *MiddlewareServerRepo, id int, clusterIDMiddleware int, serverName string, middlewareRole int, hostIP string, portNum int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareServerInfo {
+func NewMiddlewareServerInfo(repo *MiddlewareServerRepo, id int, clusterID int, serverName string, middlewareRole int, hostIP string, portNum int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareServerInfo {
 	return &MiddlewareServerInfo{
 		repo,
 		id,
-		clusterIDMiddleware,
+		clusterID,
 		serverName,
 		middlewareRole,
 		hostIP,
@@ -40,11 +42,11 @@ func NewMiddlewareServerInfo(repo *MiddlewareServerRepo, id int, clusterIDMiddle
 }
 
 // NewMiddlewareServerInfo returns a new MiddlewareServerInfo with default MiddlewareServerRepo
-func NewMiddlewareServerInfoWithGlobal(id int, clusterIDMiddleware int, serverName string, middlewareRole int, hostIP string, portNum int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareServerInfo {
+func NewMiddlewareServerInfoWithGlobal(id int, clusterID int, serverName string, middlewareRole int, hostIP string, portNum int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareServerInfo {
 	return &MiddlewareServerInfo{
 		NewMiddlewareServerRepoWithGlobal(),
 		id,
-		clusterIDMiddleware,
+		clusterID,
 		serverName,
 		middlewareRole,
 		hostIP,
@@ -60,14 +62,14 @@ func NewEmptyMiddlewareServerInfoWithGlobal() *MiddlewareServerInfo {
 }
 
 // NewMiddlewareServerInfoWithDefault returns a new MiddlewareServerInfo with default MiddlewareServerRepo
-func NewMiddlewareServerInfoWithDefault(clusterIDMiddleware int, serverName string, middlewareRole int, hostIP string, portNum int) *MiddlewareServerInfo {
+func NewMiddlewareServerInfoWithDefault(clusterID int, serverName string, middlewareRole int, hostIP string, portNum int) *MiddlewareServerInfo {
 	return &MiddlewareServerInfo{
-		Repository:          NewMiddlewareServerRepoWithGlobal(),
-		ClusterIDMiddleware: clusterIDMiddleware,
-		ServerName:          serverName,
-		MiddlewareRole:      middlewareRole,
-		HostIP:              hostIP,
-		PortNum:             portNum,
+		Repository:     NewMiddlewareServerRepoWithGlobal(),
+		ClusterID:      clusterID,
+		ServerName:     serverName,
+		MiddlewareRole: middlewareRole,
+		HostIP:         hostIP,
+		PortNum:        portNum,
 	}
 }
 

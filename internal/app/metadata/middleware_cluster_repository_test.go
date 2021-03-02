@@ -1,17 +1,19 @@
 package metadata
 
 import (
-	"github.com/romberli/das/internal/dependency"
+	"testing"
+
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
-	"testing"
+
+	"github.com/romberli/das/internal/dependency"
 )
 
 const (
 	newMiddlewareClusterName    = "ttt"
-	onlineMiddlewareClusterName = "online"
+	onlineMiddlewareClusterName = "ccc"
 )
 
 var middlewareClusterRepo = initMiddlewareClusterRepo()
@@ -108,7 +110,7 @@ func TestMiddlewareClusterRepo_GetAll(t *testing.T) {
 func TestMiddlewareClusterRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := middlewareClusterRepo.GetByID("5")
+	entity, err := middlewareClusterRepo.GetByID("1")
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	middlewareClusterName, err := entity.Get(middlewareClusterNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
