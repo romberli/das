@@ -20,7 +20,7 @@ const (
 	DebugMetadataAddMYSQLServer     = 100803
 	DebugMetadataUpdateMYSQLServer  = 100804
 
-  DebugMetadataGetMiddlewareClusterAll  = 100501
+	DebugMetadataGetMiddlewareClusterAll  = 100501
 	DebugMetadataGetMiddlewareClusterByID = 100502
 	DebugMetadataAddMiddlewareCluster     = 100503
 	DebugMetadataUpdateMiddlewareCluster  = 100504
@@ -67,7 +67,7 @@ func initDebugMessage() {
 	Messages[DebugMetadataAddMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddMYSQLServer, "metadata: add new mysql server message: %s")
 	Messages[DebugMetadataUpdateMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateMYSQLServer, "metadata: update mysql server message: %s")
 
-  Messages[DebugMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMiddlewareClusterAll, "metadata: get all middleware cluster message: %s")
+	Messages[DebugMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMiddlewareClusterAll, "metadata: get all middleware cluster message: %s")
 	Messages[DebugMetadataGetMiddlewareClusterByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMiddlewareClusterByID, "metadata: get middleware cluster by id message: %s")
 	Messages[DebugMetadataAddMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddMiddlewareCluster, "metadata: add new middleware cluster message: %s")
 	Messages[DebugMetadataUpdateMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster message: %s")
@@ -87,7 +87,7 @@ func initDebugMessage() {
 	Messages[DebugMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddUser, "metadata: add new user message: %s")
 	Messages[DebugMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateUser, "metadata: update user message: %s")
 
-  Messages[DebugMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetDbAll, "metadata: get all databases message: %s")
+	Messages[DebugMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetDbAll, "metadata: get all databases message: %s")
 	Messages[DebugMetadataGetDbByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetDbByID, "metadata: get database by id message: %s")
 	Messages[DebugMetadataAddDb] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddDb, "metadata: add new database message: %s")
 	Messages[DebugMetadataUpdateDb] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateDb, "metadata: update database message: %s")
