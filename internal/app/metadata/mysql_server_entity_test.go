@@ -13,37 +13,37 @@ import (
 )
 
 const (
-	defaultMYSQLServerInfoID                   = 1
-	defaultMYSQLServerInfoClusterID            = 1
-	defaultMYSQLServerInfoHostIP               = "127.0.01"
-	defaultMYSQLServerInfoPortNum              = 3306
-	defaultMYSQLServerInfoDeploymentType       = 1
-	defaultMYSQLServerInfoVersion              = "1.1.1"
-	defaultMYSQLServerInfoDelFlag              = 0
-	defaultMYSQLServerInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
-	defaultMYSQLServerInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"
+	defaultMySQLServerInfoID                   = 1
+	defaultMySQLServerInfoClusterID            = 1
+	defaultMySQLServerInfoHostIP               = "127.0.01"
+	defaultMySQLServerInfoPortNum              = 3306
+	defaultMySQLServerInfoDeploymentType       = 1
+	defaultMySQLServerInfoVersion              = "1.1.1"
+	defaultMySQLServerInfoDelFlag              = 0
+	defaultMySQLServerInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
+	defaultMySQLServerInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"
 	hostIPJSON                                 = "host_ip"
 	portNumJSON                                = "port_num"
 )
 
-func initNewMYSQLServerInfo() *MYSQLServerInfo {
+func initNewMySQLServerInfo() *MySQLServerInfo {
 	now.TimeFormats = append(now.TimeFormats, constant.DefaultTimeLayout)
 
-	createTime, _ := now.Parse(defaultMYSQLServerInfoCreateTimeString)
-	lastUpdateTime, _ := now.Parse(defaultMYSQLServerInfoLastUpdateTimeString)
-	return NewMYSQLServerInfoWithGlobal(
-		defaultMYSQLServerInfoID,
-		defaultMYSQLServerInfoClusterID,
-		defaultMYSQLServerInfoHostIP,
-		defaultMYSQLServerInfoPortNum,
-		defaultMYSQLServerInfoDeploymentType,
-		defaultMYSQLServerInfoVersion,
-		defaultMYSQLServerInfoDelFlag,
+	createTime, _ := now.Parse(defaultMySQLServerInfoCreateTimeString)
+	lastUpdateTime, _ := now.Parse(defaultMySQLServerInfoLastUpdateTimeString)
+	return NewMySQLServerInfoWithGlobal(
+		defaultMySQLServerInfoID,
+		defaultMySQLServerInfoClusterID,
+		defaultMySQLServerInfoHostIP,
+		defaultMySQLServerInfoPortNum,
+		defaultMySQLServerInfoDeploymentType,
+		defaultMySQLServerInfoVersion,
+		defaultMySQLServerInfoDelFlag,
 		createTime,
 		lastUpdateTime)
 }
 
-func equalMYSQLServerInfo(a, b *MYSQLServerInfo) bool {
+func equalMySQLServerInfo(a, b *MySQLServerInfo) bool {
 	return a.ID == b.ID &&
 		a.ClusterID == b.ClusterID &&
 		a.HostIP == b.HostIP &&
@@ -55,50 +55,50 @@ func equalMYSQLServerInfo(a, b *MYSQLServerInfo) bool {
 		a.LastUpdateTime == b.LastUpdateTime
 }
 
-func TestMYSQLServerEntityAll(t *testing.T) {
-	TestMYSQLServerInfo_Identity(t)
-	TestMYSQLServerInfo_IsDeleted(t)
-	TestMYSQLServerInfo_GetCreateTime(t)
-	TestMYSQLServerInfo_GetLastUpdateTime(t)
-	TestMYSQLServerInfo_Get(t)
-	TestMYSQLServerInfo_Set(t)
-	TestMYSQLServerInfo_Delete(t)
-	TestMYSQLServerInfo_MarshalJSON(t)
-	TestMYSQLServerInfo_MarshalJSONWithFields(t)
+func TestMySQLServerEntityAll(t *testing.T) {
+	TestMySQLServerInfo_Identity(t)
+	TestMySQLServerInfo_IsDeleted(t)
+	TestMySQLServerInfo_GetCreateTime(t)
+	TestMySQLServerInfo_GetLastUpdateTime(t)
+	TestMySQLServerInfo_Get(t)
+	TestMySQLServerInfo_Set(t)
+	TestMySQLServerInfo_Delete(t)
+	TestMySQLServerInfo_MarshalJSON(t)
+	TestMySQLServerInfo_MarshalJSONWithFields(t)
 }
 
-func TestMYSQLServerInfo_Identity(t *testing.T) {
+func TestMySQLServerInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
-	asst.Equal(strconv.Itoa(defaultMYSQLServerInfoID), mysqlServerInfo.Identity(), "test Identity() failed")
+	mysqlServerInfo := initNewMySQLServerInfo()
+	asst.Equal(strconv.Itoa(defaultMySQLServerInfoID), mysqlServerInfo.Identity(), "test Identity() failed")
 }
 
-func TestMYSQLServerInfo_IsDeleted(t *testing.T) {
+func TestMySQLServerInfo_IsDeleted(t *testing.T) {
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
+	mysqlServerInfo := initNewMySQLServerInfo()
 	asst.False(mysqlServerInfo.IsDeleted(), "test IsDeleted() failed")
 }
 
-func TestMYSQLServerInfo_GetCreateTime(t *testing.T) {
+func TestMySQLServerInfo_GetCreateTime(t *testing.T) {
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
+	mysqlServerInfo := initNewMySQLServerInfo()
 	asst.True(reflect.DeepEqual(mysqlServerInfo.CreateTime, mysqlServerInfo.GetCreateTime()), "test GetCreateTime failed")
 }
 
-func TestMYSQLServerInfo_GetLastUpdateTime(t *testing.T) {
+func TestMySQLServerInfo_GetLastUpdateTime(t *testing.T) {
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
+	mysqlServerInfo := initNewMySQLServerInfo()
 	asst.True(reflect.DeepEqual(mysqlServerInfo.LastUpdateTime, mysqlServerInfo.GetLastUpdateTime()), "test GetLastUpdateTime() failed")
 }
 
-func TestMYSQLServerInfo_Get(t *testing.T) {
+func TestMySQLServerInfo_Get(t *testing.T) {
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
+	mysqlServerInfo := initNewMySQLServerInfo()
 
 	clusterID, err := mysqlServerInfo.Get(clusterIDStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
@@ -121,65 +121,65 @@ func TestMYSQLServerInfo_Get(t *testing.T) {
 	asst.Equal(mysqlServerInfo.Version, version, "test Get() failed")
 }
 
-func TestMYSQLServerInfo_Set(t *testing.T) {
+func TestMySQLServerInfo_Set(t *testing.T) {
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
+	mysqlServerInfo := initNewMySQLServerInfo()
 
-	newClusterID := defaultMYSQLServerInfoClusterID
+	newClusterID := defaultMySQLServerInfoClusterID
 	err := mysqlServerInfo.Set(map[string]interface{}{"ClusterID": newClusterID})
 	asst.Nil(err, common.CombineMessageWithError("test Set() failed", err))
 	asst.Equal(newClusterID, mysqlServerInfo.ClusterID, "test Set() failed")
 
-	newHostIP := defaultMYSQLServerInfoHostIP
+	newHostIP := defaultMySQLServerInfoHostIP
 	err = mysqlServerInfo.Set(map[string]interface{}{"HostIP": newHostIP})
 	asst.Nil(err, common.CombineMessageWithError("test Set() failed", err))
 	asst.Equal(newHostIP, mysqlServerInfo.HostIP, "test Set() failed")
 
-	newPortNum := defaultMYSQLServerInfoPortNum
+	newPortNum := defaultMySQLServerInfoPortNum
 	err = mysqlServerInfo.Set(map[string]interface{}{"PortNum": newPortNum})
 	asst.Nil(err, common.CombineMessageWithError("test Set() failed", err))
 	asst.Equal(newPortNum, mysqlServerInfo.PortNum, "test Set() failed")
 
-	newDeploymentType := defaultMYSQLServerInfoDeploymentType
+	newDeploymentType := defaultMySQLServerInfoDeploymentType
 	err = mysqlServerInfo.Set(map[string]interface{}{"DeploymentType": newDeploymentType})
 	asst.Nil(err, common.CombineMessageWithError("test Set() failed", err))
 	asst.Equal(newDeploymentType, mysqlServerInfo.DeploymentType, "test Set() failed")
 
-	newVersion := defaultMYSQLServerInfoVersion
+	newVersion := defaultMySQLServerInfoVersion
 	err = mysqlServerInfo.Set(map[string]interface{}{"Version": newVersion})
 	asst.Nil(err, common.CombineMessageWithError("test Set() failed", err))
 	asst.Equal(newVersion, mysqlServerInfo.Version, "test Set() failed")
 }
 
-func TestMYSQLServerInfo_Delete(t *testing.T) {
+func TestMySQLServerInfo_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
+	mysqlServerInfo := initNewMySQLServerInfo()
 	mysqlServerInfo.Delete()
 	asst.True(mysqlServerInfo.IsDeleted(), "test Delete() failed")
 }
 
-func TestMYSQLServerInfo_MarshalJSON(t *testing.T) {
-	var mysqlServerInfoUnmarshal *MYSQLServerInfo
+func TestMySQLServerInfo_MarshalJSON(t *testing.T) {
+	var mysqlServerInfoUnmarshal *MySQLServerInfo
 
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
+	mysqlServerInfo := initNewMySQLServerInfo()
 	data, err := mysqlServerInfo.MarshalJSON()
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
 	err = json.Unmarshal(data, &mysqlServerInfoUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
-	asst.True(equalMYSQLServerInfo(mysqlServerInfo, mysqlServerInfoUnmarshal), "test MarshalJSON() failed")
+	asst.True(equalMySQLServerInfo(mysqlServerInfo, mysqlServerInfoUnmarshal), "test MarshalJSON() failed")
 }
 
-func TestMYSQLServerInfo_MarshalJSONWithFields(t *testing.T) {
+func TestMySQLServerInfo_MarshalJSONWithFields(t *testing.T) {
 	asst := assert.New(t)
 
-	mysqlServerInfo := initNewMYSQLServerInfo()
+	mysqlServerInfo := initNewMySQLServerInfo()
 	data, err := mysqlServerInfo.MarshalJSONWithFields(hostIPStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
-	expect, err := json.Marshal(map[string]interface{}{hostIPJSON: defaultMYSQLServerInfoHostIP})
+	expect, err := json.Marshal(map[string]interface{}{hostIPJSON: defaultMySQLServerInfoHostIP})
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	asst.Equal(string(expect), string(data), "test MarshalJSONWithFields() failed")
 }

@@ -28,11 +28,11 @@ const (
 // @Router /api/v1/metadata/mysql-cluster [get]
 func GetMySQLCluster(c *gin.Context) {
 	// init service
-	s := metadata.NewMYSQLClusterServiceWithDefault()
+	s := metadata.NewMySQLClusterServiceWithDefault()
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMYSQLClusterAll, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetMySQLClusterAll, err.Error())
 		return
 	}
 	// marshal service
@@ -45,9 +45,9 @@ func GetMySQLCluster(c *gin.Context) {
 	// response
 
 	jsonStr := string(jsonBytes)
-	fmt.Println(message.DebugMetadataGetMYSQLClusterAll, jsonStr)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMYSQLClusterAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMYSQLClusterAll)
+	fmt.Println(message.DebugMetadataGetMySQLClusterAll, jsonStr)
+	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLClusterAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLClusterAll)
 }
 
 // @Tags mysql cluster
@@ -63,11 +63,11 @@ func GetMySQLClusterByID(c *gin.Context) {
 		return
 	}
 	// init service
-	s := metadata.NewMYSQLClusterServiceWithDefault()
+	s := metadata.NewMySQLClusterServiceWithDefault()
 	// get entity
 	err := s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMYSQLClusterByID, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetMySQLClusterByID, id, err.Error())
 		return
 	}
 	// marshal service
@@ -78,8 +78,8 @@ func GetMySQLClusterByID(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMYSQLClusterByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMYSQLClusterByID, id)
+	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLClusterByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLClusterByID, id)
 }
 
 // @Tags mysql cluster
@@ -97,7 +97,7 @@ func AddMySQLCluster(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MYSQLClusterInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MySQLClusterInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
@@ -108,11 +108,11 @@ func AddMySQLCluster(c *gin.Context) {
 		return
 	}
 	// init service
-	s := metadata.NewMYSQLClusterServiceWithDefault()
+	s := metadata.NewMySQLClusterServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMYSQLCluster, clusterNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMySQLCluster, clusterNameStruct, err.Error())
 		return
 	}
 	// marshal service
@@ -123,8 +123,8 @@ func AddMySQLCluster(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddMYSQLCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMYSQLCluster, clusterNameStruct)
+	log.Debug(message.NewMessage(message.DebugMetadataAddMySQLCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMySQLCluster, clusterNameStruct)
 }
 
 // @Tags mysql cluster
@@ -146,7 +146,7 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MYSQLClusterInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MySQLClusterInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
@@ -158,11 +158,11 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 		return
 	}
 	// init service
-	s := metadata.NewMYSQLClusterServiceWithDefault()
+	s := metadata.NewMySQLClusterServiceWithDefault()
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMYSQLCluster, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateMySQLCluster, id, err.Error())
 		return
 	}
 	// marshal service
@@ -173,6 +173,6 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateMYSQLCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMYSQLCluster, id)
+	log.Debug(message.NewMessage(message.DebugMetadataUpdateMySQLCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMySQLCluster, id)
 }

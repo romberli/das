@@ -58,17 +58,17 @@ const (
 	ErrMetadataAddEnv     = 400203
 	ErrMetadataUpdateEnv  = 400204
 
-	ErrMetadataGetMYSQLClusterAll  = 400701
-	ErrMetadataGetMYSQLClusterByID = 400702
-	ErrMetadataAddMYSQLCluster     = 400703
-	ErrMetadataUpdateMYSQLCluster  = 400704
+	ErrMetadataGetMySQLClusterAll  = 400701
+	ErrMetadataGetMySQLClusterByID = 400702
+	ErrMetadataAddMySQLCluster     = 400703
+	ErrMetadataUpdateMySQLCluster  = 400704
 
-	ErrMetadataGetMYSQLServerAll  = 400801
-	ErrMetadataGetMYSQLServerByID = 400802
-	ErrMetadataAddMYSQLServer     = 400803
-	ErrMetadataUpdateMYSQLServer  = 400804
+	ErrMetadataGetMySQLServerAll  = 400801
+	ErrMetadataGetMySQLServerByID = 400802
+	ErrMetadataAddMySQLServer     = 400803
+	ErrMetadataUpdateMySQLServer  = 400804
 
-  ErrMetadataGetMiddlewareClusterAll  = 400501
+	ErrMetadataGetMiddlewareClusterAll  = 400501
 	ErrMetadataGetMiddlewareClusterByID = 400502
 	ErrMetadataAddMiddlewareCluster     = 400503
 	ErrMetadataUpdateMiddlewareCluster  = 400504
@@ -78,7 +78,7 @@ const (
 	ErrMetadataAddMiddlewareServer     = 400603
 	ErrMetadataUpdateMiddlewareServer  = 400604
 
-  ErrMetadataGetAppSystemAll  = 400301
+	ErrMetadataGetAppSystemAll  = 400301
 	ErrMetadataGetAppSystemByID = 400302
 	ErrMetadataAddAppSystem     = 400303
 	ErrMetadataUpdateAppSystem  = 400304
@@ -154,17 +154,17 @@ func initErrorMessage() {
 	Messages[ErrMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddEnv, "metadata: add new environment failed. env_name: %s\n%s")
 	Messages[ErrMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateEnv, "metadata: update environment failed. id: %s\n%s")
 
-	Messages[ErrMetadataGetMYSQLClusterAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMYSQLClusterAll, "metadata: get all mysql cluster failed.\n%s")
-	Messages[ErrMetadataGetMYSQLClusterByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMYSQLClusterByID, "metadata: get mysql cluster by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddMYSQLCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMYSQLCluster, "metadata: add new mysql cluster failed. env_name: %s\n%s")
-	Messages[ErrMetadataUpdateMYSQLCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMYSQLCluster, "metadata: update mysql cluster failed. id: %s\n%s")
+	Messages[ErrMetadataGetMySQLClusterAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMySQLClusterAll, "metadata: get all mysql cluster failed.\n%s")
+	Messages[ErrMetadataGetMySQLClusterByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMySQLClusterByID, "metadata: get mysql cluster by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddMySQLCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMySQLCluster, "metadata: add new mysql cluster failed. env_name: %s\n%s")
+	Messages[ErrMetadataUpdateMySQLCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMySQLCluster, "metadata: update mysql cluster failed. id: %s\n%s")
 
-	Messages[ErrMetadataGetMYSQLServerAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMYSQLServerAll, "metadata: get all mysql server failed.\n%s")
-	Messages[ErrMetadataGetMYSQLServerByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMYSQLServerByID, "metadata: get mysql server by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMYSQLServer, "metadata: add new mysql server failed. env_name: %s\n%s")
-	Messages[ErrMetadataUpdateMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMYSQLServer, "metadata: update mysql server failed. id: %s\n%s")
+	Messages[ErrMetadataGetMySQLServerAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMySQLServerAll, "metadata: get all mysql server failed.\n%s")
+	Messages[ErrMetadataGetMySQLServerByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMySQLServerByID, "metadata: get mysql server by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddMySQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMySQLServer, "metadata: add new mysql server failed. env_name: %s\n%s")
+	Messages[ErrMetadataUpdateMySQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMySQLServer, "metadata: update mysql server failed. id: %s\n%s")
 
-  Messages[ErrMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterAll, "metadata: get all middleware cluster failed.\n%s")
+	Messages[ErrMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterAll, "metadata: get all middleware cluster failed.\n%s")
 	Messages[ErrMetadataGetMiddlewareClusterByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterByID, "metadata: get middleware cluster by id failed. id: %s\n%s")
 	Messages[ErrMetadataAddMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMiddlewareCluster, "metadata: add new middleware cluster failed. env_name: %s\n%s")
 	Messages[ErrMetadataUpdateMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster failed. id: %s\n%s")

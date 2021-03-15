@@ -18,20 +18,20 @@ const (
 	testUpdateClusterName      = "cluster_name_update"
 )
 
-var mysqlClusterRepo = initMYSQLClusterRepo()
+var mysqlClusterRepo = initMySQLClusterRepo()
 
-func initMYSQLClusterRepo() *MYSQLClusterRepo {
+func initMySQLClusterRepo() *MySQLClusterRepo {
 	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
 	if err != nil {
-		log.Error(common.CombineMessageWithError("initMYSQLClusterRepo() failed", err))
+		log.Error(common.CombineMessageWithError("initMySQLClusterRepo() failed", err))
 		return nil
 	}
 
-	return NewMYSQLClusterRepo(pool)
+	return NewMySQLClusterRepo(pool)
 }
 
-func createMYSQLCluster() (dependency.Entity, error) {
-	mysqlClusterInfo := NewMYSQLClusterInfoWithDefault(defaultMYSQLClusterInfoClusterName)
+func createMySQLCluster() (dependency.Entity, error) {
+	mysqlClusterInfo := NewMySQLClusterInfoWithDefault(defaultMySQLClusterInfoClusterName)
 	entity, err := mysqlClusterRepo.Create(mysqlClusterInfo)
 	if err != nil {
 		return nil, err
@@ -40,22 +40,22 @@ func createMYSQLCluster() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteMYSQLClusterByID(id string) error {
+func deleteMySQLClusterByID(id string) error {
 	sql := `delete from t_meta_mysql_cluster_info where id = ?`
 	_, err := mysqlClusterRepo.Execute(sql, id)
 	return err
 }
 
-func TestMYSQLClusterRepoAll(t *testing.T) {
-	TestMYSQLClusterRepo_Execute(t)
-	TestMYSQLClusterRepo_Create(t)
-	TestMYSQLClusterRepo_GetAll(t)
-	TestMYSQLClusterRepo_GetByID(t)
-	TestMYSQLClusterRepo_Update(t)
-	TestMYSQLClusterRepo_Delete(t)
+func TestMySQLClusterRepoAll(t *testing.T) {
+	TestMySQLClusterRepo_Execute(t)
+	TestMySQLClusterRepo_Create(t)
+	TestMySQLClusterRepo_GetAll(t)
+	TestMySQLClusterRepo_GetByID(t)
+	TestMySQLClusterRepo_Update(t)
+	TestMySQLClusterRepo_Delete(t)
 }
 
-func TestMYSQLClusterRepo_Execute(t *testing.T) {
+func TestMySQLClusterRepo_Execute(t *testing.T) {
 	asst := assert.New(t)
 
 	sql := `select 1;`
@@ -66,7 +66,7 @@ func TestMYSQLClusterRepo_Execute(t *testing.T) {
 	asst.Equal(1, int(r), "test Execute() failed")
 }
 
-func TestMYSQLClusterRepo_Transaction(t *testing.T) {
+func TestMySQLClusterRepo_Transaction(t *testing.T) {
 	asst := assert.New(t)
 
 	sql := `
@@ -81,11 +81,11 @@ func TestMYSQLClusterRepo_Transaction(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	_, err = tx.Execute(sql,
 		testTransactionClusterName,
-		defaultMYSQLClusterInfoMiddlewareClusterID,
-		defaultMYSQLClusterInfoMonitorSystemID,
-		defaultMYSQLClusterInfoOwnerID,
-		defaultMYSQLClusterInfoOwnerGroup,
-		defaultMYSQLClusterInfoEnvID)
+		defaultMySQLClusterInfoMiddlewareClusterID,
+		defaultMySQLClusterInfoMonitorSystemID,
+		defaultMySQLClusterInfoOwnerID,
+		defaultMySQLClusterInfoOwnerGroup,
+		defaultMySQLClusterInfoEnvID)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
 	sql = `select cluster_name from t_meta_mysql_cluster_info where cluster_name=?`
@@ -111,7 +111,7 @@ func TestMYSQLClusterRepo_Transaction(t *testing.T) {
 	}
 }
 
-func TestMYSQLClusterRepo_GetAll(t *testing.T) {
+func TestMySQLClusterRepo_GetAll(t *testing.T) {
 	asst := assert.New(t)
 
 	sql := `
@@ -123,11 +123,11 @@ func TestMYSQLClusterRepo_GetAll(t *testing.T) {
 	// init data avoid empty set
 	_, err := mysqlClusterRepo.Execute(sql,
 		testInitClusterName,
-		defaultMYSQLClusterInfoMiddlewareClusterID,
-		defaultMYSQLClusterInfoMonitorSystemID,
-		defaultMYSQLClusterInfoOwnerID,
-		defaultMYSQLClusterInfoOwnerGroup,
-		defaultMYSQLClusterInfoEnvID)
+		defaultMySQLClusterInfoMiddlewareClusterID,
+		defaultMySQLClusterInfoMonitorSystemID,
+		defaultMySQLClusterInfoOwnerID,
+		defaultMySQLClusterInfoOwnerGroup,
+		defaultMySQLClusterInfoEnvID)
 	// asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 
 	entities, err := mysqlClusterRepo.GetAll()
@@ -137,7 +137,7 @@ func TestMYSQLClusterRepo_GetAll(t *testing.T) {
 	asst.Equal(testInitClusterName, mysqlClusterName.(string), "test GetAll() failed")
 }
 
-func TestMYSQLClusterRepo_GetByID(t *testing.T) {
+func TestMySQLClusterRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	entity, err := mysqlClusterRepo.GetByID("1")
@@ -147,20 +147,20 @@ func TestMYSQLClusterRepo_GetByID(t *testing.T) {
 	asst.Equal(testInitClusterName, mysqlClusterName.(string), "test GetByID() failed")
 }
 
-func TestMYSQLClusterRepo_Create(t *testing.T) {
+func TestMySQLClusterRepo_Create(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createMYSQLCluster()
+	entity, err := createMySQLCluster()
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteMYSQLClusterByID(entity.Identity())
+	err = deleteMySQLClusterByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
-func TestMYSQLClusterRepo_Update(t *testing.T) {
+func TestMySQLClusterRepo_Update(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createMYSQLCluster()
+	entity, err := createMySQLCluster()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = entity.Set(map[string]interface{}{clusterNameStruct: testUpdateClusterName})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
@@ -172,16 +172,16 @@ func TestMYSQLClusterRepo_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(testUpdateClusterName, mysqlClusterName, "test Update() failed")
 	// delete
-	err = deleteMYSQLClusterByID(entity.Identity())
+	err = deleteMySQLClusterByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
-func TestMYSQLClusterRepo_Delete(t *testing.T) {
+func TestMySQLClusterRepo_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createMYSQLCluster()
+	entity, err := createMySQLCluster()
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	// delete
-	err = deleteMYSQLClusterByID(entity.Identity())
+	err = deleteMySQLClusterByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }

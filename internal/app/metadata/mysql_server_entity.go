@@ -10,10 +10,10 @@ import (
 	"github.com/romberli/das/internal/dependency"
 )
 
-var _ dependency.Entity = (*MYSQLServerInfo)(nil)
+var _ dependency.Entity = (*MySQLServerInfo)(nil)
 
-// MYSQLServerInfo is a struct map to table in the database
-type MYSQLServerInfo struct {
+// MySQLServerInfo is a struct map to table in the database
+type MySQLServerInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
 	ClusterID      int       `middleware:"cluster_id" json:"cluster_id"`
@@ -26,8 +26,8 @@ type MYSQLServerInfo struct {
 	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
-// NewMYSQLServerInfo returns a new MYSQLServerInfo
-func NewMYSQLServerInfo(repo *MYSQLServerRepo,
+// NewMySQLServerInfo returns a new MySQLServerInfo
+func NewMySQLServerInfo(repo *MySQLServerRepo,
 	id int,
 	clusterID int,
 	hostIP string,
@@ -35,8 +35,8 @@ func NewMYSQLServerInfo(repo *MYSQLServerRepo,
 	deploymentType int,
 	version string,
 	delFlag int,
-	createTime, lastUpdateTime time.Time) *MYSQLServerInfo {
-	return &MYSQLServerInfo{
+	createTime, lastUpdateTime time.Time) *MySQLServerInfo {
+	return &MySQLServerInfo{
 		repo,
 		id,
 		clusterID,
@@ -50,8 +50,8 @@ func NewMYSQLServerInfo(repo *MYSQLServerRepo,
 	}
 }
 
-// NewMYSQLServerInfoWithGlobal returns a new MYSQLServerInfo with default MYSQLServerRepo
-func NewMYSQLServerInfoWithGlobal(
+// NewMySQLServerInfoWithGlobal returns a new MySQLServerInfo with default MySQLServerRepo
+func NewMySQLServerInfoWithGlobal(
 	id int,
 	clusterID int,
 	hostIP string,
@@ -59,9 +59,9 @@ func NewMYSQLServerInfoWithGlobal(
 	deploymentType int,
 	version string,
 	delFlag int,
-	createTime, lastUpdateTime time.Time) *MYSQLServerInfo {
-	return &MYSQLServerInfo{
-		NewMYSQLServerRepoWithGlobal(),
+	createTime, lastUpdateTime time.Time) *MySQLServerInfo {
+	return &MySQLServerInfo{
+		NewMySQLServerRepoWithGlobal(),
 		id,
 		clusterID,
 		hostIP,
@@ -74,49 +74,49 @@ func NewMYSQLServerInfoWithGlobal(
 	}
 }
 
-// NewEmptyMYSQLServerInfoWithGlobal returns a new MYSQLServerInfo with default MYSQLServerRepo
-func NewEmptyMYSQLServerInfoWithGlobal() *MYSQLServerInfo {
-	return &MYSQLServerInfo{Repository: NewMYSQLServerRepoWithGlobal()}
+// NewEmptyMySQLServerInfoWithGlobal returns a new MySQLServerInfo with default MySQLServerRepo
+func NewEmptyMySQLServerInfoWithGlobal() *MySQLServerInfo {
+	return &MySQLServerInfo{Repository: NewMySQLServerRepoWithGlobal()}
 }
 
-// NewMYSQLServerInfoWithDefault returns a new MYSQLServerInfo with default MYSQLServerRepo
-func NewMYSQLServerInfoWithDefault(hostIP string, portNum int) *MYSQLServerInfo {
-	return &MYSQLServerInfo{
-		Repository: NewMYSQLServerRepoWithGlobal(),
+// NewMySQLServerInfoWithDefault returns a new MySQLServerInfo with default MySQLServerRepo
+func NewMySQLServerInfoWithDefault(hostIP string, portNum int) *MySQLServerInfo {
+	return &MySQLServerInfo{
+		Repository: NewMySQLServerRepoWithGlobal(),
 		HostIP:     hostIP,
 		PortNum:    portNum,
 	}
 }
 
 // Identity returns ID of entity
-func (mci *MYSQLServerInfo) Identity() string {
-	return strconv.Itoa(mci.ID)
+func (msi *MySQLServerInfo) Identity() string {
+	return strconv.Itoa(msi.ID)
 }
 
 // IsDeleted checks if delete flag had been set
-func (mci *MYSQLServerInfo) IsDeleted() bool {
-	return mci.DelFlag != constant.ZeroInt
+func (msi *MySQLServerInfo) IsDeleted() bool {
+	return msi.DelFlag != constant.ZeroInt
 }
 
 // GetCreateTime returns created time of entity
-func (mci *MYSQLServerInfo) GetCreateTime() time.Time {
-	return mci.CreateTime
+func (msi *MySQLServerInfo) GetCreateTime() time.Time {
+	return msi.CreateTime
 }
 
 // GetLastUpdateTime returns last updated time of entity
-func (mci *MYSQLServerInfo) GetLastUpdateTime() time.Time {
-	return mci.LastUpdateTime
+func (msi *MySQLServerInfo) GetLastUpdateTime() time.Time {
+	return msi.LastUpdateTime
 }
 
 // Get returns value of given field
-func (mci *MYSQLServerInfo) Get(field string) (interface{}, error) {
-	return common.GetValueOfStruct(mci, field)
+func (msi *MySQLServerInfo) Get(field string) (interface{}, error) {
+	return common.GetValueOfStruct(msi, field)
 }
 
 // Set sets entity with given fields, key is the field name and value is the relevant value of the key
-func (mci *MYSQLServerInfo) Set(fields map[string]interface{}) error {
+func (msi *MySQLServerInfo) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {
-		err := common.SetValueOfStruct(mci, fieldName, fieldValue)
+		err := common.SetValueOfStruct(msi, fieldName, fieldValue)
 		if err != nil {
 			return err
 		}
@@ -126,16 +126,16 @@ func (mci *MYSQLServerInfo) Set(fields map[string]interface{}) error {
 }
 
 // Delete sets DelFlag to true, need to use Save to write to the middleware
-func (mci *MYSQLServerInfo) Delete() {
-	mci.DelFlag = 1
+func (msi *MySQLServerInfo) Delete() {
+	msi.DelFlag = 1
 }
 
 // MarshalJSON marshals entity to json string, it only marshals fields that has default tag
-func (mci *MYSQLServerInfo) MarshalJSON() ([]byte, error) {
-	return common.MarshalStructWithTag(mci, constant.DefaultMarshalTag)
+func (msi *MySQLServerInfo) MarshalJSON() ([]byte, error) {
+	return common.MarshalStructWithTag(msi, constant.DefaultMarshalTag)
 }
 
 // MarshalJSONWithFields marshals only with specified fields of entity to json string
-func (mci *MYSQLServerInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
-	return common.MarshalStructWithFields(mci, fields...)
+func (msi *MySQLServerInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
+	return common.MarshalStructWithFields(msi, fields...)
 }
