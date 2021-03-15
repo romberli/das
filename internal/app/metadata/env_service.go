@@ -69,7 +69,7 @@ func (es *EnvService) Create(fields map[string]interface{}) error {
 		return message.NewMessage(message.ErrFieldNotExists, envNameStruct)
 	}
 	// create a new entity
-	envInfo, err := NewEnvInfoWithMap(fields)
+	envInfo, err := NewEnvInfoWithMapAndRandom(fields)
 	if err != nil {
 		return err
 	}

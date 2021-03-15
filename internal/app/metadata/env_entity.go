@@ -58,8 +58,8 @@ func NewEnvInfoWithDefault(envName string) *EnvInfo {
 	}
 }
 
-// NewEnvInfoWithMap returns a new *EnvInfo with given map
-func NewEnvInfoWithMap(fields map[string]interface{}) (*EnvInfo, error) {
+// NewEnvInfoWithMapAndRandom returns a new *EnvInfo with given map
+func NewEnvInfoWithMapAndRandom(fields map[string]interface{}) (*EnvInfo, error) {
 	ei := &EnvInfo{}
 	err := common.SetValuesWithMapAndRandom(ei, fields)
 	if err != nil {
