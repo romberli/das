@@ -94,7 +94,7 @@ func TestMSService_Delete(t *testing.T) {
 }
 
 func TestMSService_Marshal(t *testing.T) {
-	var entitiesUnmarshal []*MSInfo
+	var entitiesUnmarshal []*MonitorSystemInfo
 
 	asst := assert.New(t)
 
@@ -109,7 +109,7 @@ func TestMSService_Marshal(t *testing.T) {
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(mSEqual(entity.(*MSInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(mSEqual(entity.(*MonitorSystemInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 

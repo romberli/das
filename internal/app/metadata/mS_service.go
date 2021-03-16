@@ -33,8 +33,8 @@ func NewMSService(repo dependency.Repository) *MSService {
 	return &MSService{repo, []dependency.Entity{}}
 }
 
-// NewMSServiceWithDefault returns a new *MSService with default repository
-func NewMSServiceWithDefault() *MSService {
+// NewMonitorSystemServiceWithDefault returns a new *MSService with default repository
+func NewMonitorSystemServiceWithDefault() *MSService {
 	return NewMSService(NewMSRepoWithGlobal())
 }
 

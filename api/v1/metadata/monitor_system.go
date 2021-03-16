@@ -13,12 +13,12 @@ import (
 )
 
 const (
-	mSNameStruct      = "MSName"
-	systemTypeStruct  = "SystemType"
-	mSHostIpStruct    = "HostIp"
-	mSportNumStruct   = "PortNum"
-	portNumSlowStruct = "PortNumSlow"
-	baseUrlStruct     = "BaseUrl"
+	monitorSystemNameStruct        = "SystemName"
+	monitorSystemTypeStruct        = "SystemType"
+	monitorSystemHostIpStruct      = "HostIp"
+	monitorSystemPortNumStruct     = "PortNum"
+	monitorSystemPortNumSlowStruct = "PortNumSlow"
+	monitorSystemBaseUrlStruct     = "BaseUrl"
 )
 
 // @Tags monitor system
@@ -28,11 +28,11 @@ const (
 // @Router /api/v1/metadata/monitor-system [get]
 func GetMonitorSystem(c *gin.Context) {
 	// init service
-	s := metadata.NewMSServiceWithDefault()
+	s := metadata.NewMonitorSystemServiceWithDefault()
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMSAll, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetMonitorSystemAll, err.Error())
 		return
 	}
 	// marshal service
@@ -43,8 +43,8 @@ func GetMonitorSystem(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMSAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMSAll)
+	log.Debug(message.NewMessage(message.DebugMetadataGetMonitorSystemAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMonitorSystemAll)
 }
 
 // @Tags monitor system
@@ -60,11 +60,11 @@ func GetMonitorSystemByID(c *gin.Context) {
 		return
 	}
 	// init service
-	s := metadata.NewMSServiceWithDefault()
+	s := metadata.NewMonitorSystemServiceWithDefault()
 	// get entity
 	err := s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMSByID, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetMonitorSystemByID, id, err.Error())
 		return
 	}
 	// marshal service
@@ -75,8 +75,8 @@ func GetMonitorSystemByID(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMSByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMSByID, id)
+	log.Debug(message.NewMessage(message.DebugMetadataGetMonitorSystemByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMonitorSystemByID, id)
 }
 
 // @Tags monitor system
@@ -94,34 +94,39 @@ func AddMonitorSystem(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MSInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MonitorSystemInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, ok := fields[mSNameStruct]
-	if !ok {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, mSNameStruct)
+	_, systemNameExists := fields[monitorSystemNameStruct]
+	_, systemTypeExists := fields[monitorSystemTypeStruct]
+	_, hostIpExists := fields[monitorSystemHostIpStruct]
+	_, portNumExists := fields[monitorSystemPortNumStruct]
+	_, portNumSlowExists := fields[monitorSystemPortNumSlowStruct]
+	_, baseUrlExists := fields[monitorSystemBaseUrlStruct]
+	if !systemNameExists && !systemTypeExists && !hostIpExists && !portNumExists && !portNumSlowExists && !baseUrlExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s", monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIpStruct, monitorSystemPortNumStruct, monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct))
 		return
 	}
 	// init service
-	s := metadata.NewMSServiceWithDefault()
+	s := metadata.NewMonitorSystemServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSportNumStruct, portNumSlowStruct, baseUrlStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIpStruct, monitorSystemPortNumStruct, monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct), err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSportNumStruct, portNumSlowStruct, baseUrlStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s and %s and %s", monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIpStruct, monitorSystemPortNumStruct, monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct), err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddMS, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSportNumStruct, portNumSlowStruct, baseUrlStruct))
+	log.Debug(message.NewMessage(message.DebugMetadataAddMonitorSystem, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMonitorSystem, fmt.Sprintf("%s and %s and %s and %s and %s and %s", monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIpStruct, monitorSystemPortNumStruct, monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct))
 }
 
 // @Tags monitor system
@@ -143,28 +148,28 @@ func UpdateMonitorSystemByID(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MSInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MonitorSystemInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, mSNameExists := fields[mSNameStruct]
-	_, systemTypeExists := fields[systemTypeStruct]
-	_, hostIpExists := fields[mSHostIpStruct]
-	_, portNumExists := fields[mSportNumStruct]
-	_, portNumSlowExists := fields[portNumSlowStruct]
-	_, baseUrlExists := fields[baseUrlStruct]
+	_, systemNameExists := fields[monitorSystemNameStruct]
+	_, systemTypeExists := fields[monitorSystemTypeStruct]
+	_, hostIpExists := fields[monitorSystemHostIpStruct]
+	_, portNumExists := fields[monitorSystemPortNumStruct]
+	_, portNumSlowExists := fields[monitorSystemPortNumSlowStruct]
+	_, baseUrlExists := fields[monitorSystemBaseUrlStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !mSNameExists && !systemTypeExists && !hostIpExists && !portNumExists && !portNumSlowExists && !baseUrlExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s and %s", mSNameStruct, systemTypeStruct, mSHostIpStruct, mSportNumStruct, portNumSlowStruct, baseUrlStruct, delFlagStruct))
+	if !systemNameExists && !systemTypeExists && !hostIpExists && !portNumExists && !portNumSlowExists && !baseUrlExists && !delFlagExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s and %s", monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIpStruct, monitorSystemPortNumStruct, monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct, delFlagStruct))
 		return
 	}
 	// init service
-	s := metadata.NewMSServiceWithDefault()
+	s := metadata.NewMonitorSystemServiceWithDefault()
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMS, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateMonitorSystem, id, err.Error())
 		return
 	}
 	// marshal service
@@ -175,6 +180,6 @@ func UpdateMonitorSystemByID(c *gin.Context) {
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateMS, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMS, id)
+	log.Debug(message.NewMessage(message.DebugMetadataUpdateMonitorSystem, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMonitorSystem, id)
 }

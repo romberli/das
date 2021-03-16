@@ -18,18 +18,18 @@ const (
 
 var dbRepo = initDbRepo()
 
-func initDbRepo() *DbRepo {
+func initDbRepo() *DBRepo {
 	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initEnvRepo() failed", err))
 		return nil
 	}
 
-	return NewDbRepo(pool)
+	return NewDBRepo(pool)
 }
 
 func createDb() (dependency.Entity, error) {
-	dbInfo := NewDbInfoWithDefault(defaultDbInfoDbName, defaultDbInfoOwnerId, defaultDbInfoEnvId)
+	dbInfo := NewDBInfoWithDefault(defaultDBInfoDBName, defaultDBInfoOwnerID, defaultDBInfoEnvID)
 	entity, err := dbRepo.Create(dbInfo)
 	if err != nil {
 		return nil, err
@@ -72,15 +72,15 @@ func TestDbRepo_Transaction(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	_, err = tx.Execute(sql, defaultDbInfoDbName, defaultDbInfoOwnerId, defaultDbInfoEnvId)
+	_, err = tx.Execute(sql, defaultDBInfoDBName, defaultDBInfoOwnerID, defaultDBInfoEnvID)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
 	sql = `select db_name from t_meta_db_info where db_name=?`
-	result, err := tx.Execute(sql, defaultDbInfoDbName)
+	result, err := tx.Execute(sql, defaultDBInfoDBName)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	dbName, err := result.GetString(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	if dbName != defaultDbInfoDbName {
+	if dbName != defaultDBInfoDBName {
 		asst.Fail("test Transaction() failed")
 	}
 	err = tx.Rollback()
@@ -91,7 +91,7 @@ func TestDbRepo_Transaction(t *testing.T) {
 	for _, entity := range entities {
 		dbName, err := entity.Get(dbNameStruct)
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-		if dbName == defaultDbInfoDbName {
+		if dbName == defaultDBInfoDBName {
 			asst.Fail("test Transaction() failed")
 			break
 		}
@@ -103,7 +103,7 @@ func TestDbRepo_GetAll(t *testing.T) {
 
 	entities, err := dbRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	dbName, err := entities[0].Get("DbName")
+	dbName, err := entities[0].Get("DBName")
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
 	asst.Equal(onlineDbName, dbName.(string), "test GetAll() failed")
 }

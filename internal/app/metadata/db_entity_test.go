@@ -13,104 +13,104 @@ import (
 )
 
 const (
-	defaultDbInfoID                   = 1
-	defaultDbInfoDbName               = "das1"
-	defaultDbInfoClusterId            = 1
-	defaultDbInfoClusterType          = 1
-	defaultDbInfoOwnerId              = "1"
-	defaultDbInfoOwnerGroup           = "2,5,6"
-	defaultDbInfoEnvId                = "2"
-	defaultDbInfoDelFlag              = 0
-	defaultDbInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
-	defaultDbInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"
+	defaultDBInfoID                   = 1
+	defaultDBInfoDBName               = "das1"
+	defaultDBInfoClusterID            = "1"
+	defaultDBInfoClusterType          = "1"
+	defaultDBInfoOwnerID              = "1"
+	defaultDBInfoOwnerGroup           = "2,5,6"
+	defaultDBInfoEnvID                = "2"
+	defaultDBInfoDelFlag              = 0
+	defaultDBInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
+	defaultDBInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"
 	dbNameJSON                        = "db_name"
 )
 
-func initNewDbInfo() *DbInfo {
+func initNewDBInfo() *DBInfo {
 	now.TimeFormats = append(now.TimeFormats, constant.DefaultTimeLayout)
 
-	createTime, _ := now.Parse(defaultDbInfoCreateTimeString)
-	lastUpdateTime, _ := now.Parse(defaultDbInfoLastUpdateTimeString)
-	return NewDbInfoWithGlobal(defaultDbInfoID, defaultDbInfoDbName, defaultDbInfoClusterId, defaultDbInfoClusterType, defaultDbInfoOwnerId, defaultDbInfoOwnerGroup, defaultDbInfoEnvId, defaultDbInfoDelFlag, createTime, lastUpdateTime)
+	createTime, _ := now.Parse(defaultDBInfoCreateTimeString)
+	lastUpdateTime, _ := now.Parse(defaultDBInfoLastUpdateTimeString)
+	return NewDBInfoWithGlobal(defaultDBInfoID, defaultDBInfoDBName, defaultDBInfoClusterID, defaultDBInfoClusterType, defaultDBInfoOwnerID, defaultDBInfoOwnerGroup, defaultDBInfoEnvID, defaultDBInfoDelFlag, createTime, lastUpdateTime)
 }
 
-func dbEqual(a, b *DbInfo) bool {
-	return a.ID == b.ID && a.DbName == b.DbName && a.ClusterId == b.ClusterId && a.ClusterType == b.ClusterType && a.OwnerId == b.OwnerId && a.OwnerGroup == b.OwnerGroup && a.EnvId == b.EnvId && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
+func dbEqual(a, b *DBInfo) bool {
+	return a.ID == b.ID && a.DBName == b.DBName && a.ClusterID == b.ClusterID && a.ClusterType == b.ClusterType && a.OwnerID == b.OwnerID && a.OwnerGroup == b.OwnerGroup && a.EnvID == b.EnvID && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
 }
 
-func TestDbEntityAll(t *testing.T) {
-	TestDbInfo_Identity(t)
-	TestDbInfo_IsDeleted(t)
-	TestDbInfo_GetCreateTime(t)
-	TestDbInfo_GetLastUpdateTime(t)
-	TestDbInfo_Get(t)
-	TestDbInfo_Set(t)
-	TestDbInfo_Delete(t)
-	TestDbInfo_MarshalJSON(t)
-	TestDbInfo_MarshalJSONWithFields(t)
+func TestDBEntityAll(t *testing.T) {
+	TestDBInfo_Identity(t)
+	TestDBInfo_IsDeleted(t)
+	TestDBInfo_GetCreateTime(t)
+	TestDBInfo_GetLastUpdateTime(t)
+	TestDBInfo_Get(t)
+	TestDBInfo_Set(t)
+	TestDBInfo_Delete(t)
+	TestDBInfo_MarshalJSON(t)
+	TestDBInfo_MarshalJSONWithFields(t)
 }
 
-func TestDbInfo_Identity(t *testing.T) {
+func TestDBInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
-	asst.Equal(strconv.Itoa(defaultDbInfoID), dbInfo.Identity(), "test Identity() failed")
+	dbInfo := initNewDBInfo()
+	asst.Equal(strconv.Itoa(defaultDBInfoID), dbInfo.Identity(), "test Identity() failed")
 }
 
-func TestDbInfo_IsDeleted(t *testing.T) {
+func TestDBInfo_IsDeleted(t *testing.T) {
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
+	dbInfo := initNewDBInfo()
 	asst.False(dbInfo.IsDeleted(), "test IsDeleted() failed")
 }
 
-func TestDbInfo_GetCreateTime(t *testing.T) {
+func TestDBInfo_GetCreateTime(t *testing.T) {
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
+	dbInfo := initNewDBInfo()
 	asst.True(reflect.DeepEqual(dbInfo.CreateTime, dbInfo.GetCreateTime()), "test GetCreateTime failed")
 }
 
-func TestDbInfo_GetLastUpdateTime(t *testing.T) {
+func TestDBInfo_GetLastUpdateTime(t *testing.T) {
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
+	dbInfo := initNewDBInfo()
 	asst.True(reflect.DeepEqual(dbInfo.LastUpdateTime, dbInfo.GetLastUpdateTime()), "test GetLastUpdateTime() failed")
 }
 
-func TestDbInfo_Get(t *testing.T) {
+func TestDBInfo_Get(t *testing.T) {
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
+	dbInfo := initNewDBInfo()
 	dbName, err := dbInfo.Get(dbNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(dbInfo.DbName, dbName, "test Get() failed")
+	asst.Equal(dbInfo.DBName, dbName, "test Get() failed")
 }
 
-func TestDbInfo_Set(t *testing.T) {
+func TestDBInfo_Set(t *testing.T) {
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
-	newDbName := "new_db"
-	err := dbInfo.Set(map[string]interface{}{"DbName": newDbName})
+	dbInfo := initNewDBInfo()
+	newDBName := "new_db"
+	err := dbInfo.Set(map[string]interface{}{"DBName": newDBName})
 	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(newDbName, dbInfo.DbName, "test Set() failed")
+	asst.Equal(newDBName, dbInfo.DBName, "test Set() failed")
 }
 
-func TestDbInfo_Delete(t *testing.T) {
+func TestDBInfo_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
+	dbInfo := initNewDBInfo()
 	dbInfo.Delete()
 	asst.True(dbInfo.IsDeleted(), "test Delete() failed")
 }
 
-func TestDbInfo_MarshalJSON(t *testing.T) {
-	var dbInfoUnmarshal *DbInfo
+func TestDBInfo_MarshalJSON(t *testing.T) {
+	var dbInfoUnmarshal *DBInfo
 
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
+	dbInfo := initNewDBInfo()
 	data, err := dbInfo.MarshalJSON()
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
 	err = json.Unmarshal(data, &dbInfoUnmarshal)
@@ -118,10 +118,10 @@ func TestDbInfo_MarshalJSON(t *testing.T) {
 	asst.True(dbEqual(dbInfo, dbInfoUnmarshal), "test MarshalJSON() failed")
 }
 
-func TestDbInfo_MarshalJSONWithFields(t *testing.T) {
+func TestDBInfo_MarshalJSONWithFields(t *testing.T) {
 	asst := assert.New(t)
 
-	dbInfo := initNewDbInfo()
+	dbInfo := initNewDBInfo()
 	data, err := dbInfo.MarshalJSONWithFields(dbNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	expect, err := json.Marshal(map[string]interface{}{dbNameJSON: "das1"})

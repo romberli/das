@@ -20,7 +20,7 @@ const (
 	mSNameJSON                        = "system_name"
 )
 
-func initNewMSInfo() *MSInfo {
+func initNewMSInfo() *MonitorSystemInfo {
 	now.TimeFormats = append(now.TimeFormats, constant.DefaultTimeLayout)
 
 	createTime, _ := now.Parse(defaultMSInfoCreateTimeString)
@@ -28,7 +28,7 @@ func initNewMSInfo() *MSInfo {
 	return NewMSInfoWithGlobal(defaultMSInfoID, defaultMSInfoMSName, defaultMSInfoSystemType, defaultMSInfoHostIp, defaultMSInfoPortNum, defaultMSInfoPortNumSlow, defaultMSInfoBaseUrl, defaultMSInfoDelFlag, createTime, lastUpdateTime)
 }
 
-func mSEqual(a, b *MSInfo) bool {
+func mSEqual(a, b *MonitorSystemInfo) bool {
 	return a.ID == b.ID && a.MSName == b.MSName && a.SystemType == b.SystemType && a.HostIp == b.HostIp && a.PortNum == b.PortNum && a.PortNumSlow == b.PortNumSlow && a.BaseUrl == b.BaseUrl && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
 }
 
@@ -100,7 +100,7 @@ func TestMSInfo_Delete(t *testing.T) {
 }
 
 func TestMSInfo_MarshalJSON(t *testing.T) {
-	var mSInfoUnmarshal *MSInfo
+	var mSInfoUnmarshal *MonitorSystemInfo
 
 	asst := assert.New(t)
 

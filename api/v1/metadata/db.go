@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	dbNameStruct  = "DbName"
-	ownerIdStruct = "OwnerId"
-	envIdStruct   = "EnvId"
+	dbNameStruct      = "DBName"
+	clusterTypeStruct = "ClusterType"
+	dbOwnerIDStruct     = "OwnerID"
+	dbEnvIDStruct       = "EnvID"
 )
 
 // @Tags database
@@ -25,11 +26,11 @@ const (
 // @Router /api/v1/metadata/db [get]
 func GetDB(c *gin.Context) {
 	// init service
-	s := metadata.NewDbServiceWithDefault()
+	s := metadata.NewDBServiceWithDefault()
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetDbAll, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetDBAll, err.Error())
 		return
 	}
 	// marshal service
@@ -40,8 +41,8 @@ func GetDB(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetDbAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetDbAll)
+	log.Debug(message.NewMessage(message.DebugMetadataGetDBAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetDBAll)
 }
 
 // @Tags database
@@ -57,11 +58,11 @@ func GetDBByID(c *gin.Context) {
 		return
 	}
 	// init service
-	s := metadata.NewDbServiceWithDefault()
+	s := metadata.NewDBServiceWithDefault()
 	// get entity
 	err := s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetDbByID, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetDBByID, id, err.Error())
 		return
 	}
 	// marshal service
@@ -72,8 +73,8 @@ func GetDBByID(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetDbByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetDbByID, id)
+	log.Debug(message.NewMessage(message.DebugMetadataGetDBByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetDBByID, id)
 }
 
 // @Tags database
@@ -91,34 +92,38 @@ func AddDB(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.DbInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.DBInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, ok := fields[dbNameStruct]
-	if !ok {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, dbNameStruct)
+	_, dbNameExists := fields[dbNameStruct]
+	_, clusterTypeExists := fields[clusterTypeStruct]
+	_, ownerIDExists := fields[dbOwnerIDStruct]
+	_, envIDExists := fields[dbEnvIDStruct]
+
+	if !dbNameExists && !clusterTypeExists && !ownerIDExists && !envIDExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct))
 		return
 	}
 	// init service
-	s := metadata.NewDbServiceWithDefault()
+	s := metadata.NewDBServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddDb, fmt.Sprintf("%s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddDB, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct), err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct), err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddDb, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddDb, fmt.Sprintf("%s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct))
+	log.Debug(message.NewMessage(message.DebugMetadataAddDB, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddDB, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct))
 }
 
 // @Tags database
@@ -140,25 +145,26 @@ func UpdateDBByID(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.DbInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.DBInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
 	_, dbNameExists := fields[dbNameStruct]
-	_, ownerIdExists := fields[ownerIdStruct]
-	_, envIdExists := fields[envIdStruct]
+	_, clusterTypeExists := fields[clusterTypeStruct]
+	_, ownerIDExists := fields[dbOwnerIDStruct]
+	_, envIDExists := fields[dbEnvIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !dbNameExists && !ownerIdExists && !envIdExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct, delFlagStruct))
+	if !dbNameExists && !clusterTypeExists && !ownerIDExists && !envIDExists && !delFlagExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct, delFlagStruct))
 		return
 	}
 	// init service
-	s := metadata.NewDbServiceWithDefault()
+	s := metadata.NewDBServiceWithDefault()
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateDb, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateDB, id, err.Error())
 		return
 	}
 	// marshal service
@@ -169,6 +175,6 @@ func UpdateDBByID(c *gin.Context) {
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateDb, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateDb, id)
+	log.Debug(message.NewMessage(message.DebugMetadataUpdateDB, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateDB, id)
 }
