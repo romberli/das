@@ -33,7 +33,7 @@ import (
 )
 
 var (
-	ValidLogLevels = []string{"debug", "info", "warn", "warning", "message", "fatal"}
+	ValidLogLevels = []string{"debug", "info", "warn", "warning", "error", "fatal"}
 	ValidLogFormat = []string{"text", "json"}
 )
 

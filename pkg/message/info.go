@@ -26,7 +26,7 @@ const (
 	InfoMetadataAddMYSQLServer     = 200803
 	InfoMetadataUpdateMYSQLServer  = 200804
 
-  InfoMetadataGetMiddlewareClusterAll  = 200501
+	InfoMetadataGetMiddlewareClusterAll  = 200501
 	InfoMetadataGetMiddlewareClusterByID = 200502
 	InfoMetadataAddMiddlewareCluster     = 200503
 	InfoMetadataUpdateMiddlewareCluster  = 200504
@@ -36,7 +36,7 @@ const (
 	InfoMetadataAddMiddlewareServer     = 200603
 	InfoMetadataUpdateMiddlewareServer  = 200604
 
-  InfoMetadataGetAppSystemAll  = 200301
+	InfoMetadataGetAppSystemAll  = 200301
 	InfoMetadataGetAppSystemByID = 200302
 	InfoMetadataAddAppSystem     = 200303
 	InfoMetadataUpdateAppSystem  = 200304
@@ -46,14 +46,14 @@ const (
 	InfoMetadataAddUser     = 200903
 	InfoMetadataUpdateUser  = 200904
 
-  InfoMetadataGetDbAll  = 200401
+	InfoMetadataGetDbAll  = 200401
 	InfoMetadataGetDbByID = 200402
-	InfoMetadataAddDb    = 200403
+	InfoMetadataAddDb     = 200403
 	InfoMetadataUpdateDb  = 200404
 
 	InfoMetadataGetMSAll  = 200601
 	InfoMetadataGetMSByID = 200602
-	InfoMetadataAddMS    = 200603
+	InfoMetadataAddMS     = 200603
 	InfoMetadataUpdateMS  = 200604
 )
 
@@ -79,7 +79,7 @@ func initInfoMessage() {
 	Messages[InfoMetadataAddMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMYSQLServer, "metadata: add new mysql server completed. env_name: %s")
 	Messages[InfoMetadataUpdateMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMYSQLServer, "metadata: update mysql server completed. id: %s")
 
-  Messages[InfoMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareClusterAll, "metadata: get middleware cluster all completed. id: %s")
+	Messages[InfoMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareClusterAll, "metadata: get middleware cluster all completed. id: %s")
 	Messages[InfoMetadataGetMiddlewareClusterByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareClusterByID, "metadata: get middleware cluster by id completed. id: %s")
 	Messages[InfoMetadataAddMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMiddlewareCluster, "metadata: add new middleware cluster completed. env_name: %s")
 	Messages[InfoMetadataUpdateMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster completed. id: %s")
@@ -99,7 +99,7 @@ func initInfoMessage() {
 	Messages[InfoMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddUser, "metadata: add new user completed. env_name: %s")
 	Messages[InfoMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateUser, "metadata: update user completed. id: %s")
 
-  Messages[InfoMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetDbAll, "metadata: get database all completed")
+	Messages[InfoMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetDbAll, "metadata: get database all completed")
 	Messages[InfoMetadataGetDbByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetDbByID, "metadata: get database by id completed. id: %s")
 	Messages[InfoMetadataAddDb] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddDb, "metadata: add new database completed. db_name and owner_id and env_id: %s")
 	Messages[InfoMetadataUpdateDb] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateDb, "metadata: update database completed. id: %s")
