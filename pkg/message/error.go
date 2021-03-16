@@ -68,7 +68,7 @@ const (
 	ErrMetadataAddMYSQLServer     = 400803
 	ErrMetadataUpdateMYSQLServer  = 400804
 
-  ErrMetadataGetMiddlewareClusterAll  = 400501
+	ErrMetadataGetMiddlewareClusterAll  = 400501
 	ErrMetadataGetMiddlewareClusterByID = 400502
 	ErrMetadataAddMiddlewareCluster     = 400503
 	ErrMetadataUpdateMiddlewareCluster  = 400504
@@ -78,7 +78,7 @@ const (
 	ErrMetadataAddMiddlewareServer     = 400603
 	ErrMetadataUpdateMiddlewareServer  = 400604
 
-  ErrMetadataGetAppSystemAll  = 400301
+	ErrMetadataGetAppSystemAll  = 400301
 	ErrMetadataGetAppSystemByID = 400302
 	ErrMetadataAddAppSystem     = 400303
 	ErrMetadataUpdateAppSystem  = 400304
@@ -164,7 +164,7 @@ func initErrorMessage() {
 	Messages[ErrMetadataAddMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMYSQLServer, "metadata: add new mysql server failed. env_name: %s\n%s")
 	Messages[ErrMetadataUpdateMYSQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMYSQLServer, "metadata: update mysql server failed. id: %s\n%s")
 
-  Messages[ErrMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterAll, "metadata: get all middleware cluster failed.\n%s")
+	Messages[ErrMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterAll, "metadata: get all middleware cluster failed.\n%s")
 	Messages[ErrMetadataGetMiddlewareClusterByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterByID, "metadata: get middleware cluster by id failed. id: %s\n%s")
 	Messages[ErrMetadataAddMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMiddlewareCluster, "metadata: add new middleware cluster failed. env_name: %s\n%s")
 	Messages[ErrMetadataUpdateMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster failed. id: %s\n%s")
