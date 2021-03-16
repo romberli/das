@@ -71,7 +71,7 @@ func GetEnvByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -112,19 +112,19 @@ func AddEnv(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddEnv, envNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddEnv, fields[envNameStruct], err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, envNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddEnv, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddEnv, envNameStruct)
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddEnv, fields[envNameStruct])
 }
 
 // @Tags	environment
@@ -171,7 +171,7 @@ func UpdateEnvByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// resp

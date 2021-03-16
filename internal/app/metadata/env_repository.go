@@ -47,6 +47,7 @@ func (er *EnvRepo) Execute(command string, args ...interface{}) (middleware.Resu
 	return conn.Execute(command, args...)
 }
 
+// Transaction implements dependency.Repository interface
 func (er *EnvRepo) Transaction() (middleware.Transaction, error) {
 	return er.Database.Transaction()
 }

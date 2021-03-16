@@ -21,7 +21,7 @@ type EnvInfo struct {
 	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
-// NewEnvInfo returns a new EnvInfo
+// NewEnvInfo returns a new *EnvInfo
 func NewEnvInfo(repo *EnvRepo, id int, envName string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *EnvInfo {
 	return &EnvInfo{
 		repo,
@@ -33,7 +33,7 @@ func NewEnvInfo(repo *EnvRepo, id int, envName string, delFlag int, createTime t
 	}
 }
 
-// NewEnvInfo returns a new EnvInfo with default EnvRepo
+// NewEnvInfo returns a new *EnvInfo with default EnvRepo
 func NewEnvInfoWithGlobal(id int, envName string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *EnvInfo {
 	return &EnvInfo{
 		NewEnvRepoWithGlobal(),
@@ -45,16 +45,28 @@ func NewEnvInfoWithGlobal(id int, envName string, delFlag int, createTime time.T
 	}
 }
 
+// NewEmptyEnvInfoWithGlobal returns a new *EnvInfo with global repository
 func NewEmptyEnvInfoWithGlobal() *EnvInfo {
 	return &EnvInfo{Repository: NewEnvRepoWithGlobal()}
 }
 
-// NewEnvInfoWithDefault returns a new EnvInfo with default EnvRepo
+// NewEnvInfoWithDefault returns a new *EnvInfo with default EnvRepo
 func NewEnvInfoWithDefault(envName string) *EnvInfo {
 	return &EnvInfo{
 		Repository: NewEnvRepoWithGlobal(),
 		EnvName:    envName,
 	}
+}
+
+// NewEnvInfoWithMapAndRandom returns a new *EnvInfo with given map
+func NewEnvInfoWithMapAndRandom(fields map[string]interface{}) (*EnvInfo, error) {
+	ei := &EnvInfo{}
+	err := common.SetValuesWithMapAndRandom(ei, fields)
+	if err != nil {
+		return nil, err
+	}
+
+	return ei, nil
 }
 
 // Identity returns ID of entity

@@ -25,7 +25,7 @@ func NewAppSystemRepo(db middleware.Pool) *AppSystemRepo {
 	return &AppSystemRepo{db}
 }
 
-//NewAppSystemRepoWithGlobal returns *AppSystemRepo with global mysql pool
+// NewAppSystemRepoWithGlobal returns *AppSystemRepo with global mysql pool
 func NewAppSystemRepoWithGlobal() *AppSystemRepo {
 	return NewAppSystemRepo(global.MySQLPool)
 }
@@ -54,7 +54,7 @@ func (asr *AppSystemRepo) Transaction() (middleware.Transaction, error) {
 // GetAll returns all available entities
 func (asr *AppSystemRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
-		select id, system_name, del_flag, create_time, last_update_time,level,owner_id,owner_group
+		select id, system_name, del_flag, create_time, last_update_time, level,owner_id, owner_group
 		from t_meta_app_system_info
 		where del_flag = 0
 		order by id;

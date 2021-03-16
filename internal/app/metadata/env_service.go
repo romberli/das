@@ -64,11 +64,15 @@ func (es *EnvService) GetByID(id string) error {
 // Create creates a new environment entity and insert it into the middleware
 func (es *EnvService) Create(fields map[string]interface{}) error {
 	// generate new map
-	envName, ok := fields[envNameStruct]
+	_, ok := fields[envNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, envNameStruct)
 	}
-	envInfo := NewEnvInfoWithDefault(envName.(string))
+	// create a new entity
+	envInfo, err := NewEnvInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
 	// insert into middleware
 	entity, err := es.Repository.Create(envInfo)
 	if err != nil {
