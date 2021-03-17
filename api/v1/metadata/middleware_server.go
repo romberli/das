@@ -12,7 +12,11 @@ import (
 )
 
 const (
-	middlewareServerNameStruct = "ServerName"
+	middlewareServerClusterIDStruct      = "ClusterID"
+	middlewareServerNameStruct           = "ServerName"
+	middlewareServerMiddlewareRoleStruct = "MiddlewareRole"
+	middlewareServerHostIPStruct         = "HostIP"
+	middlewareServerPortNumStruct        = "PortNum"
 )
 
 // @Tags middleware server
@@ -64,7 +68,7 @@ func GetMiddlewareServerByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -93,9 +97,29 @@ func AddMiddlewareServer(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, ok := fields[middlewareServerNameStruct]
+	_, ok := fields[middlewareServerClusterIDStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareServerClusterIDStruct)
+		return
+	}
+	_, ok = fields[middlewareServerNameStruct]
 	if !ok {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareServerNameStruct)
+		return
+	}
+	_, ok = fields[middlewareServerMiddlewareRoleStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareServerMiddlewareRoleStruct)
+		return
+	}
+	_, ok = fields[middlewareServerHostIPStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareServerHostIPStruct)
+		return
+	}
+	_, ok = fields[middlewareServerPortNumStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareServerPortNumStruct)
 		return
 	}
 	// init service
@@ -103,19 +127,19 @@ func AddMiddlewareServer(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMiddlewareServer, middlewareServerNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMiddlewareServer, fields[middlewareServerNameStruct], err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, middlewareServerNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddMiddlewareServer, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMiddlewareServer, middlewareServerNameStruct)
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMiddlewareServer, fields[middlewareServerNameStruct])
 }
 
 // @Tags middleware server
@@ -142,9 +166,13 @@ func UpdateMiddlewareServerByID(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
+	_, middlewareServerClusterIDExists := fields[middlewareServerClusterIDStruct]
 	_, middlewareServerNameExists := fields[middlewareServerNameStruct]
+	_, middlewareServerMiddlewareRoleExists := fields[middlewareServerMiddlewareRoleStruct]
+	_, middlewareServerHostIPExists := fields[middlewareServerHostIPStruct]
+	_, middlewareServerPortNumExists := fields[middlewareServerPortNumStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !middlewareServerNameExists && !delFlagExists {
+	if !middlewareServerClusterIDExists && !middlewareServerNameExists && !middlewareServerMiddlewareRoleExists && !middlewareServerHostIPExists && !middlewareServerPortNumExists && !delFlagExists {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", middlewareServerNameStruct, delFlagStruct))
 		return
 	}
@@ -153,7 +181,7 @@ func UpdateMiddlewareServerByID(c *gin.Context) {
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMiddlewareServer, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateMiddlewareServer, err.Error())
 		return
 	}
 	// marshal service
