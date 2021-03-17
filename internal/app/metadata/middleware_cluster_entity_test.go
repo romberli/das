@@ -30,7 +30,7 @@ func initNewMiddlewareClusterInfo() *MiddlewareClusterInfo {
 	return NewMiddlewareClusterInfoWithGlobal(defaultMiddlewareClusterInfoID, defaultMiddlewareClusterInfoClusterName, defaultMiddlewareClusterInfoEnvID, defaultMiddlewareClusterInfoDelFlag, createTime, lastUpdateTime)
 }
 
-func middlewareClusterStuctEqual(a, b *MiddlewareClusterInfo) bool {
+func middlewareClusterStructEqual(a, b *MiddlewareClusterInfo) bool {
 	return a.ID == b.ID && a.ClusterName == b.ClusterName && a.EnvID == b.EnvID && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
 }
 
@@ -111,7 +111,7 @@ func TestMiddlewareClusterInfo_MarshalJSON(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
 	err = json.Unmarshal(data, &middlewareClusterInfoUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
-	asst.True(middlewareClusterStuctEqual(middlewareClusterInfo, middlewareClusterInfoUnmarshal), "test MarshalJSON() failed")
+	asst.True(middlewareClusterStructEqual(middlewareClusterInfo, middlewareClusterInfoUnmarshal), "test MarshalJSON() failed")
 }
 
 func TestMiddlewareClusterInfo_MarshalJSONWithFields(t *testing.T) {

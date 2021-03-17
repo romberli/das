@@ -45,7 +45,7 @@ func (mss *MiddlewareServerService) GetEntities() []dependency.Entity {
 	return entityList
 }
 
-// GetAll gets all middlewareServerironment entities from the middleware
+// GetAll gets all middlewareServerEnvironment entities from the middleware
 func (mss *MiddlewareServerService) GetAll() error {
 	var err error
 	mss.Entities, err = mss.Repository.GetAll()
@@ -53,7 +53,7 @@ func (mss *MiddlewareServerService) GetAll() error {
 	return err
 }
 
-// GetByID gets an middlewareServerironment entity that contains the given id from the middleware
+// GetByID gets an middlewareServerEnvironment entity that contains the given id from the middleware
 func (mss *MiddlewareServerService) GetByID(id string) error {
 	entity, err := mss.Repository.GetByID(id)
 	if err != nil {
@@ -65,30 +65,34 @@ func (mss *MiddlewareServerService) GetByID(id string) error {
 	return err
 }
 
-// Create creates a new middlewareServerironment entity and insert it into the middleware
+// Create creates a new middlewareServerEnvironment entity and insert it into the middleware
 func (mss *MiddlewareServerService) Create(fields map[string]interface{}) error {
 	// generate new map
-	middlewareServerClusterID, ok := fields[middlewareServerClusterIDStruct]
+	_, ok := fields[middlewareServerClusterIDStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, middlewareServerClusterIDStruct)
 	}
-	middlewareServerName, ok := fields[middlewareServerNameStruct]
+	_, ok = fields[middlewareServerNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, middlewareServerNameStruct)
 	}
-	middlewareServerMiddlewareRole, ok := fields[middlewareServerMiddlewareRoleStruct]
+	_, ok = fields[middlewareServerMiddlewareRoleStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, middlewareServerMiddlewareRoleStruct)
 	}
-	middlewareServerHostIP, ok := fields[middlewareServerHostIPStruct]
+	_, ok = fields[middlewareServerHostIPStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, middlewareServerHostIPStruct)
 	}
-	middlewareServerPortNum, ok := fields[middlewareServerPortNumStruct]
+	_, ok = fields[middlewareServerPortNumStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, middlewareServerPortNumStruct)
 	}
-	middlewareServerInfo := NewMiddlewareServerInfoWithDefault(middlewareServerClusterID.(int), middlewareServerName.(string), middlewareServerMiddlewareRole.(int), middlewareServerHostIP.(string), middlewareServerPortNum.(int))
+	// create a new entity
+	middlewareServerInfo, err := NewMiddlewareServerInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
 	// insert into middleware
 	entity, err := mss.Repository.Create(middlewareServerInfo)
 	if err != nil {
@@ -99,7 +103,7 @@ func (mss *MiddlewareServerService) Create(fields map[string]interface{}) error 
 	return nil
 }
 
-// Update gets an middleware Serverironment entity that contains the given id from the middleware,
+// Update gets an middleware ServerEnvironment entity that contains the given id from the middleware,
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
@@ -116,7 +120,7 @@ func (mss *MiddlewareServerService) Update(id string, fields map[string]interfac
 	return mss.Repository.Update(mss.Entities[constant.ZeroInt])
 }
 
-// Delete deletes the middlewareServerironment entity that contains the given id in the middleware
+// Delete deletes the middlewareServerEnvironment entity that contains the given id in the middleware
 func (mss *MiddlewareServerService) Delete(id string) error {
 	return mss.Repository.Delete(id)
 }
