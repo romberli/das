@@ -16,6 +16,7 @@ import (
 
 var _ dependency.Repository = (*AppSystemRepo)(nil)
 
+// AppSystemRepo AppSystemRepo
 type AppSystemRepo struct {
 	Database middleware.Pool
 }
@@ -47,6 +48,7 @@ func (asr *AppSystemRepo) Execute(command string, args ...interface{}) (middlewa
 	return conn.Execute(command, args...)
 }
 
+// Transaction deal the info
 func (asr *AppSystemRepo) Transaction() (middleware.Transaction, error) {
 	return asr.Database.Transaction()
 }
@@ -54,7 +56,7 @@ func (asr *AppSystemRepo) Transaction() (middleware.Transaction, error) {
 // GetAll returns all available entities
 func (asr *AppSystemRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
-		select id, system_name, del_flag, create_time, last_update_time, level,owner_id, owner_group
+		select id, system_name, level,owner_id, owner_group, del_flag, create_time, last_update_time
 		from t_meta_app_system_info
 		where del_flag = 0
 		order by id;
@@ -84,9 +86,10 @@ func (asr *AppSystemRepo) GetAll() ([]dependency.Entity, error) {
 	return entityList, nil
 }
 
+// GetByID get app_system info by the ID
 func (asr *AppSystemRepo) GetByID(id string) (dependency.Entity, error) {
 	sql := `
-		select id, system_name, del_flag, create_time, last_update_time,level,owner_id,owner_group
+		select id, system_name, level,owner_id, owner_group, del_flag, create_time, last_update_time
 		from t_meta_app_system_info
 		where del_flag = 0
 		and id = ?;
@@ -128,7 +131,7 @@ func (asr *AppSystemRepo) GetID(entity dependency.Entity) (string, error) {
 
 // Create creates data with given entity in the middleware
 func (asr *AppSystemRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
-	sql := `insert into t_meta_app_system_info(system_name,level,owner_id,owner_group) values(?,?,?,?);`
+	sql := `insert into t_meta_app_system_info( system_name, level,owner_id, owner_group ) values( ?, ?, ?, ? );`
 	log.Debugf("metadata AppSystemRepo.Create() insert sql: %s", sql)
 	// execute
 	_, err := asr.Execute(sql, entity.(*AppSystemInfo).AppSystemName, entity.(*AppSystemInfo).Level, entity.(*AppSystemInfo).OwnerID, entity.(*AppSystemInfo).OwnerGroup)
@@ -146,10 +149,10 @@ func (asr *AppSystemRepo) Create(entity dependency.Entity) (dependency.Entity, e
 
 // Update updates data with given entity in the middleware
 func (asr *AppSystemRepo) Update(entity dependency.Entity) error {
-	sql := `update t_meta_app_system_info set system_name = ?, del_flag = ?,level = ?,owner_id = ?,owner_group = ? where id = ?;`
+	sql := `update t_meta_app_system_info set system_name = ?, level = ?, owner_id = ?, owner_group = ? where id = ?, del_flag = ?;`
 	log.Debugf("metadata AppSystemRepo.Update() update sql: %s", sql)
 	appSystemInfo := entity.(*AppSystemInfo)
-	_, err := asr.Execute(sql, appSystemInfo.AppSystemName, appSystemInfo.DelFlag, appSystemInfo.Level, appSystemInfo.OwnerID, appSystemInfo.OwnerGroup, appSystemInfo.ID)
+	_, err := asr.Execute(sql, appSystemInfo.AppSystemName, appSystemInfo.Level, appSystemInfo.OwnerID, appSystemInfo.OwnerGroup, appSystemInfo.ID, appSystemInfo.DelFlag)
 
 	return err
 }
