@@ -59,7 +59,7 @@ func TestUserService_Create(t *testing.T) {
 		userNameStruct:       defaultUserInfoUserName,
 		departmentNameStruct: defaultUserInfoDepartmentName,
 		employeeIDStruct:     defaultUserInfoEmployeeID,
-		domainAccountStruct:  defaultUserInfoDomainAccount,
+		accountNameStruct:    defaultUserInfoAccountName,
 		emailStruct:          defaultUserInfoEmail,
 		telephoneStruct:      defaultUserInfoTelephone,
 		mobileStruct:         defaultUserInfoMobile,

@@ -20,6 +20,7 @@ const (
 
 var _ dependency.Service = (*AppSystemService)(nil)
 
+// AppSystemService service struct
 type AppSystemService struct {
 	dependency.Repository
 	Entities []dependency.Entity
@@ -113,7 +114,7 @@ func (ass *AppSystemService) Update(id string, fields map[string]interface{}) er
 	return ass.Repository.Update(ass.Entities[constant.ZeroInt])
 }
 
-// Delete delet entity that contains the given id in the middleware
+// Delete delete entity that contains the given id in the middleware
 func (ass *AppSystemService) Delete(id string) error {
 	return ass.Repository.Delete(id)
 }
@@ -123,7 +124,7 @@ func (ass *AppSystemService) Marshal() ([]byte, error) {
 	return json.Marshal(ass.Entities)
 }
 
-// Marshal marshals service.Entities with given fields
+// MarshalWithFields marshals service.Entities with given fields
 func (ass *AppSystemService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(ass.Entities))
 	for i := range interfaceList {

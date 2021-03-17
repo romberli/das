@@ -16,53 +16,53 @@ type UserInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
 	UserName       string    `middleware:"user_name" json:"user_name"`
-	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
-	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
-	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
 	DepartmentName string    `middleware:"department_name" json:"department_name"`
 	EmployeeID     int       `middleware:"employee_id" json:"employee_id"`
-	DomainAccount  string    `middleware:"domain_account" json:"domain_account"`
+	AccountName    string    `middleware:"account_name" json:"account_name"`
 	Email          string    `middleware:"email" json:"email"`
 	Telephone      string    `middleware:"telephone" json:"telephone"`
 	Mobile         string    `middleware:"mobile" json:"mobile"`
 	Role           int       `middleware:"role" json:"role"`
+	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
+	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
+	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
 // NewUserInfo returns a new UserInfo
-func NewUserInfo(repo *UserRepo, id int, userName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, departmentName string, employeeID int, domainAccount string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfo(repo *UserRepo, id int, userName string, departmentName string, employeeID int, accountName string, email string, telephone string, mobile string, role int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *UserInfo {
 	return &UserInfo{
 		repo,
 		id,
 		userName,
-		delFlag,
-		createTime,
-		lastUpdateTime,
 		departmentName,
 		employeeID,
-		domainAccount,
+		accountName,
 		email,
 		telephone,
 		mobile,
 		role,
+		delFlag,
+		createTime,
+		lastUpdateTime,
 	}
 }
 
 // NewUserInfo returns a new UserInfo with default UserRepo
-func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, departmentName string, employeeID int, domainAccount string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, departmentName string, employeeID int, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
 	return &UserInfo{
 		NewUserRepoWithGlobal(),
 		id,
 		userName,
-		delFlag,
-		createTime,
-		lastUpdateTime,
 		departmentName,
 		employeeID,
-		domainAccount,
+		accountName,
 		email,
 		telephone,
 		mobile,
 		role,
+		delFlag,
+		createTime,
+		lastUpdateTime,
 	}
 }
 
@@ -71,13 +71,13 @@ func NewEmptyUserInfoWithGlobal() *UserInfo {
 }
 
 // NewUserInfoWithDefault returns a new UserInfo with default UserRepo
-func NewUserInfoWithDefault(userName string, departmentName string, employeeID int, domainAccount string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfoWithDefault(userName string, departmentName string, employeeID int, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
 	return &UserInfo{
 		Repository:     NewUserRepoWithGlobal(),
 		UserName:       userName,
 		DepartmentName: departmentName,
 		EmployeeID:     employeeID,
-		DomainAccount:  domainAccount,
+		AccountName:    accountName,
 		Email:          email,
 		Telephone:      telephone,
 		Mobile:         mobile,
@@ -117,7 +117,7 @@ func (ui *UserInfo) GetEmployeeID() int {
 
 // GetDomainAccount returns last updated time of entity
 func (ui *UserInfo) GetDomainAccount() string {
-	return ui.DomainAccount
+	return ui.AccountName
 }
 
 // GetEmail returns last updated time of entity

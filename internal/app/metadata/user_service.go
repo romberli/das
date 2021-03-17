@@ -15,7 +15,7 @@ const (
 	userNameStruct       = "UserName"
 	departmentNameStruct = "DepartmentName"
 	employeeIDStruct     = "EmployeeID"
-	domainAccountStruct  = "DomainAccount"
+	accountNameStruct    = "accountName"
 	emailStruct          = "Email"
 	telephoneStruct      = "Telephone"
 	mobileStruct         = "Mobile"
@@ -84,9 +84,9 @@ func (us *UserService) Create(fields map[string]interface{}) error {
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, employeeIDStruct)
 	}
-	domainAccount, ok := fields[domainAccountStruct]
+	accountName, ok := fields[accountNameStruct]
 	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, domainAccountStruct)
+		return message.NewMessage(message.ErrFieldNotExists, accountNameStruct)
 	}
 	email, ok := fields[emailStruct]
 	if !ok {
@@ -105,7 +105,7 @@ func (us *UserService) Create(fields map[string]interface{}) error {
 		return message.NewMessage(message.ErrFieldNotExists, roleStruct)
 	}
 
-	userInfo := NewUserInfoWithDefault(userName.(string), departmentName.(string), employeeID.(int), domainAccount.(string), email.(string), telephone.(string), mobile.(string), role.(int))
+	userInfo := NewUserInfoWithDefault(userName.(string), departmentName.(string), employeeID.(int), accountName.(string), email.(string), telephone.(string), mobile.(string), role.(int))
 	// insert into middleware
 	entity, err := us.Repository.Create(userInfo)
 	if err != nil {

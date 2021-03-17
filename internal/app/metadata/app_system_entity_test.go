@@ -32,11 +32,12 @@ func initNewAppSystemInfo() *AppSystemInfo {
 	return NewAppSystemInfoWithGlobal(
 		defaultAppSystemInfoID,
 		defaultAppSystemInfoAppSystemName,
-		defaultAppSystemInfoDelFlag, createTime,
-		lastUpdateTime,
 		defaultAppSystemInfoLevel,
 		defaultAppSystemInfoOwnerID,
-		defaultAppSystemInfoOwnerGroup)
+		defaultAppSystemInfoOwnerGroup,
+		defaultAppSystemInfoDelFlag, createTime,
+		lastUpdateTime,
+	)
 }
 
 func appSystemEqual(a, b *AppSystemInfo) bool {

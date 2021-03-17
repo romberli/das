@@ -12,48 +12,50 @@ import (
 
 var _ dependency.Entity = (*AppSystemInfo)(nil)
 
+// AppSystemInfo store systeminfo
 type AppSystemInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
 	AppSystemName  string    `middleware:"system_name" json:"system_name"`
-	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
-	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
-	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
 	Level          int       `middleware:"level" json:"level"`
 	OwnerID        int       `middleware:"owner_id" json:"owner_id"`
 	OwnerGroup     string    `middleware:"owner_group" json:"owner_group"`
+	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
+	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
+	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
 // NewAppSystemInfo returns a new AppSystemInfo
-func NewAppSystemInfo(repo *AppSystemRepo, id int, appSystemName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, level int, ownerID int, ownerGroup string) *AppSystemInfo {
+func NewAppSystemInfo(repo *AppSystemRepo, id int, appSystemName string, level int, ownerID int, ownerGroup string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *AppSystemInfo {
 	return &AppSystemInfo{
 		repo,
 		id,
 		appSystemName,
-		delFlag,
-		createTime,
-		lastUpdateTime,
 		level,
 		ownerID,
 		ownerGroup,
+		delFlag,
+		createTime,
+		lastUpdateTime,
 	}
 }
 
-// NewAppSystemInfo returns a new AppSystemInfo with default AppSystemRepo
-func NewAppSystemInfoWithGlobal(id int, appSystemName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, level int, ownerID int, ownerGroup string) *AppSystemInfo {
+// NewAppSystemInfoWithGlobal NewAppSystemInfo returns a new AppSystemInfo with default AppSystemRepo
+func NewAppSystemInfoWithGlobal(id int, appSystemName string, level int, ownerID int, ownerGroup string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *AppSystemInfo {
 	return &AppSystemInfo{
 		NewAppSystemRepoWithGlobal(),
 		id,
 		appSystemName,
-		delFlag,
-		createTime,
-		lastUpdateTime,
 		level,
 		ownerID,
 		ownerGroup,
+		delFlag,
+		createTime,
+		lastUpdateTime,
 	}
 }
 
+// NewEmptyAppSystemInfoWithGlobal return AppSystemInfo
 func NewEmptyAppSystemInfoWithGlobal() *AppSystemInfo {
 	return &AppSystemInfo{Repository: NewAppSystemRepoWithGlobal()}
 }
@@ -87,21 +89,6 @@ func (asi *AppSystemInfo) GetCreateTime() time.Time {
 // GetLastUpdateTime returns last updated time of entity
 func (asi *AppSystemInfo) GetLastUpdateTime() time.Time {
 	return asi.LastUpdateTime
-}
-
-// GetLevel returns last updated time of entity
-func (asi *AppSystemInfo) GetLevel() int {
-	return asi.Level
-}
-
-// GetOwnerID returns last updated time of entity
-func (asi *AppSystemInfo) GetOwnerID() int {
-	return asi.OwnerID
-}
-
-// GetOwnerGroup returns last updated time of entity
-func (asi *AppSystemInfo) GetOwnerGroup() string {
-	return asi.OwnerGroup
 }
 
 // Get returns value of given field
