@@ -13,9 +13,9 @@ import (
 
 const (
 	userNameStruct       = "UserName"
-	departmentNameStruct = "accountName"
+	departmentNameStruct = "DepartmentName"
 	employeeIDStruct     = "EmployeeID"
-	accountNameStruct    = "accountName"
+	accountNameStruct    = "AccountName"
 	emailStruct          = "Email"
 	telephoneStruct      = "Telephone"
 	mobileStruct         = "Mobile"

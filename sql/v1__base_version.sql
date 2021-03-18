@@ -140,7 +140,7 @@ CREATE TABLE `t_meta_user_info` (
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx01_employee_id` (`employee_id`),
-  UNIQUE KEY `idx02_domain_account` (`account_name`),
+  UNIQUE KEY `idx02_account_name` (`account_name`),
   UNIQUE KEY `idx03_user_name` (`email`),
   KEY `idx04_user_name` (`user_name`),
   KEY `idx05_user_name` (`mobile`)
