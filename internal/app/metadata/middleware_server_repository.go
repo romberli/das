@@ -31,8 +31,8 @@ func NewMiddlewareServerRepoWithGlobal() *MiddlewareServerRepo {
 
 // Execute implements dependency.Repository interface,
 // it executes command with arguments on database
-func (er *MiddlewareServerRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
-	conn, err := er.Database.Get()
+func (msr *MiddlewareServerRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
+	conn, err := msr.Database.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -115,9 +115,9 @@ func (msr *MiddlewareServerRepo) GetByID(id string) (dependency.Entity, error) {
 
 // GetID checks identity of given entity from the middleware
 func (msr *MiddlewareServerRepo) GetID(entity dependency.Entity) (string, error) {
-	sql := `select id from t_meta_middleware_server_info where del_flag = 0 and server_name = ?;`
+	sql := `select id from t_meta_middleware_server_info where del_flag = 0 and host_ip = ? and port_num = ?;`
 	log.Debugf("metadata MiddlewareServerRepo.GetID() select sql: %s", sql)
-	result, err := msr.Execute(sql, entity.(*MiddlewareServerInfo).ServerName)
+	result, err := msr.Execute(sql, entity.(*MiddlewareServerInfo).HostIP, entity.(*MiddlewareServerInfo).PortNum)
 	if err != nil {
 		return constant.EmptyString, err
 	}
