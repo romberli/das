@@ -13,7 +13,7 @@ import (
 
 const (
 	userNameStruct       = "UserName"
-	departmentNameStruct = "DepartmentName"
+	departmentNameStruct = "accountName"
 	employeeIDStruct     = "EmployeeID"
 	accountNameStruct    = "accountName"
 	emailStruct          = "Email"
@@ -49,7 +49,7 @@ func (us *UserService) GetEntities() []dependency.Entity {
 	return entityList
 }
 
-// GetAll gets all Userironment entities from the middleware
+// GetAll gets all user entities from the middleware
 func (us *UserService) GetAll() error {
 	var err error
 	us.Entities, err = us.Repository.GetAll()
@@ -57,7 +57,7 @@ func (us *UserService) GetAll() error {
 	return err
 }
 
-// GetByID gets an Userironment entity that contains the given id from the middleware
+// GetByID gets an user entity that contains the given id from the middleware
 func (us *UserService) GetByID(id string) error {
 	entity, err := us.Repository.GetByID(id)
 	if err != nil {
@@ -69,43 +69,41 @@ func (us *UserService) GetByID(id string) error {
 	return err
 }
 
-// Create creates a new Userironment entity and insert it into the middleware
+// Create creates a new user entity and insert it into the middleware
 func (us *UserService) Create(fields map[string]interface{}) error {
 	// generate new map
-	userName, ok := fields[userNameStruct]
+	_, ok := fields[userNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, userNameStruct)
 	}
-	departmentName, ok := fields[departmentNameStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, departmentName)
-	}
-	employeeID, ok := fields[employeeIDStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, employeeIDStruct)
-	}
-	accountName, ok := fields[accountNameStruct]
+	_, ok = fields[accountNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, accountNameStruct)
 	}
-	email, ok := fields[emailStruct]
+	_, ok = fields[employeeIDStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, employeeIDStruct)
+	}
+	_, ok = fields[accountNameStruct]
+	if !ok {
+		return message.NewMessage(message.ErrFieldNotExists, accountNameStruct)
+	}
+	_, ok = fields[emailStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, emailStruct)
 	}
-	telephone, ok := fields[telephoneStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, telephoneStruct)
-	}
-	mobile, ok := fields[mobileStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, mobileStruct)
-	}
-	role, ok := fields[roleStruct]
+
+	_, ok = fields[roleStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, roleStruct)
 	}
 
-	userInfo := NewUserInfoWithDefault(userName.(string), departmentName.(string), employeeID.(int), accountName.(string), email.(string), telephone.(string), mobile.(string), role.(int))
+	// create a new entity
+	userInfo, err := NewUserInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
+
 	// insert into middleware
 	entity, err := us.Repository.Create(userInfo)
 	if err != nil {
@@ -116,7 +114,7 @@ func (us *UserService) Create(fields map[string]interface{}) error {
 	return nil
 }
 
-// Update gets an Userironment entity that contains the given id from the middleware,
+// Update gets an user entity that contains the given id from the middleware,
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
@@ -133,7 +131,7 @@ func (us *UserService) Update(id string, fields map[string]interface{}) error {
 	return us.Repository.Update(us.Entities[constant.ZeroInt])
 }
 
-// Delete deletes the Userironment entity that contains the given id in the middleware
+// Delete deletes the user entity that contains the given id in the middleware
 func (us *UserService) Delete(id string) error {
 	return us.Repository.Delete(id)
 }

@@ -109,7 +109,7 @@ func TestAppSystemService_Marshal(t *testing.T) {
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(appSystemEqual(entity.(*AppSystemInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(appSystemStructEqual(entity.(*AppSystemInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 

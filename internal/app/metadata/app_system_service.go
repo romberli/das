@@ -69,24 +69,21 @@ func (ass *AppSystemService) GetByID(id string) error {
 // Create creates entity and insert it into the middleware
 func (ass *AppSystemService) Create(fields map[string]interface{}) error {
 	// generate new map
-	appSystemName, ok := fields[appSystemNameStruct]
-
+	_, ok := fields[appSystemNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, appSystemNameStruct)
 	}
-	level, ok := fields[appSystemLevelStruct]
+	_, ok = fields[appSystemLevelStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, appSystemLevelStruct)
 	}
-	ownerID, ok := fields[appSystemOwnerIDStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, appSystemOwnerIDStruct)
+
+	// create a new entity
+	appSystemInfo, err := NewAppSystemInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
 	}
-	ownerGroup, ok := fields[appSystemOwnerGroupStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, appSystemOwnerGroupStruct)
-	}
-	appSystemInfo := NewAppSystemInfoWithDefault(appSystemName.(string), level.(int), ownerID.(int), ownerGroup.(string))
+
 	// insert into middleware
 	entity, err := ass.Repository.Create(appSystemInfo)
 	if err != nil {

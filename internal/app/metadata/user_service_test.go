@@ -59,11 +59,11 @@ func TestUserService_Create(t *testing.T) {
 		userNameStruct:       defaultUserInfoUserName,
 		departmentNameStruct: defaultUserInfoDepartmentName,
 		employeeIDStruct:     defaultUserInfoEmployeeID,
-		accountNameStruct:    defaultUserInfoAccountName,
-		emailStruct:          defaultUserInfoEmail,
-		telephoneStruct:      defaultUserInfoTelephone,
-		mobileStruct:         defaultUserInfoMobile,
-		roleStruct:           defaultUserInfoRole,
+		//	accountNameStruct:    defaultUserInfoAccountName,
+		emailStruct:     defaultUserInfoEmail,
+		telephoneStruct: defaultUserInfoTelephone,
+		mobileStruct:    defaultUserInfoMobile,
+		roleStruct:      defaultUserInfoRole,
 	})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
@@ -118,7 +118,7 @@ func TestUserService_Marshal(t *testing.T) {
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(userEqual(entity.(*UserInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(userStructEqual(entity.(*UserInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 

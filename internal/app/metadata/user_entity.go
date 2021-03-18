@@ -79,10 +79,21 @@ func NewUserInfoWithDefault(userName string, departmentName string, employeeID i
 		EmployeeID:     employeeID,
 		AccountName:    accountName,
 		Email:          email,
-		Telephone:      telephone,
-		Mobile:         mobile,
-		Role:           role,
+		Telephone:      constant.DefaultRandomString,
+		Mobile:         constant.DefaultRandomString,
+		Role:           constant.DefaultRandomInt,
 	}
+}
+
+// NewUserInfoWithMapAndRandom returns a new *UserInfoInfo with given map
+func NewUserInfoWithMapAndRandom(fields map[string]interface{}) (*UserInfo, error) {
+	ui := &UserInfo{}
+	err := common.SetValuesWithMapAndRandom(ui, fields)
+	if err != nil {
+		return nil, err
+	}
+
+	return ui, nil
 }
 
 // Identity returns ID of entity

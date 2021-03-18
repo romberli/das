@@ -49,7 +49,7 @@ func initNewUserInfo() *UserInfo {
 	)
 }
 
-func userEqual(a, b *UserInfo) bool {
+func userStructEqual(a, b *UserInfo) bool {
 	return a.ID == b.ID && a.UserName == b.UserName && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime && a.DepartmentName == b.DepartmentName && a.EmployeeID == b.EmployeeID && a.AccountName == b.AccountName && a.Email == b.Email && a.Telephone == b.Telephone && a.Mobile == b.Mobile && a.Role == b.Role
 }
 
@@ -130,7 +130,7 @@ func TestUserInfo_MarshalJSON(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
 	err = json.Unmarshal(data, &userInfoUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
-	asst.True(userEqual(userInfo, userInfoUnmarshal), "test MarshalJSON() failed")
+	asst.True(userStructEqual(userInfo, userInfoUnmarshal), "test MarshalJSON() failed")
 }
 
 func TestUserInfo_MarshalJSONWithFields(t *testing.T) {

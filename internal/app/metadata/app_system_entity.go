@@ -66,9 +66,20 @@ func NewAppSystemInfoWithDefault(appSystemName string, level int, ownerID int, o
 		Repository:    NewAppSystemRepoWithGlobal(),
 		AppSystemName: appSystemName,
 		Level:         level,
-		OwnerID:       ownerID,
-		OwnerGroup:    ownerGroup,
+		OwnerID:       constant.DefaultRandomInt,
+		OwnerGroup:    constant.DefaultRandomString,
 	}
+}
+
+// NewAppSystemInfoWithMapAndRandom returns a new *AppSystemInfoInfo with given map
+func NewAppSystemInfoWithMapAndRandom(fields map[string]interface{}) (*AppSystemInfo, error) {
+	asi := &AppSystemInfo{}
+	err := common.SetValuesWithMapAndRandom(asi, fields)
+	if err != nil {
+		return nil, err
+	}
+
+	return asi, nil
 }
 
 // Identity returns ID of entity
