@@ -12,10 +12,10 @@ Accept: application/json
 POST http://{{baseURL}}/api/v1/metadata/mysql-server
 Content-Type: application/json
 
-{"host_ip": "192.168.1.1", "port_num": 3306}
+{"cluster_id": 1, "server_name": "test", "host_ip": "192.168.1.1", "port_num": 3306, "deployment_type": 1}
 
 ### update mysql server by id
-POST http://{{baseURL}}/api/v1/metadata/mysql-server/93
+POST http://{{baseURL}}/api/v1/metadata/mysql-server/1
 Content-Type: application/json
 
-{"host_ip": "192.168.1.1", "port_num": 3306, "del_flag": 1}
+{"host_ip": "192.168.1.2", "port_num": 3306, "del_flag": 1}
