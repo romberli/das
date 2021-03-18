@@ -71,17 +71,20 @@ func (mss *MonitorSystemService) GetByID(id string) error {
 // Create creates a new monitor system entity and insert it into the middleware
 func (mss *MonitorSystemService) Create(fields map[string]interface{}) error {
 	// generate new map
-	monitorSystemName, monitorSystemNameExists := fields[monitorSystemNameStruct]
-	systemType, systemTypeExists := fields[monitorSystemTypeStruct]
-	hostIP, hostIPExists := fields[monitorSystemHostIPStruct]
-	portNum, portNumExists := fields[monitorSystemPortNumStruct]
-	portNumSlow, portNumSlowExists := fields[portNumSlowStruct]
-	baseUrl, baseUrlExists := fields[baseUrlStruct]
+	_, monitorSystemNameExists := fields[monitorSystemNameStruct]
+	_, systemTypeExists := fields[monitorSystemTypeStruct]
+	_, hostIPExists := fields[monitorSystemHostIPStruct]
+	_, portNumExists := fields[monitorSystemPortNumStruct]
+	_, portNumSlowExists := fields[portNumSlowStruct]
+	_, baseUrlExists := fields[baseUrlStruct]
 	if !monitorSystemNameExists && !systemTypeExists && !hostIPExists && !portNumExists && !portNumSlowExists && !baseUrlExists {
 		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s", monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIPStruct, monitorSystemPortNumStruct, portNumSlowStruct, baseUrlStruct))
 	}
 	// create a new entity
-	monitorSystemInfo := NewMonitorSystemInfoWithDefault(monitorSystemName.(string), systemType.(int), hostIP.(string), portNum.(int), portNumSlow.(int), baseUrl.(string))
+	monitorSystemInfo, err := NewMonitorSystemInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
 	// insert into middleware
 	entity, err := mss.Repository.Create(monitorSystemInfo)
 	if err != nil {

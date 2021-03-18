@@ -71,24 +71,18 @@ func (dbs *DBService) GetByID(id string) error {
 // Create creates a new database entity and insert it into the middleware
 func (dbs *DBService) Create(fields map[string]interface{}) error {
 	// generate new map
-	dbName, dbNameExists := fields[dbNameStruct]
-	clusterID, clusterIDExists := fields[dbClusterIDStruct]
-	clusterType, clusterTypeExists := fields[dbClusterTypeStruct]
-	ownerID, ownerIDExists := fields[dbOwnerIDStruct]
-	ownerGroup, ownerGroupExists := fields[dbOwnerGroupStruct]
-	envID, envIDExists := fields[dbEnvIDStruct]
+	_, dbNameExists := fields[dbNameStruct]
+	_, clusterIDExists := fields[dbClusterIDStruct]
+	_, clusterTypeExists := fields[dbClusterTypeStruct]
+	_, envIDExists := fields[dbEnvIDStruct]
 	if !dbNameExists && !clusterIDExists && !clusterTypeExists && !envIDExists {
 		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
 	}
 	// create a new entity
-	dbInfo := NewDBInfoWithDefault(dbName.(string), clusterID.(int), clusterType.(int), envID.(int))
-	if ownerIDExists {
-		dbInfo.OwnerID = ownerID.(int)
+	dbInfo, err := NewDBInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
 	}
-	if ownerGroupExists {
-		dbInfo.OwnerGroup = ownerGroup.(string)
-	}
-
 	// insert into middleware
 	entity, err := dbs.Repository.Create(dbInfo)
 	if err != nil {
