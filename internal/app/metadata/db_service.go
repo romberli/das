@@ -13,75 +13,83 @@ import (
 )
 
 const (
-	dbNameStruct  = "DbName"
-	ownerIdStruct = "OwnerId"
-	envIdStruct   = "EnvId"
+	dbNameStruct        = "DBName"
+	dbClusterIDStruct   = "ClusterID"
+	dbClusterTypeStruct = "ClusterType"
+	dbOwnerIDStruct     = "OwnerID"
+	dbOwnerGroupStruct  = "OwnerGroup"
+	dbEnvIDStruct       = "EnvID"
 )
 
-var _ dependency.Service = (*DbService)(nil)
+var _ dependency.Service = (*DBService)(nil)
 
-type DbService struct {
+type DBService struct {
 	dependency.Repository
 	Entities []dependency.Entity
 }
 
-// NewDbService returns a new *DbService
-func NewDbService(repo dependency.Repository) *DbService {
-	return &DbService{repo, []dependency.Entity{}}
+// NewDBService returns a new *DBService
+func NewDBService(repo dependency.Repository) *DBService {
+	return &DBService{repo, []dependency.Entity{}}
 }
 
-// NewDbServiceWithDefault returns a new *DbService with default repository
-func NewDbServiceWithDefault() *DbService {
-	return NewDbService(NewDbRepoWithGlobal())
+// NewDBServiceWithDefault returns a new *DBService with default repository
+func NewDBServiceWithDefault() *DBService {
+	return NewDBService(NewDBRepoWithGlobal())
 }
 
 // GetEntities returns entities of the service
-func (es *DbService) GetEntities() []dependency.Entity {
-	entityList := make([]dependency.Entity, len(es.Entities))
+func (dbs *DBService) GetEntities() []dependency.Entity {
+	entityList := make([]dependency.Entity, len(dbs.Entities))
 	for i := range entityList {
-		entityList[i] = es.Entities[i]
+		entityList[i] = dbs.Entities[i]
 	}
 
 	return entityList
 }
 
 // GetAll gets all database entities from the middleware
-func (es *DbService) GetAll() error {
+func (dbs *DBService) GetAll() error {
 	var err error
-	es.Entities, err = es.Repository.GetAll()
+	dbs.Entities, err = dbs.Repository.GetAll()
 
 	return err
 }
 
 // GetByID gets an database entity that contains the given id from the middleware
-func (es *DbService) GetByID(id string) error {
-	entity, err := es.Repository.GetByID(id)
+func (dbs *DBService) GetByID(id string) error {
+	entity, err := dbs.Repository.GetByID(id)
 	if err != nil {
 		return err
 	}
 
-	es.Entities = append(es.Entities, entity)
+	dbs.Entities = append(dbs.Entities, entity)
 
 	return err
 }
 
 // Create creates a new database entity and insert it into the middleware
-func (es *DbService) Create(fields map[string]interface{}) error {
+func (dbs *DBService) Create(fields map[string]interface{}) error {
 	// generate new map
-	dbName, dbNameExists := fields[dbNameStruct]
-	ownerId, ownerIdExists := fields[ownerIdStruct]
-	envId, envIdExists := fields[envIdStruct]
-	if !dbNameExists && !ownerIdExists && !envIdExists {
-		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct))
+	_, dbNameExists := fields[dbNameStruct]
+	_, clusterIDExists := fields[dbClusterIDStruct]
+	_, clusterTypeExists := fields[dbClusterTypeStruct]
+	_, envIDExists := fields[dbEnvIDStruct]
+	if !dbNameExists && !clusterIDExists && !clusterTypeExists && !envIDExists {
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
 	}
-	dbInfo := NewDbInfoWithDefault(dbName.(string), ownerId.(string), envId.(string))
+	// create a new entity
+	dbInfo, err := NewDBInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
 	// insert into middleware
-	entity, err := es.Repository.Create(dbInfo)
+	entity, err := dbs.Repository.Create(dbInfo)
 	if err != nil {
 		return err
 	}
 
-	es.Entities = append(es.Entities, entity)
+	dbs.Entities = append(dbs.Entities, entity)
 	return nil
 }
 
@@ -89,34 +97,34 @@ func (es *DbService) Create(fields map[string]interface{}) error {
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (es *DbService) Update(id string, fields map[string]interface{}) error {
-	err := es.GetByID(id)
+func (dbs *DBService) Update(id string, fields map[string]interface{}) error {
+	err := dbs.GetByID(id)
 	if err != nil {
 		return err
 	}
-	err = es.Entities[constant.ZeroInt].Set(fields)
+	err = dbs.Entities[constant.ZeroInt].Set(fields)
 	if err != nil {
 		return err
 	}
 
-	return es.Repository.Update(es.Entities[constant.ZeroInt])
+	return dbs.Repository.Update(dbs.Entities[constant.ZeroInt])
 }
 
 // Delete deletes the database entity that contains the given id in the middleware
-func (es *DbService) Delete(id string) error {
-	return es.Repository.Delete(id)
+func (dbs *DBService) Delete(id string) error {
+	return dbs.Repository.Delete(id)
 }
 
 // Marshal marshals service.Entities
-func (es *DbService) Marshal() ([]byte, error) {
-	return json.Marshal(es.Entities)
+func (dbs *DBService) Marshal() ([]byte, error) {
+	return json.Marshal(dbs.Entities)
 }
 
 // Marshal marshals service.Entities with given fields
-func (es *DbService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(es.Entities))
+func (dbs *DBService) MarshalWithFields(fields ...string) ([]byte, error) {
+	interfaceList := make([]interface{}, len(dbs.Entities))
 	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(es.Entities[i], fields...)
+		entity, err := common.CopyStructWithFields(dbs.Entities[i], fields...)
 		if err != nil {
 			return nil, err
 		}

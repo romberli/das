@@ -1,0 +1,20 @@
+### get all databases
+GET http://{{baseURL}}/api/v1/metadata/db
+Accept: application/json
+
+### get database by id
+GET http://{{baseURL}}/api/v1/metadata/db/1
+Accept: application/json
+
+### add new database
+POST http://{{baseURL}}/api/v1/metadata/db
+Content-Type: application/json
+
+{"db_name": "db100", "cluster_id": 8, "cluster_type": 1, "env_id": 5}
+
+### update database by id
+POST http://{{baseURL}}/api/v1/metadata/db/5
+Content-Type: application/json
+
+{"db_name": "db13", "del_flag": 1}
+
