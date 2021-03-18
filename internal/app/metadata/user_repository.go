@@ -16,6 +16,7 @@ import (
 
 var _ dependency.Repository = (*UserRepo)(nil)
 
+// UserRepo struct
 type UserRepo struct {
 	Database middleware.Pool
 }
@@ -25,7 +26,7 @@ func NewUserRepo(db middleware.Pool) *UserRepo {
 	return &UserRepo{db}
 }
 
-// NewUserRepo returns *UserRepo with global mysql pool
+// NewUserRepoWithGlobal returns *UserRepo with global mysql pool
 func NewUserRepoWithGlobal() *UserRepo {
 	return NewUserRepo(global.MySQLPool)
 }
@@ -47,6 +48,7 @@ func (ur *UserRepo) Execute(command string, args ...interface{}) (middleware.Res
 	return conn.Execute(command, args...)
 }
 
+// Transaction ..
 func (ur *UserRepo) Transaction() (middleware.Transaction, error) {
 	return ur.Database.Transaction()
 }
@@ -84,6 +86,7 @@ func (ur *UserRepo) GetAll() ([]dependency.Entity, error) {
 	return entityList, nil
 }
 
+// GetByID get userinfo by id
 func (ur *UserRepo) GetByID(id string) (dependency.Entity, error) {
 	sql := `
 		select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time

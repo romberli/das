@@ -24,6 +24,7 @@ const (
 
 var _ dependency.Service = (*UserService)(nil)
 
+// UserService struct
 type UserService struct {
 	dependency.Repository
 	Entities []dependency.Entity
@@ -141,7 +142,7 @@ func (us *UserService) Marshal() ([]byte, error) {
 	return json.Marshal(us.Entities)
 }
 
-// Marshal marshals service.Entities with given fields
+// MarshalWithFields marshals service.Entities with given fields
 func (us *UserService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(us.Entities))
 	for i := range interfaceList {

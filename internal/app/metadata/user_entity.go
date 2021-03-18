@@ -12,6 +12,7 @@ import (
 
 var _ dependency.Entity = (*UserInfo)(nil)
 
+// UserInfo create userinfo struct
 type UserInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
@@ -47,7 +48,7 @@ func NewUserInfo(repo *UserRepo, id int, userName string, departmentName string,
 	}
 }
 
-// NewUserInfo returns a new UserInfo with default UserRepo
+// NewUserInfoWithGlobal returns a new UserInfo with default UserRepo
 func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, departmentName string, employeeID int, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
 	return &UserInfo{
 		NewUserRepoWithGlobal(),
@@ -66,6 +67,7 @@ func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time
 	}
 }
 
+// NewEmptyUserInfoWithGlobal return userinfo
 func NewEmptyUserInfoWithGlobal() *UserInfo {
 	return &UserInfo{Repository: NewUserRepoWithGlobal()}
 }

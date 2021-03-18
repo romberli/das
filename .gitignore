@@ -28,3 +28,5 @@ http-client.env.json
 .vscode/
 .test
 das.yaml
+
+*.http
