@@ -149,10 +149,10 @@ func (asr *AppSystemRepo) Create(entity dependency.Entity) (dependency.Entity, e
 
 // Update updates data with given entity in the middleware
 func (asr *AppSystemRepo) Update(entity dependency.Entity) error {
-	sql := `update t_meta_app_system_info set system_name = ?, level = ?, owner_id = ?, owner_group = ? where id = ?, del_flag = ?;`
+	sql := `update t_meta_app_system_info set system_name = ?, level = ?, owner_id = ?, owner_group = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata AppSystemRepo.Update() update sql: %s", sql)
 	appSystemInfo := entity.(*AppSystemInfo)
-	_, err := asr.Execute(sql, appSystemInfo.AppSystemName, appSystemInfo.Level, appSystemInfo.OwnerID, appSystemInfo.OwnerGroup, appSystemInfo.ID, appSystemInfo.DelFlag)
+	_, err := asr.Execute(sql, appSystemInfo.AppSystemName, appSystemInfo.Level, appSystemInfo.OwnerID, appSystemInfo.OwnerGroup, appSystemInfo.DelFlag, appSystemInfo.ID)
 
 	return err
 }

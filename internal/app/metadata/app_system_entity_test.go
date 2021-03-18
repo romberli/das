@@ -14,7 +14,7 @@ import (
 
 const (
 	defaultAppSystemInfoID                   = 1
-	defaultAppSystemInfoAppSystemName        = "kkkk"
+	defaultAppSystemInfoAppSystemName        = "dfname"
 	defaultAppSystemInfoLevel                = 8
 	defaultAppSystemInfoOwnerID              = 8
 	defaultAppSystemInfoOwnerGroup           = "k"

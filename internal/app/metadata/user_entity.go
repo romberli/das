@@ -83,7 +83,7 @@ func NewUserInfoWithDefault(userName string, departmentName string, employeeID i
 		Email:          email,
 		Telephone:      constant.DefaultRandomString,
 		Mobile:         constant.DefaultRandomString,
-		Role:           constant.DefaultRandomInt,
+		Role:           role,
 	}
 }
 
@@ -128,8 +128,8 @@ func (ui *UserInfo) GetEmployeeID() int {
 	return ui.EmployeeID
 }
 
-// GetDomainAccount returns last updated time of entity
-func (ui *UserInfo) GetDomainAccount() string {
+// GetAccountName returns last updated time of entity
+func (ui *UserInfo) GetAccountName() string {
 	return ui.AccountName
 }
 
