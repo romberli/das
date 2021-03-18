@@ -10,18 +10,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDbServiceAll(t *testing.T) {
-	TestDbService_GetEntities(t)
-	TestDbService_GetAll(t)
-	TestDbService_GetByID(t)
-	TestDbService_Create(t)
-	TestDbService_Update(t)
-	TestDbService_Delete(t)
-	TestDbService_Marshal(t)
-	TestDbService_MarshalWithFields(t)
+func TestDBServiceAll(t *testing.T) {
+	TestDBService_GetEntities(t)
+	TestDBService_GetAll(t)
+	TestDBService_GetByID(t)
+	TestDBService_Create(t)
+	TestDBService_Update(t)
+	TestDBService_Delete(t)
+	TestDBService_Marshal(t)
+	TestDBService_MarshalWithFields(t)
 }
 
-func TestDbService_GetEntities(t *testing.T) {
+func TestDBService_GetEntities(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewDBService(dbRepo)
@@ -31,7 +31,7 @@ func TestDbService_GetEntities(t *testing.T) {
 	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
 }
 
-func TestDbService_GetAll(t *testing.T) {
+func TestDBService_GetAll(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewDBService(dbRepo)
@@ -41,7 +41,7 @@ func TestDbService_GetAll(t *testing.T) {
 	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
 }
 
-func TestDbService_GetByID(t *testing.T) {
+func TestDBService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewDBService(dbRepo)
@@ -51,49 +51,49 @@ func TestDbService_GetByID(t *testing.T) {
 	asst.Equal("1", id, "test GetByID() failed")
 }
 
-func TestDbService_Create(t *testing.T) {
+func TestDBService_Create(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewDBService(dbRepo)
-	err := s.Create(map[string]interface{}{dbNameStruct: defaultDBInfoDBName, ownerIdStruct: defaultDBInfoOwnerID, envIdStruct: defaultDBInfoEnvID})
+	err := s.Create(map[string]interface{}{dbNameStruct: defaultDBInfoDBName, dbClusterIDStruct: defaultDBInfoClusterID, dbClusterTypeStruct: defaultDBInfoClusterType, dbEnvIDStruct: defaultDBInfoEnvID})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteDbByID(s.Entities[0].Identity())
+	err = deleteDBByID(s.Entities[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
-func TestDbService_Update(t *testing.T) {
+func TestDBService_Update(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createDb()
+	entity, err := createDB()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	s := NewDBService(dbRepo)
-	err = s.Update(entity.Identity(), map[string]interface{}{dbNameStruct: newDbName})
+	err = s.Update(entity.Identity(), map[string]interface{}{dbNameStruct: newDBName})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	dbName, err := s.GetEntities()[constant.ZeroInt].Get(dbNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	asst.Equal(newDbName, dbName)
+	asst.Equal(newDBName, dbName)
 	// delete
-	err = deleteDbByID(s.Entities[0].Identity())
+	err = deleteDBByID(s.Entities[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
-func TestDbService_Delete(t *testing.T) {
+func TestDBService_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createDb()
+	entity, err := createDB()
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	s := NewDBService(dbRepo)
 	err = s.Delete(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	// delete
-	err = deleteDbByID(entity.Identity())
+	err = deleteDBByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }
 
-func TestDbService_Marshal(t *testing.T) {
+func TestDBService_Marshal(t *testing.T) {
 	var entitiesUnmarshal []*DBInfo
 
 	asst := assert.New(t)
@@ -113,10 +113,10 @@ func TestDbService_Marshal(t *testing.T) {
 	}
 }
 
-func TestDbService_MarshalWithFields(t *testing.T) {
+func TestDBService_MarshalWithFields(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createDb()
+	entity, err := createDB()
 	asst.Nil(err, common.CombineMessageWithError("test MarshalWithFields() failed", err))
 	s := NewDBService(dbRepo)
 	err = s.GetByID(entity.Identity())
@@ -126,6 +126,6 @@ func TestDbService_MarshalWithFields(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test MarshalWithFields() failed", err))
 	asst.Equal(string(dataService), fmt.Sprintf("[%s]", string(dataEntity)))
 	// delete
-	err = deleteDbByID(entity.Identity())
+	err = deleteDBByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }

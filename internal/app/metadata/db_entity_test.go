@@ -14,12 +14,12 @@ import (
 
 const (
 	defaultDBInfoID                   = 1
-	defaultDBInfoDBName               = "das1"
-	defaultDBInfoClusterID            = "1"
-	defaultDBInfoClusterType          = "1"
-	defaultDBInfoOwnerID              = "1"
+	defaultDBInfoDBName               = "das"
+	defaultDBInfoClusterID            = 1
+	defaultDBInfoClusterType          = 1
+	defaultDBInfoOwnerID              = 1
 	defaultDBInfoOwnerGroup           = "2,5,6"
-	defaultDBInfoEnvID                = "2"
+	defaultDBInfoEnvID                = 2
 	defaultDBInfoDelFlag              = 0
 	defaultDBInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
 	defaultDBInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"
@@ -124,7 +124,7 @@ func TestDBInfo_MarshalJSONWithFields(t *testing.T) {
 	dbInfo := initNewDBInfo()
 	data, err := dbInfo.MarshalJSONWithFields(dbNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
-	expect, err := json.Marshal(map[string]interface{}{dbNameJSON: "das1"})
+	expect, err := json.Marshal(map[string]interface{}{dbNameJSON: "das"})
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	asst.Equal(string(expect), string(data), "test MarshalJSONWithFields() failed")
 }

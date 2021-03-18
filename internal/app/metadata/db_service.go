@@ -13,9 +13,12 @@ import (
 )
 
 const (
-	dbNameStruct  = "DBName"
-	ownerIdStruct = "OwnerID"
-	envIdStruct   = "EnvID"
+	dbNameStruct        = "DBName"
+	dbClusterIDStruct   = "ClusterID"
+	dbClusterTypeStruct = "ClusterType"
+	dbOwnerIDStruct     = "OwnerID"
+	dbOwnerGroupStruct  = "OwnerGroup"
+	dbEnvIDStruct       = "EnvID"
 )
 
 var _ dependency.Service = (*DBService)(nil)
@@ -69,12 +72,23 @@ func (dbs *DBService) GetByID(id string) error {
 func (dbs *DBService) Create(fields map[string]interface{}) error {
 	// generate new map
 	dbName, dbNameExists := fields[dbNameStruct]
-	ownerId, ownerIdExists := fields[ownerIdStruct]
-	envId, envIdExists := fields[envIdStruct]
-	if !dbNameExists && !ownerIdExists && !envIdExists {
-		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s", dbNameStruct, ownerIdStruct, envIdStruct))
+	clusterID, clusterIDExists := fields[dbClusterIDStruct]
+	clusterType, clusterTypeExists := fields[dbClusterTypeStruct]
+	ownerID, ownerIDExists := fields[dbOwnerIDStruct]
+	ownerGroup, ownerGroupExists := fields[dbOwnerGroupStruct]
+	envID, envIDExists := fields[dbEnvIDStruct]
+	if !dbNameExists && !clusterIDExists && !clusterTypeExists && !envIDExists {
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
 	}
-	dbInfo := NewDBInfoWithDefault(dbName.(string), ownerId.(string), envId.(string))
+	// create a new entity
+	dbInfo := NewDBInfoWithDefault(dbName.(string), clusterID.(int), clusterType.(int), envID.(int))
+	if ownerIDExists {
+		dbInfo.OwnerID = ownerID.(int)
+	}
+	if ownerGroupExists {
+		dbInfo.OwnerGroup = ownerGroup.(string)
+	}
+
 	// insert into middleware
 	entity, err := dbs.Repository.Create(dbInfo)
 	if err != nil {

@@ -13,11 +13,11 @@ import (
 )
 
 const (
-	monitorSystemNameStruct        = "SystemName"
-	monitorSystemTypeStruct        = "SystemType"
-	monitorSystemHostIpStruct      = "HostIp"
-	monitorSystemPortNumStruct     = "PortNum"
-	monitorSystemPortNumSlowStruct = "PortNumSlow"
+	monitorSystemNameStruct        = "MonitorSystemName"
+	monitorSystemTypeStruct        = "MonitorSystemType"
+	monitorSystemHostIpStruct      = "MonitorSystemHostIP"
+	monitorSystemPortNumStruct     = "MonitorSystemPortNum"
+	monitorSystemPortNumSlowStruct = "MonitorSystemPortNumSlow"
 	monitorSystemBaseUrlStruct     = "BaseUrl"
 )
 
@@ -70,7 +70,7 @@ func GetMonitorSystemByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -114,13 +114,13 @@ func AddMonitorSystem(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMS, fmt.Sprintf("%s and %s and %s and %s and %s and %s", monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIpStruct, monitorSystemPortNumStruct, monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMonitorSystem, fields[monitorSystemNameStruct], err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s and %s and %s", monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIpStruct, monitorSystemPortNumStruct, monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -175,7 +175,7 @@ func UpdateMonitorSystemByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// resp
