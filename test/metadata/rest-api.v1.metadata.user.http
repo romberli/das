@@ -1,0 +1,25 @@
+### get all appsystems
+GET http://127.0.0.1:6090/api/v1/metadata/user
+Accept: application/json
+
+### get appsystem by id
+GET http://127.0.0.1:6090/api/v1/metadata/user/1
+Accept: application/json
+
+### add new appsystem
+POST http://127.0.0.1:6090/api/v1/metadata/user
+Content-Type: application/json
+
+{ "user_name": "test","department_name":"test","employee_id":1123, "domain_account":"1","email":"1","telephone":"1","mobile":"1","role":1}
+
+
+
+
+
+
+
+### get appsystem by id
+POST http://127.0.0.1:6090/api/v1/metadata/user/109
+Content-Type: application/json
+
+{"user_name": "test","department_name":"test","employee_id":1123, "domain_account":"1","email":"1","telephone":"1","mobile":"1","role":1 ,"del_flag":0}
