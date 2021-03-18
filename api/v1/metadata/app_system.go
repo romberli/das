@@ -17,6 +17,7 @@ const (
 	// idJSON        = "id"
 	// delFlagStruct = "DelFlag"
 	appSystemNameStruct = "AppSystemName"
+	levelStruct         = "Level"
 )
 
 // @Tags application system
@@ -26,6 +27,7 @@ const (
 // @Router /api/v1/metadata/app-system [get]
 func GetAppSystem(c *gin.Context) {
 	// init service
+	fmt.Println(ownerGroupStruct)
 	s := metadata.NewAppSystemServiceWithDefault()
 	// get entities
 	err := s.GetAll()
@@ -100,6 +102,12 @@ func AddAppSystem(c *gin.Context) {
 	_, ok := fields[appSystemNameStruct]
 	if !ok {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, appSystemNameStruct)
+		return
+	}
+
+	_, ok = fields[levelStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, levelStruct)
 		return
 	}
 	// init service
