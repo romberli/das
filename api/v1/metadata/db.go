@@ -13,9 +13,11 @@ import (
 )
 
 const (
-	dbNameStruct      = "DBName"
-	clusterTypeStruct = "ClusterType"
+	dbNameStruct        = "DBName"
+	dbClusterIDStruct   = "ClusterID"
+	dbClusterTypeStruct = "ClusterType"
 	dbOwnerIDStruct     = "OwnerID"
+	dbOwnerGroupStruct  = "OwnerGroup"
 	dbEnvIDStruct       = "EnvID"
 )
 
@@ -68,7 +70,7 @@ func GetDBByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -98,12 +100,11 @@ func AddDB(c *gin.Context) {
 		return
 	}
 	_, dbNameExists := fields[dbNameStruct]
-	_, clusterTypeExists := fields[clusterTypeStruct]
-	_, ownerIDExists := fields[dbOwnerIDStruct]
+	_, clusterIDExists := fields[dbClusterIDStruct]
+	_, clusterTypeExists := fields[dbClusterTypeStruct]
 	_, envIDExists := fields[dbEnvIDStruct]
-
-	if !dbNameExists && !clusterTypeExists && !ownerIDExists && !envIDExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct))
+	if !dbNameExists && !clusterIDExists && !clusterTypeExists && !envIDExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
 		return
 	}
 	// init service
@@ -111,19 +112,19 @@ func AddDB(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddDB, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddDB, fields[dbNameStruct], err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct), err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddDB, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddDB, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct))
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddDB, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
 }
 
 // @Tags database
@@ -151,12 +152,14 @@ func UpdateDBByID(c *gin.Context) {
 		return
 	}
 	_, dbNameExists := fields[dbNameStruct]
-	_, clusterTypeExists := fields[clusterTypeStruct]
+	_, clusterIDExists := fields[dbClusterIDStruct]
+	_, clusterTypeExists := fields[dbClusterTypeStruct]
 	_, ownerIDExists := fields[dbOwnerIDStruct]
+	_, ownerGroupExists := fields[dbOwnerGroupStruct]
 	_, envIDExists := fields[dbEnvIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !dbNameExists && !clusterTypeExists && !ownerIDExists && !envIDExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s", dbNameStruct, clusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct, delFlagStruct))
+	if !dbNameExists && !clusterIDExists && !clusterTypeExists && !ownerIDExists && !ownerGroupExists && !envIDExists && !delFlagExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbOwnerIDStruct, dbOwnerGroupStruct, dbEnvIDStruct, delFlagStruct))
 		return
 	}
 	// init service
@@ -170,7 +173,7 @@ func UpdateDBByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// resp

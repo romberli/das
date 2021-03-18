@@ -1,0 +1,19 @@
+### get all monitor systems
+GET http://{{baseURL}}/api/v1/metadata/monitor-system
+Accept: application/json
+
+### get monitor system by id
+GET http://{{baseURL}}/api/v1/metadata/monitor-system/1
+Accept: application/json
+
+### add new monitor system
+POST http://{{baseURL}}/api/v1/metadata/monitor-system
+Content-Type: application/json
+
+{"system_name": "ms6", "system_type":1, "host_ip": "127.0.0.1", "port_num": 3311, "port_num_slow": 3312, "base_url": "http://127.0.0.1/prometheus/api/v1/"}
+
+### update monitor system by id
+POST http://{{baseURL}}/api/v1/metadata/monitor-system/3
+Content-Type: application/json
+
+{"system_name": "ms10", "port_num": 3300, "del_flag": 1}

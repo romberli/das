@@ -16,18 +16,18 @@ type DBInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
 	DBName         string    `middleware:"db_name" json:"db_name"`
-	ClusterID      string    `middleware:"cluster_id" json:"cluster_id"`
-	ClusterType    string    `middleware:"cluster_type" json:"cluster_type"`
-	OwnerID        string    `middleware:"owner_id" json:"owner_id"`
+	ClusterID      int       `middleware:"cluster_id" json:"cluster_id"`
+	ClusterType    int       `middleware:"cluster_type" json:"cluster_type"`
+	OwnerID        int       `middleware:"owner_id" json:"owner_id"`
 	OwnerGroup     string    `middleware:"owner_group" json:"owner_group"`
-	EnvID          string    `middleware:"env_id" json:"env_id"`
+	EnvID          int       `middleware:"env_id" json:"env_id"`
 	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
 	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
 	LastUpdateTime time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
-// NewDBInfo returns a new DBInfo
-func NewDBInfo(repo *DBRepo, id int, dbName string, clusterID string, clusterType string, ownerID string, ownerGroup string, envID string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *DBInfo {
+// NewDBInfo returns a new *DBInfo
+func NewDBInfo(repo *DBRepo, id int, dbName string, clusterID int, clusterType int, ownerID int, ownerGroup string, envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *DBInfo {
 	return &DBInfo{
 		repo,
 		id,
@@ -43,8 +43,8 @@ func NewDBInfo(repo *DBRepo, id int, dbName string, clusterID string, clusterTyp
 	}
 }
 
-// NewDBInfo returns a new DBInfo with default DBRepo
-func NewDBInfoWithGlobal(id int, dbName string, clusterID string, clusterType string, ownerID string, ownerGroup string, envID string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *DBInfo {
+// NewDBInfo returns a new *DBInfo with default DBRepo
+func NewDBInfoWithGlobal(id int, dbName string, clusterID int, clusterType int, ownerID int, ownerGroup string, envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *DBInfo {
 	return &DBInfo{
 		NewDBRepoWithGlobal(),
 		id,
@@ -60,20 +60,33 @@ func NewDBInfoWithGlobal(id int, dbName string, clusterID string, clusterType st
 	}
 }
 
+// NewEmptyDBInfoWithGlobal returns a new *DBInfo with global repository
 func NewEmptyDBInfoWithGlobal() *DBInfo {
 	return &DBInfo{Repository: NewDBRepoWithGlobal()}
 }
 
-// NewDBInfoWithDefault returns a new DBInfo with default DBRepo
-func NewDBInfoWithDefault(dbName, clusterID, ownerID, ownerGroup, envID string) *DBInfo {
+// NewDBInfoWithDefault returns a new *DBInfo with default DBRepo
+func NewDBInfoWithDefault(dbName string, clusterID, clusterType, envID int) *DBInfo {
 	return &DBInfo{
-		Repository: NewDBRepoWithGlobal(),
-		DBName:     dbName,
-		ClusterID:  constant.Default,
-		OwnerID:    ownerID,
-		OwnerGroup: ownerGroup,
-		EnvID:      envID,
+		Repository:  NewDBRepoWithGlobal(),
+		DBName:      dbName,
+		ClusterID:   clusterID,
+		ClusterType: clusterType,
+		OwnerID:     constant.DefaultRandomInt,
+		OwnerGroup:  constant.DefaultRandomString,
+		EnvID:       envID,
 	}
+}
+
+// NewDBInfoWithMapAndRandom returns a new *DBInfo with given map
+func NewDBInfoWithMapAndRandom(fields map[string]interface{}) (*DBInfo, error) {
+	dbi := &DBInfo{}
+	err := common.SetValuesWithMapAndRandom(dbi, fields)
+	if err != nil {
+		return nil, err
+	}
+
+	return dbi, nil
 }
 
 // Identity returns ID of entity

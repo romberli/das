@@ -88,15 +88,15 @@ const (
 	ErrMetadataAddUser     = 400903
 	ErrMetadataUpdateUser  = 400904
 
-	ErrMetadataGetDbAll  = 400401
-	ErrMetadataGetDbByID = 400402
-	ErrMetadataAddDb     = 400403
-	ErrMetadataUpdateDb  = 400404
+	ErrMetadataGetDBAll  = 400401
+	ErrMetadataGetDBByID = 400402
+	ErrMetadataAddDB     = 400403
+	ErrMetadataUpdateDB  = 400404
 
-	ErrMetadataGetMSAll  = 400601
-	ErrMetadataGetMSByID = 400602
-	ErrMetadataAddMS     = 400603
-	ErrMetadataUpdateMS  = 400604
+	ErrMetadataGetMonitorSystemAll  = 400601
+	ErrMetadataGetMonitorSystemByID = 400602
+	ErrMetadataAddMonitorSystem     = 400603
+	ErrMetadataUpdateMonitorSystem  = 400604
 )
 
 func initErrorMessage() {
@@ -184,13 +184,13 @@ func initErrorMessage() {
 	Messages[ErrMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddUser, "metadata: add new user failed. env_name: %s\n%s")
 	Messages[ErrMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateUser, "metadata: update user failed. id: %s\n%s")
 
-	Messages[ErrMetadataGetDbAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetDbAll, "metadata: get all databases failed.\n%s")
-	Messages[ErrMetadataGetDbByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetDbByID, "metadata: get database by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddDb] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddDb, "metadata: add new databases failed. db_name: %s\n%s")
-	Messages[ErrMetadataUpdateDb] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateDb, "metadata: update database failed. id: %s\n%s")
+	Messages[ErrMetadataGetDBAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetDBAll, "metadata: get all databases failed.\n%s")
+	Messages[ErrMetadataGetDBByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetDBByID, "metadata: get database by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddDB] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddDB, "metadata: add new databases failed. db_name: %s\n%s")
+	Messages[ErrMetadataUpdateDB] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateDB, "metadata: update database failed. id: %s\n%s")
 
-	Messages[ErrMetadataGetMSAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMSAll, "metadata: get all monitor systems failed.\n%s")
-	Messages[ErrMetadataGetMSByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMSByID, "metadata: get monitor system by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddMS] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMS, "metadata: add new monitor system failed. system_name: %s\n%s")
-	Messages[ErrMetadataUpdateMS] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMS, "metadata: update monitor system failed. id: %s\n%s")
+	Messages[ErrMetadataGetMonitorSystemAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMonitorSystemAll, "metadata: get all monitor systems failed.\n%s")
+	Messages[ErrMetadataGetMonitorSystemByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMonitorSystemByID, "metadata: get monitor system by id failed. id: %s\n%s")
+	Messages[ErrMetadataAddMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMonitorSystem, "metadata: add new monitor system failed. system_name: %s\n%s")
+	Messages[ErrMetadataUpdateMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMonitorSystem, "metadata: update monitor system failed. id: %s\n%s")
 }
