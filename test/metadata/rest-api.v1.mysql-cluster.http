@@ -1,0 +1,22 @@
+### =============== mysql-cluster ===================
+
+### get all mysql clusters
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster
+Accept: application/json
+
+### get mysql cluster by id
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster/1
+Accept: application/json
+
+### add new mysql cluster
+POST http://{{baseURL}}/api/v1/metadata/mysql-cluster
+Content-Type: application/json
+
+{"cluster_name": "api_test", "env_id": 1}
+
+### update mysql cluster by id
+POST http://{{baseURL}}/api/v1/metadata/mysql-cluster/1
+Content-Type: application/json
+
+{"cluster_name": "test", "del_flag": 1}
+

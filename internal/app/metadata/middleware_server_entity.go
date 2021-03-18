@@ -65,12 +65,23 @@ func NewEmptyMiddlewareServerInfoWithGlobal() *MiddlewareServerInfo {
 func NewMiddlewareServerInfoWithDefault(clusterID int, serverName string, middlewareRole int, hostIP string, portNum int) *MiddlewareServerInfo {
 	return &MiddlewareServerInfo{
 		Repository:     NewMiddlewareServerRepoWithGlobal(),
-		ClusterID:      clusterID,
-		ServerName:     serverName,
-		MiddlewareRole: middlewareRole,
-		HostIP:         hostIP,
-		PortNum:        portNum,
+		ClusterID:      constant.DefaultRandomInt,
+		ServerName:     constant.DefaultRandomString,
+		MiddlewareRole: constant.DefaultRandomInt,
+		HostIP:         constant.DefaultRandomString,
+		PortNum:        constant.DefaultRandomInt,
 	}
+}
+
+// NewMiddlewareServerInfoWithMapAndRandom returns a new *MiddlewareServerInfo with given map
+func NewMiddlewareServerInfoWithMapAndRandom(fields map[string]interface{}) (*MiddlewareServerInfo, error) {
+	msi := &MiddlewareServerInfo{}
+	err := common.SetValuesWithMapAndRandom(msi, fields)
+	if err != nil {
+		return nil, err
+	}
+
+	return msi, nil
 }
 
 // Identity returns ID of entity

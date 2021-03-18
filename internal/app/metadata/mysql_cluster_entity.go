@@ -10,10 +10,10 @@ import (
 	"github.com/romberli/das/internal/dependency"
 )
 
-var _ dependency.Entity = (*MYSQLClusterInfo)(nil)
+var _ dependency.Entity = (*MySQLClusterInfo)(nil)
 
-// MYSQLClusterInfo is a struct map to table in the database
-type MYSQLClusterInfo struct {
+// MySQLClusterInfo is a struct map to table in the database
+type MySQLClusterInfo struct {
 	dependency.Repository
 	ID                  int       `middleware:"id" json:"id"`
 	ClusterName         string    `middleware:"cluster_name" json:"cluster_name"`
@@ -27,8 +27,8 @@ type MYSQLClusterInfo struct {
 	LastUpdateTime      time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
-// NewMYSQLClusterInfo returns a new MYSQLClusterInfo
-func NewMYSQLClusterInfo(repo *MYSQLClusterRepo,
+// NewMySQLClusterInfo returns a new MySQLClusterInfo
+func NewMySQLClusterInfo(repo *MySQLClusterRepo,
 	id int,
 	clusterName string,
 	middlewareClusterID int,
@@ -36,8 +36,8 @@ func NewMYSQLClusterInfo(repo *MYSQLClusterRepo,
 	ownerID int, ownerGroup string,
 	envID int,
 	delFlag int,
-	createTime, lastUpdateTime time.Time) *MYSQLClusterInfo {
-	return &MYSQLClusterInfo{
+	createTime, lastUpdateTime time.Time) *MySQLClusterInfo {
+	return &MySQLClusterInfo{
 		repo,
 		id,
 		clusterName,
@@ -52,8 +52,8 @@ func NewMYSQLClusterInfo(repo *MYSQLClusterRepo,
 	}
 }
 
-// NewMYSQLClusterInfoWithGlobal returns a new MYSQLClusterInfo with default MYSQLClusterRepo
-func NewMYSQLClusterInfoWithGlobal(
+// NewMySQLClusterInfoWithGlobal returns a new MySQLClusterInfo with default MySQLClusterRepo
+func NewMySQLClusterInfoWithGlobal(
 	id int,
 	clusterName string,
 	middlewareClusterID int,
@@ -61,9 +61,9 @@ func NewMYSQLClusterInfoWithGlobal(
 	ownerID int, ownerGroup string,
 	envID int,
 	delFlag int,
-	createTime, lastUpdateTime time.Time) *MYSQLClusterInfo {
-	return &MYSQLClusterInfo{
-		NewMYSQLClusterRepoWithGlobal(),
+	createTime, lastUpdateTime time.Time) *MySQLClusterInfo {
+	return &MySQLClusterInfo{
+		NewMySQLClusterRepoWithGlobal(),
 		id,
 		clusterName,
 		middlewareClusterID,
@@ -77,46 +77,63 @@ func NewMYSQLClusterInfoWithGlobal(
 	}
 }
 
-// NewEmptyMYSQLClusterInfoWithGlobal returns a new MYSQLClusterInfo with default MYSQLClusterRepo
-func NewEmptyMYSQLClusterInfoWithGlobal() *MYSQLClusterInfo {
-	return &MYSQLClusterInfo{Repository: NewMYSQLClusterRepoWithGlobal()}
+// NewEmptyMySQLClusterInfoWithGlobal returns a new MySQLClusterInfo with default MySQLClusterRepo
+func NewEmptyMySQLClusterInfoWithGlobal() *MySQLClusterInfo {
+	return &MySQLClusterInfo{Repository: NewMySQLClusterRepoWithGlobal()}
 }
 
-// NewMYSQLClusterInfoWithDefault returns a new MYSQLClusterInfo with default MYSQLClusterRepo
-func NewMYSQLClusterInfoWithDefault(clusterName string) *MYSQLClusterInfo {
-	return &MYSQLClusterInfo{
-		Repository:  NewMYSQLClusterRepoWithGlobal(),
-		ClusterName: clusterName,
+// NewMySQLClusterInfoWithDefault returns a new MySQLClusterInfo with default MySQLClusterRepo
+func NewMySQLClusterInfoWithDefault(
+	clusterName string,
+	envID int) *MySQLClusterInfo {
+	return &MySQLClusterInfo{
+		Repository:          NewMySQLClusterRepoWithGlobal(),
+		ClusterName:         clusterName,
+		MiddlewareClusterID: constant.DefaultRandomInt,
+		MonitorSystemID:     constant.DefaultRandomInt,
+		OwnerID:             constant.DefaultRandomInt,
+		OwnerGroup:          constant.DefaultRandomString,
+		EnvID:               envID,
 	}
 }
 
+// NewMySQLClusterInfoWithMapAndRandom returns a new *MySQLClusterInfo with given map
+func NewMySQLClusterInfoWithMapAndRandom(fields map[string]interface{}) (*MySQLClusterInfo, error) {
+	mci := &MySQLClusterInfo{}
+	err := common.SetValuesWithMapAndRandom(mci, fields)
+	if err != nil {
+		return nil, err
+	}
+	return mci, nil
+}
+
 // Identity returns ID of entity
-func (mci *MYSQLClusterInfo) Identity() string {
+func (mci *MySQLClusterInfo) Identity() string {
 	return strconv.Itoa(mci.ID)
 }
 
 // IsDeleted checks if delete flag had been set
-func (mci *MYSQLClusterInfo) IsDeleted() bool {
+func (mci *MySQLClusterInfo) IsDeleted() bool {
 	return mci.DelFlag != constant.ZeroInt
 }
 
 // GetCreateTime returns created time of entity
-func (mci *MYSQLClusterInfo) GetCreateTime() time.Time {
+func (mci *MySQLClusterInfo) GetCreateTime() time.Time {
 	return mci.CreateTime
 }
 
 // GetLastUpdateTime returns last updated time of entity
-func (mci *MYSQLClusterInfo) GetLastUpdateTime() time.Time {
+func (mci *MySQLClusterInfo) GetLastUpdateTime() time.Time {
 	return mci.LastUpdateTime
 }
 
 // Get returns value of given field
-func (mci *MYSQLClusterInfo) Get(field string) (interface{}, error) {
+func (mci *MySQLClusterInfo) Get(field string) (interface{}, error) {
 	return common.GetValueOfStruct(mci, field)
 }
 
 // Set sets entity with given fields, key is the field name and value is the relevant value of the key
-func (mci *MYSQLClusterInfo) Set(fields map[string]interface{}) error {
+func (mci *MySQLClusterInfo) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {
 		err := common.SetValueOfStruct(mci, fieldName, fieldValue)
 		if err != nil {
@@ -128,16 +145,16 @@ func (mci *MYSQLClusterInfo) Set(fields map[string]interface{}) error {
 }
 
 // Delete sets DelFlag to true, need to use Save to write to the middleware
-func (mci *MYSQLClusterInfo) Delete() {
+func (mci *MySQLClusterInfo) Delete() {
 	mci.DelFlag = 1
 }
 
 // MarshalJSON marshals entity to json string, it only marshals fields that has default tag
-func (mci *MYSQLClusterInfo) MarshalJSON() ([]byte, error) {
+func (mci *MySQLClusterInfo) MarshalJSON() ([]byte, error) {
 	return common.MarshalStructWithTag(mci, constant.DefaultMarshalTag)
 }
 
 // MarshalJSONWithFields marshals only with specified fields of entity to json string
-func (mci *MYSQLClusterInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
+func (mci *MySQLClusterInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
 	return common.MarshalStructWithFields(mci, fields...)
 }
