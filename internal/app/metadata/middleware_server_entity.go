@@ -65,11 +65,11 @@ func NewEmptyMiddlewareServerInfoWithGlobal() *MiddlewareServerInfo {
 func NewMiddlewareServerInfoWithDefault(clusterID int, serverName string, middlewareRole int, hostIP string, portNum int) *MiddlewareServerInfo {
 	return &MiddlewareServerInfo{
 		Repository:     NewMiddlewareServerRepoWithGlobal(),
-		ClusterID:      constant.DefaultRandomInt,
-		ServerName:     constant.DefaultRandomString,
-		MiddlewareRole: constant.DefaultRandomInt,
-		HostIP:         constant.DefaultRandomString,
-		PortNum:        constant.DefaultRandomInt,
+		ClusterID:      clusterID,
+		ServerName:     serverName,
+		MiddlewareRole: middlewareRole,
+		HostIP:         hostIP,
+		PortNum:        portNum,
 	}
 }
 
