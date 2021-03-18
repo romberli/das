@@ -65,8 +65,8 @@ func (er *MSRepo) GetAll() ([]dependency.Entity, error) {
 	if err != nil {
 		return nil, err
 	}
-	// init []*MSInfo
-	mSInfoList := make([]*MSInfo, result.RowNumber())
+	// init []*MonitorSystemInfo
+	mSInfoList := make([]*MonitorSystemInfo, result.RowNumber())
 	for i := range mSInfoList {
 		mSInfoList[i] = NewEmptyMSInfoWithGlobal()
 	}
@@ -99,7 +99,7 @@ func (er *MSRepo) GetByID(id string) (dependency.Entity, error) {
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, errors.New(fmt.Sprintf("metadata MSInfo.GetByID(): data does not exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata MonitorSystemInfo.GetByID(): data does not exists, id: %s", id))
 	case 1:
 		dbInfo := NewEmptyMSInfoWithGlobal()
 		// map to struct
@@ -110,7 +110,7 @@ func (er *MSRepo) GetByID(id string) (dependency.Entity, error) {
 
 		return dbInfo, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("metadata MSInfo.GetByID(): duplicate key exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata MonitorSystemInfo.GetByID(): duplicate key exists, id: %s", id))
 	}
 }
 
@@ -118,7 +118,7 @@ func (er *MSRepo) GetByID(id string) (dependency.Entity, error) {
 func (er *MSRepo) GetID(entity dependency.Entity) (string, error) {
 	sql := `select id from t_meta_monitor_system_info where del_flag = 0 and system_name = ?;`
 	log.Debugf("metadata MSRepo.GetID() select sql: %s", sql)
-	result, err := er.Execute(sql, entity.(*MSInfo).MSName)
+	result, err := er.Execute(sql, entity.(*MonitorSystemInfo).MSName)
 	if err != nil {
 		return constant.EmptyString, err
 	}
@@ -131,7 +131,7 @@ func (er *MSRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
 	sql := `insert into t_meta_monitor_system_info(system_name, system_type, host_ip, port_num, port_num_slow, base_url) values(?,?,?,?,?,?);`
 	log.Debugf("metadata MSRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := er.Execute(sql, entity.(*MSInfo).MSName, entity.(*MSInfo).SystemType, entity.(*MSInfo).HostIp, entity.(*MSInfo).PortNum, entity.(*MSInfo).PortNumSlow, entity.(*MSInfo).BaseUrl)
+	_, err := er.Execute(sql, entity.(*MonitorSystemInfo).MSName, entity.(*MonitorSystemInfo).SystemType, entity.(*MonitorSystemInfo).HostIp, entity.(*MonitorSystemInfo).PortNum, entity.(*MonitorSystemInfo).PortNumSlow, entity.(*MonitorSystemInfo).BaseUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (er *MSRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
 func (er *MSRepo) Update(entity dependency.Entity) error {
 	sql := `update t_meta_monitor_system_info set system_name = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata MSRepo.Update() update sql: %s", sql)
-	mSInfo := entity.(*MSInfo)
+	mSInfo := entity.(*MonitorSystemInfo)
 	_, err := er.Execute(sql, mSInfo.MSName, mSInfo.DelFlag, mSInfo.ID)
 
 	return err

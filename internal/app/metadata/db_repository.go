@@ -14,61 +14,62 @@ import (
 	"github.com/romberli/das/internal/dependency"
 )
 
-var _ dependency.Repository = (*DbRepo)(nil)
+var _ dependency.Repository = (*DBRepo)(nil)
 
-type DbRepo struct {
+type DBRepo struct {
 	Database middleware.Pool
 }
 
-// NewDbRepo returns *DbRepo with given middleware.Pool
-func NewDbRepo(db middleware.Pool) *DbRepo {
-	return &DbRepo{db}
+// NewDBRepo returns *DBRepo with given middleware.Pool
+func NewDBRepo(db middleware.Pool) *DBRepo {
+	return &DBRepo{db}
 }
 
-// NewDbRepo returns *DbRepo with global mysql pool
-func NewDbRepoWithGlobal() *DbRepo {
-	return NewDbRepo(global.MySQLPool)
+// NewDBRepo returns *DBRepo with global mysql pool
+func NewDBRepoWithGlobal() *DBRepo {
+	return NewDBRepo(global.MySQLPool)
 }
 
 // Execute implements dependency.Repository interface,
 // it executes command with arguments on database
-func (er *DbRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
-	conn, err := er.Database.Get()
+func (dbr *DBRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
+	conn, err := dbr.Database.Get()
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
 		err = conn.Close()
 		if err != nil {
-			log.Errorf("metadata DbRepo.Execute(): close database connection failed.\n%s", err.Error())
+			log.Errorf("metadata DBRepo.Execute(): close database connection failed.\n%s", err.Error())
 		}
 	}()
 
 	return conn.Execute(command, args...)
 }
 
-func (er *DbRepo) Transaction() (middleware.Transaction, error) {
-	return er.Database.Transaction()
+// Transaction implements dependency.Repository interface
+func (dbr *DBRepo) Transaction() (middleware.Transaction, error) {
+	return dbr.Database.Transaction()
 }
 
 // GetAll returns all available entities
-func (er *DbRepo) GetAll() ([]dependency.Entity, error) {
+func (dbr *DBRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
 		select id, db_name, cluster_id, cluster_type, owner_id, owner_group, env_id, del_flag, create_time, last_update_time
 		from t_meta_db_info
 		where del_flag = 0
 		order by id;
 	`
-	log.Debugf("metadata DbRepo.GetAll() sql: \n%s", sql)
+	log.Debugf("metadata DBRepo.GetAll() sql: \n%s", sql)
 
-	result, err := er.Execute(sql)
+	result, err := dbr.Execute(sql)
 	if err != nil {
 		return nil, err
 	}
-	// init []*DbInfo
-	dbInfoList := make([]*DbInfo, result.RowNumber())
+	// init []*DBInfo
+	dbInfoList := make([]*DBInfo, result.RowNumber())
 	for i := range dbInfoList {
-		dbInfoList[i] = NewEmptyDbInfoWithGlobal()
+		dbInfoList[i] = NewEmptyDBInfoWithGlobal()
 	}
 	// map to struct
 	err = result.MapToStructSlice(dbInfoList, constant.DefaultMiddlewareTag)
@@ -84,24 +85,24 @@ func (er *DbRepo) GetAll() ([]dependency.Entity, error) {
 	return entityList, nil
 }
 
-func (er *DbRepo) GetByID(id string) (dependency.Entity, error) {
+func (dbr *DBRepo) GetByID(id string) (dependency.Entity, error) {
 	sql := `
 		select id, db_name, cluster_id, cluster_type, owner_id, owner_group, env_id, del_flag, create_time, last_update_time
 		from t_meta_db_info
 		where del_flag = 0
 		and id = ?;
 	`
-	log.Debugf("metadata DbRepo.GetByID() sql: \n%s\nplaceholders: %s", sql, id)
+	log.Debugf("metadata DBRepo.GetByID() sql: \n%s\nplaceholders: %s", sql, id)
 
-	result, err := er.Execute(sql, id)
+	result, err := dbr.Execute(sql, id)
 	if err != nil {
 		return nil, err
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, errors.New(fmt.Sprintf("metadata DbInfo.GetByID(): data does not exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByID(): data does not exists, id: %s", id))
 	case 1:
-		dbInfo := NewEmptyDbInfoWithGlobal()
+		dbInfo := NewEmptyDBInfoWithGlobal()
 		// map to struct
 		err = result.MapToStructByRowIndex(dbInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
 		if err != nil {
@@ -110,15 +111,15 @@ func (er *DbRepo) GetByID(id string) (dependency.Entity, error) {
 
 		return dbInfo, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("metadata DbInfo.GetByID(): duplicate key exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByID(): duplicate key exists, id: %s", id))
 	}
 }
 
 // GetID checks identity of given entity from the middleware
-func (er *DbRepo) GetID(entity dependency.Entity) (string, error) {
-	sql := `select id from t_meta_db_info where del_flag = 0 and db_name = ? and owner_id = ? and env_id = ? order by id desc;`
-	log.Debugf("metadata DbRepo.GetID() select sql: %s", sql)
-	result, err := er.Execute(sql, entity.(*DbInfo).DbName, entity.(*DbInfo).OwnerId, entity.(*DbInfo).EnvId)
+func (dbr *DBRepo) GetID(entity dependency.Entity) (string, error) {
+	sql := `select id from t_meta_db_info where del_flag = 0 and db_name = ? and cluster_id = ? and cluster_type = ?;`
+	log.Debugf("metadata DBRepo.GetID() select sql: %s", sql)
+	result, err := dbr.Execute(sql, entity.(*DBInfo).DBName, entity.(*DBInfo).ClusterID, entity.(*DBInfo).ClusterType)
 	if err != nil {
 		return constant.EmptyString, err
 	}
@@ -127,43 +128,43 @@ func (er *DbRepo) GetID(entity dependency.Entity) (string, error) {
 }
 
 // Create creates data with given entity in the middleware
-func (er *DbRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
-	sql := `insert into t_meta_db_info(db_name, owner_id, env_id) values(?,?,?);`
-	log.Debugf("metadata DbRepo.Create() insert sql: %s", sql)
+func (dbr *DBRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
+	sql := `insert into t_meta_db_info(db_name, cluster_id, cluster_type, owner_id, owner_group, env_id) values(?, ?, ?, ?, ?, ?);`
+	log.Debugf("metadata DBRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := er.Execute(sql, entity.(*DbInfo).DbName, entity.(*DbInfo).OwnerId, entity.(*DbInfo).EnvId)
+	_, err := dbr.Execute(sql, entity.(*DBInfo).DBName, entity.(*DBInfo).ClusterID, entity.(*DBInfo).ClusterType, entity.(*DBInfo).OwnerID, entity.(*DBInfo).OwnerGroup, entity.(*DBInfo).EnvID)
 	if err != nil {
 		return nil, err
 	}
 	// get id
-	id, err := er.GetID(entity)
+	id, err := dbr.GetID(entity)
 	if err != nil {
 		return nil, err
 	}
 	// get entity
-	return er.GetByID(id)
+	return dbr.GetByID(id)
 }
 
 // Update updates data with given entity in the middleware
-func (er *DbRepo) Update(entity dependency.Entity) error {
-	sql := `update t_meta_db_info set db_name = ?, del_flag = ? where id = ?;`
-	log.Debugf("metadata DbRepo.Update() update sql: %s", sql)
-	dbInfo := entity.(*DbInfo)
-	_, err := er.Execute(sql, dbInfo.DbName, dbInfo.DelFlag, dbInfo.ID)
+func (dbr *DBRepo) Update(entity dependency.Entity) error {
+	sql := `update t_meta_db_info set db_name = ?, cluster_id = ?, cluster_type = ?, owner_id = ?, owner_group = ?, env_id = ?, del_flag = ? where id = ?;`
+	log.Debugf("metadata DBRepo.Update() update sql: %s", sql)
+	dbInfo := entity.(*DBInfo)
+	_, err := dbr.Execute(sql, dbInfo.DBName, dbInfo.ClusterID, dbInfo.ClusterType, dbInfo.OwnerID, dbInfo.OwnerGroup, dbInfo.EnvID, dbInfo.DelFlag, dbInfo.ID)
 
 	return err
 }
 
 // Delete deletes data in the middleware, it is recommended to use soft deletion,
 // therefore use update instead of delete
-func (er *DbRepo) Delete(id string) error {
+func (dbr *DBRepo) Delete(id string) error {
 	sql := `update t_meta_db_info set del_flag = 1 where id = ?;`
-	log.Debugf("metadata DbRepo.Delete() update sql: %s", sql)
+	log.Debugf("metadata DBRepo.Delete() update sql: %s", sql)
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		return err
 	}
-	_, err = er.Execute(sql, idInt)
+	_, err = dbr.Execute(sql, idInt)
 
 	return err
 }
