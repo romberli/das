@@ -83,11 +83,28 @@ func NewEmptyMySQLClusterInfoWithGlobal() *MySQLClusterInfo {
 }
 
 // NewMySQLClusterInfoWithDefault returns a new MySQLClusterInfo with default MySQLClusterRepo
-func NewMySQLClusterInfoWithDefault(clusterName string) *MySQLClusterInfo {
+func NewMySQLClusterInfoWithDefault(
+	clusterName string,
+	envID int) *MySQLClusterInfo {
 	return &MySQLClusterInfo{
-		Repository:  NewMySQLClusterRepoWithGlobal(),
-		ClusterName: clusterName,
+		Repository:          NewMySQLClusterRepoWithGlobal(),
+		ClusterName:         clusterName,
+		MiddlewareClusterID: constant.DefaultRandomInt,
+		MonitorSystemID:     constant.DefaultRandomInt,
+		OwnerID:             constant.DefaultRandomInt,
+		OwnerGroup:          constant.DefaultRandomString,
+		EnvID:               envID,
 	}
+}
+
+// NewMySQLClusterInfoWithMapAndRandom returns a new *MySQLClusterInfo with given map
+func NewMySQLClusterInfoWithMapAndRandom(fields map[string]interface{}) (*MySQLClusterInfo, error) {
+	mci := &MySQLClusterInfo{}
+	err := common.SetValuesWithMapAndRandom(mci, fields)
+	if err != nil {
+		return nil, err
+	}
+	return mci, nil
 }
 
 // Identity returns ID of entity

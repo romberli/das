@@ -15,7 +15,8 @@ import (
 const (
 	defaultMySQLServerInfoID                   = 1
 	defaultMySQLServerInfoClusterID            = 1
-	defaultMySQLServerInfoHostIP               = "127.0.01"
+	defaultMySQLServerInfoServerName           = "server1"
+	defaultMySQLServerInfoHostIP               = "127.0.0.1"
 	defaultMySQLServerInfoPortNum              = 3306
 	defaultMySQLServerInfoDeploymentType       = 1
 	defaultMySQLServerInfoVersion              = "1.1.1"
@@ -34,6 +35,7 @@ func initNewMySQLServerInfo() *MySQLServerInfo {
 	return NewMySQLServerInfoWithGlobal(
 		defaultMySQLServerInfoID,
 		defaultMySQLServerInfoClusterID,
+		defaultMySQLServerInfoServerName,
 		defaultMySQLServerInfoHostIP,
 		defaultMySQLServerInfoPortNum,
 		defaultMySQLServerInfoDeploymentType,
@@ -108,7 +110,7 @@ func TestMySQLServerInfo_Get(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
 	asst.Equal(mysqlServerInfo.HostIP, hostIP, "test Get() failed")
 
-	portNum, err := mysqlServerInfo.Get(mSPortNumStruct)
+	portNum, err := mysqlServerInfo.Get(portNumStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
 	asst.Equal(mysqlServerInfo.PortNum, portNum, "test Get() failed")
 

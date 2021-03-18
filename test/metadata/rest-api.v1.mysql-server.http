@@ -1,0 +1,21 @@
+### =============== mysql-server ===================
+
+### get all mysql servers
+GET http://{{baseURL}}/api/v1/metadata/mysql-server
+Accept: application/json
+
+### get mysql server by id
+GET http://{{baseURL}}/api/v1/metadata/mysql-server/1
+Accept: application/json
+
+### add new mysql server
+POST http://{{baseURL}}/api/v1/metadata/mysql-server
+Content-Type: application/json
+
+{"host_ip": "192.168.1.1", "port_num": 3306}
+
+### update mysql server by id
+POST http://{{baseURL}}/api/v1/metadata/mysql-server/93
+Content-Type: application/json
+
+{"host_ip": "192.168.1.1", "port_num": 3306, "del_flag": 1}

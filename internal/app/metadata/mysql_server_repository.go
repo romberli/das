@@ -55,7 +55,7 @@ func (msr *MySQLServerRepo) Transaction() (middleware.Transaction, error) {
 // GetAll returns all available entities
 func (msr *MySQLServerRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
-		select id, cluster_id, host_ip, port_num, deployment_type, version, del_flag, 
+		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
 		from t_meta_mysql_server_info
 		where del_flag = 0
@@ -68,19 +68,19 @@ func (msr *MySQLServerRepo) GetAll() ([]dependency.Entity, error) {
 		return nil, err
 	}
 	// init []*MySQLServerInfo
-	mysqlClusterInfoList := make([]*MySQLServerInfo, result.RowNumber())
-	for i := range mysqlClusterInfoList {
-		mysqlClusterInfoList[i] = NewEmptyMySQLServerInfoWithGlobal()
+	mysqlServerInfoList := make([]*MySQLServerInfo, result.RowNumber())
+	for i := range mysqlServerInfoList {
+		mysqlServerInfoList[i] = NewEmptyMySQLServerInfoWithGlobal()
 	}
 	// map to struct
-	err = result.MapToStructSlice(mysqlClusterInfoList, constant.DefaultMiddlewareTag)
+	err = result.MapToStructSlice(mysqlServerInfoList, constant.DefaultMiddlewareTag)
 	if err != nil {
 		return nil, err
 	}
 	// init []dependency.Entity
 	entityList := make([]dependency.Entity, result.RowNumber())
 	for i := range entityList {
-		entityList[i] = mysqlClusterInfoList[i]
+		entityList[i] = mysqlServerInfoList[i]
 	}
 
 	return entityList, nil
@@ -89,7 +89,7 @@ func (msr *MySQLServerRepo) GetAll() ([]dependency.Entity, error) {
 // GetByID Select returns an available entity of the given id
 func (msr *MySQLServerRepo) GetByID(id string) (dependency.Entity, error) {
 	sql := `
-		select id, cluster_id, host_ip, port_num, deployment_type, version, del_flag, 
+		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
 		from t_meta_mysql_server_info
 		where del_flag = 0
@@ -105,14 +105,14 @@ func (msr *MySQLServerRepo) GetByID(id string) (dependency.Entity, error) {
 	case 0:
 		return nil, fmt.Errorf("metadata MySQLServerInfo.GetByID(): data does not exists, id: %s", id)
 	case 1:
-		mysqlClusterInfo := NewEmptyMySQLServerInfoWithGlobal()
+		mysqlServerInfo := NewEmptyMySQLServerInfoWithGlobal()
 		// map to struct
-		err = result.MapToStructByRowIndex(mysqlClusterInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+		err = result.MapToStructByRowIndex(mysqlServerInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
 		if err != nil {
 			return nil, err
 		}
 
-		return mysqlClusterInfo, nil
+		return mysqlServerInfo, nil
 	default:
 		return nil, fmt.Errorf("metadata MySQLServerInfo.GetByID(): duplicate key exists, id: %s", id)
 	}
@@ -134,12 +134,13 @@ func (msr *MySQLServerRepo) GetID(entity dependency.Entity) (string, error) {
 func (msr *MySQLServerRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
 	sql := `
 		insert into t_meta_mysql_server_info(
-			cluster_id, host_ip, port_num, deployment_type, version) 
-		values(?, ?, ?, ?, ?);`
+			cluster_id, server_name, host_ip, port_num, deployment_type, version) 
+		values(?, ?, ?, ?, ?, ?);`
 	log.Debugf("metadata MySQLServerRepo.Create() insert sql: %s", sql)
 	// execute
 	_, err := msr.Execute(sql,
 		entity.(*MySQLServerInfo).ClusterID,
+		entity.(*MySQLServerInfo).ServerName,
 		entity.(*MySQLServerInfo).HostIP,
 		entity.(*MySQLServerInfo).PortNum,
 		entity.(*MySQLServerInfo).DeploymentType,
@@ -161,13 +162,14 @@ func (msr *MySQLServerRepo) Create(entity dependency.Entity) (dependency.Entity,
 func (msr *MySQLServerRepo) Update(entity dependency.Entity) error {
 	sql := `
 		update t_meta_mysql_server_info set 
-			cluster_id = ?, host_ip = ?, port_num = ?, deployment_type = ?, 
+			cluster_id = ?, server_name = ?, host_ip = ?, port_num = ?, deployment_type = ?, 
 			version = ?, del_flag = ? 
 		where id = ?;`
 	log.Debugf("metadata MySQLServerRepo.Update() update sql: %s", sql)
 	mysqlServerInfo := entity.(*MySQLServerInfo)
 	_, err := msr.Execute(sql,
 		mysqlServerInfo.ClusterID,
+		mysqlServerInfo.ServerName,
 		mysqlServerInfo.HostIP,
 		mysqlServerInfo.PortNum,
 		mysqlServerInfo.DeploymentType,

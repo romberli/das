@@ -55,7 +55,15 @@ func TestMySQLClusterService_Create(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMySQLClusterService(mysqlClusterRepo)
-	err := s.Create(map[string]interface{}{clusterNameStruct: testInsertClusterName})
+
+	err := s.Create(map[string]interface{}{
+		clusterNameStruct:         testInsertClusterName,
+		middlewareClusterIDStruct: defaultMySQLClusterInfoMiddlewareClusterID,
+		monitorSystemIDStruct:     defaultMySQLClusterInfoMonitorSystemID,
+		ownerIDStruct:             defaultMySQLClusterInfoOwnerID,
+		ownerGroupStruct:          defaultMySQLClusterInfoOwnerGroup,
+		envIDStruct:               defaultMySQLClusterInfoEnvID,
+	})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteMySQLClusterByID(s.Entities[0].Identity())

@@ -13,6 +13,7 @@ import (
 
 const (
 	clusterIDStruct      = "ClusterID"
+	serverNameStruct     = "ServerName"
 	hostIPStruct         = "HostIP"
 	portNumStruct        = "PortNum"
 	deploymentTypeStruct = "DeploymentType"
@@ -47,7 +48,7 @@ func (mss *MySQLServerService) GetEntities() []dependency.Entity {
 	return entityList
 }
 
-// GetAll gets all environment entities from the middleware
+// GetAll gets all mysql server entities from the middleware
 func (mss *MySQLServerService) GetAll() error {
 	var err error
 	mss.Entities, err = mss.Repository.GetAll()
@@ -55,7 +56,7 @@ func (mss *MySQLServerService) GetAll() error {
 	return err
 }
 
-// GetByID gets an environment entity that contains the given id from the middleware
+// GetByID gets an mysql server entity that contains the given id from the middleware
 func (mss *MySQLServerService) GetByID(id string) error {
 	entity, err := mss.Repository.GetByID(id)
 	if err != nil {
@@ -67,18 +68,32 @@ func (mss *MySQLServerService) GetByID(id string) error {
 	return err
 }
 
-// Create creates a new environment entity and insert it into the middleware
+// Create creates a new mysql server entity and insert it into the middleware
 func (mss *MySQLServerService) Create(fields map[string]interface{}) error {
 	// generate new map
-	hostIP, ok := fields[hostIPStruct]
-	if !ok {
+	if _, ok := fields[clusterIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, clusterIDStruct)
+	}
+	if _, ok := fields[serverNameStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, serverNameStruct)
+	}
+	if _, ok := fields[hostIPStruct]; !ok {
 		return message.NewMessage(message.ErrFieldNotExists, hostIPStruct)
 	}
-	portNum, ok := fields[portNumStruct]
-	if !ok {
+	if _, ok := fields[portNumStruct]; !ok {
 		return message.NewMessage(message.ErrFieldNotExists, portNumStruct)
 	}
-	mysqlServerInfo := NewMySQLServerInfoWithDefault(hostIP.(string), portNum.(int))
+	if _, ok := fields[deploymentTypeStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, deploymentTypeStruct)
+	}
+	if _, ok := fields[versionStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, versionStruct)
+	}
+	// create a new entity
+	mysqlServerInfo, err := NewMySQLServerInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
 	// insert into middleware
 	entity, err := mss.Repository.Create(mysqlServerInfo)
 	if err != nil {
@@ -89,7 +104,7 @@ func (mss *MySQLServerService) Create(fields map[string]interface{}) error {
 	return nil
 }
 
-// Update gets an environment entity that contains the given id from the middleware,
+// Update gets an mysql server entity that contains the given id from the middleware,
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
@@ -106,7 +121,7 @@ func (mss *MySQLServerService) Update(id string, fields map[string]interface{}) 
 	return mss.Repository.Update(mss.Entities[constant.ZeroInt])
 }
 
-// Delete deletes the environment entity that contains the given id in the middleware
+// Delete deletes the mysql server entity that contains the given id in the middleware
 func (mss *MySQLServerService) Delete(id string) error {
 	return mss.Repository.Delete(id)
 }

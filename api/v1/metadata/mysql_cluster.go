@@ -73,7 +73,7 @@ func GetMySQLClusterByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -102,11 +102,27 @@ func AddMySQLCluster(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, ok := fields[clusterNameStruct]
-	if !ok {
+	if _, ok := fields[clusterNameStruct]; !ok {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, clusterNameStruct)
 		return
 	}
+	if _, ok := fields[middlewareClusterIDStruct]; !ok {
+		fields[middlewareClusterIDStruct] = constant.DefaultRandomInt
+	}
+	if _, ok := fields[monitorSystemIDStruct]; !ok {
+		fields[monitorSystemIDStruct] = constant.DefaultRandomInt
+	}
+	if _, ok := fields[ownerIDStruct]; !ok {
+		fields[ownerIDStruct] = constant.DefaultRandomInt
+	}
+	if _, ok := fields[ownerGroupStruct]; !ok {
+		fields[ownerGroupStruct] = constant.DefaultRandomString
+	}
+	if _, ok := fields[envIDStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, envIDStruct)
+		return
+	}
+
 	// init service
 	s := metadata.NewMySQLClusterServiceWithDefault()
 	// insert into middleware
@@ -118,7 +134,7 @@ func AddMySQLCluster(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, clusterNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -152,9 +168,29 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 		return
 	}
 	_, clusterNameExists := fields[clusterNameStruct]
+	_, middlewareClusterIDExists := fields[middlewareClusterIDStruct]
+	_, monitorSystemIDExists := fields[monitorSystemIDStruct]
+	_, ownerIDExists := fields[ownerIDStruct]
+	_, ownerGroupExists := fields[ownerGroupStruct]
+	_, envIDExists := fields[envIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !clusterNameExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", clusterNameStruct, delFlagStruct))
+	if !clusterNameExists &&
+		!middlewareClusterIDExists &&
+		!monitorSystemIDExists &&
+		!ownerGroupExists &&
+		!ownerIDExists &&
+		!envIDExists &&
+		!delFlagExists {
+		resp.ResponseNOK(
+			c, message.ErrFieldNotExists,
+			fmt.Sprintf("%s, %s, %s, %s, %s, %s and %s",
+				clusterNameStruct,
+				middlewareClusterIDStruct,
+				monitorSystemIDStruct,
+				ownerIDStruct,
+				ownerGroupStruct,
+				envIDStruct,
+				delFlagStruct))
 		return
 	}
 	// init service
@@ -168,7 +204,7 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// resp

@@ -17,6 +17,7 @@ type MySQLServerInfo struct {
 	dependency.Repository
 	ID             int       `middleware:"id" json:"id"`
 	ClusterID      int       `middleware:"cluster_id" json:"cluster_id"`
+	ServerName     string    `middleware:"server_name" json:"server_name"`
 	HostIP         string    `middleware:"host_ip" json:"host_ip"`
 	PortNum        int       `middleware:"port_num" json:"port_num"`
 	DeploymentType int       `middleware:"deployment_type" json:"deployment_type"`
@@ -30,6 +31,7 @@ type MySQLServerInfo struct {
 func NewMySQLServerInfo(repo *MySQLServerRepo,
 	id int,
 	clusterID int,
+	serverName string,
 	hostIP string,
 	portNum int,
 	deploymentType int,
@@ -40,6 +42,7 @@ func NewMySQLServerInfo(repo *MySQLServerRepo,
 		repo,
 		id,
 		clusterID,
+		serverName,
 		hostIP,
 		portNum,
 		deploymentType,
@@ -54,6 +57,7 @@ func NewMySQLServerInfo(repo *MySQLServerRepo,
 func NewMySQLServerInfoWithGlobal(
 	id int,
 	clusterID int,
+	serverName string,
 	hostIP string,
 	portNum int,
 	deploymentType int,
@@ -64,6 +68,7 @@ func NewMySQLServerInfoWithGlobal(
 		NewMySQLServerRepoWithGlobal(),
 		id,
 		clusterID,
+		serverName,
 		hostIP,
 		portNum,
 		deploymentType,
@@ -80,12 +85,31 @@ func NewEmptyMySQLServerInfoWithGlobal() *MySQLServerInfo {
 }
 
 // NewMySQLServerInfoWithDefault returns a new MySQLServerInfo with default MySQLServerRepo
-func NewMySQLServerInfoWithDefault(hostIP string, portNum int) *MySQLServerInfo {
+func NewMySQLServerInfoWithDefault(
+	clusterID int,
+	serverName string,
+	hostIP string, 
+	portNum int,
+	deploymentType int) *MySQLServerInfo {
 	return &MySQLServerInfo{
 		Repository: NewMySQLServerRepoWithGlobal(),
+		ClusterID: clusterID,
+		ServerName: serverName,
 		HostIP:     hostIP,
 		PortNum:    portNum,
+		DeploymentType: deploymentType,
+		Version: constant.DefaultRandomString,
 	}
+}
+
+// NewMySQLServerInfoWithMapAndRandom returns a new *MySQLServerInfo with given map
+func NewMySQLServerInfoWithMapAndRandom(fields map[string]interface{}) (*MySQLServerInfo, error) {
+	msi := &MySQLServerInfo{}
+	err := common.SetValuesWithMapAndRandom(msi, fields)
+	if err != nil {
+		return nil, err
+	}
+	return msi, nil
 }
 
 // Identity returns ID of entity

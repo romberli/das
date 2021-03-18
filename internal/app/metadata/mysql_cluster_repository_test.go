@@ -12,9 +12,11 @@ import (
 )
 
 const (
+	testInitClusterID          = 1
 	testInitClusterName        = "cluster_name_init"
-	testInsertClusterName      = "cluster_name_insert"
+	testTransactionClusterID   = 2
 	testTransactionClusterName = "cluster_name_need_rollback"
+	testInsertClusterName      = "cluster_name_insert"
 	testUpdateClusterName      = "cluster_name_update"
 )
 
@@ -31,7 +33,9 @@ func initMySQLClusterRepo() *MySQLClusterRepo {
 }
 
 func createMySQLCluster() (dependency.Entity, error) {
-	mysqlClusterInfo := NewMySQLClusterInfoWithDefault(defaultMySQLClusterInfoClusterName)
+	mysqlClusterInfo := NewMySQLClusterInfoWithDefault(
+		defaultMySQLClusterInfoClusterName,
+		defaultMySQLClusterInfoEnvID)
 	entity, err := mysqlClusterRepo.Create(mysqlClusterInfo)
 	if err != nil {
 		return nil, err
@@ -71,15 +75,16 @@ func TestMySQLClusterRepo_Transaction(t *testing.T) {
 
 	sql := `
 	insert into t_meta_mysql_cluster_info(
-		cluster_name, middleware_cluster_id, monitor_system_id, 
+		id, cluster_name, middleware_cluster_id, monitor_system_id, 
 		owner_id, owner_group, env_id) 
-	values(?,?,?,?,?,?);`
+	values(?,?,?,?,?,?,?);`
 
 	tx, err := mysqlClusterRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	_, err = tx.Execute(sql,
+		testTransactionClusterID,
 		testTransactionClusterName,
 		defaultMySQLClusterInfoMiddlewareClusterID,
 		defaultMySQLClusterInfoMonitorSystemID,
@@ -118,10 +123,11 @@ func TestMySQLClusterRepo_GetAll(t *testing.T) {
 	insert into t_meta_mysql_cluster_info(
 		id, cluster_name, middleware_cluster_id, monitor_system_id, 
 		owner_id, owner_group, env_id) 
-	values(1,?,?,?,?,?,?,?);`
+	values(?,?,?,?,?,?,?);`
 
 	// init data avoid empty set
 	_, err := mysqlClusterRepo.Execute(sql,
+		testInitClusterID,
 		testInitClusterName,
 		defaultMySQLClusterInfoMiddlewareClusterID,
 		defaultMySQLClusterInfoMonitorSystemID,

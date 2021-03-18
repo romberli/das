@@ -48,7 +48,7 @@ func (mcs *MySQLClusterService) GetEntities() []dependency.Entity {
 	return entityList
 }
 
-// GetAll gets all environment entities from the middleware
+// GetAll gets all mysql cluster entities from the middleware
 func (mcs *MySQLClusterService) GetAll() error {
 	var err error
 	mcs.Entities, err = mcs.Repository.GetAll()
@@ -56,7 +56,7 @@ func (mcs *MySQLClusterService) GetAll() error {
 	return err
 }
 
-// GetByID gets an environment entity that contains the given id from the middleware
+// GetByID gets an mysql cluster entity that contains the given id from the middleware
 func (mcs *MySQLClusterService) GetByID(id string) error {
 	entity, err := mcs.Repository.GetByID(id)
 	if err != nil {
@@ -68,14 +68,32 @@ func (mcs *MySQLClusterService) GetByID(id string) error {
 	return err
 }
 
-// Create creates a new environment entity and insert it into the middleware
+// Create creates a new mysql cluster entity and insert it into the middleware
 func (mcs *MySQLClusterService) Create(fields map[string]interface{}) error {
 	// generate new map
-	clusterName, ok := fields[clusterNameStruct]
-	if !ok {
+	if _, ok := fields[clusterNameStruct]; !ok {
 		return message.NewMessage(message.ErrFieldNotExists, clusterNameStruct)
 	}
-	mysqlClusterInfo := NewMySQLClusterInfoWithDefault(clusterName.(string))
+	if _, ok := fields[middlewareClusterIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, middlewareClusterIDStruct)
+	}
+	if _, ok := fields[monitorSystemIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, monitorSystemIDStruct)
+	}
+	if _, ok := fields[ownerIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, ownerIDStruct)
+	}
+	if _, ok := fields[ownerGroupStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, ownerGroupStruct)
+	}
+	if _, ok := fields[envIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, envIDStruct)
+	}
+	// create a new entity
+	mysqlClusterInfo, err := NewMySQLClusterInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
 	// insert into middleware
 	entity, err := mcs.Repository.Create(mysqlClusterInfo)
 	if err != nil {
@@ -86,7 +104,7 @@ func (mcs *MySQLClusterService) Create(fields map[string]interface{}) error {
 	return nil
 }
 
-// Update gets an environment entity that contains the given id from the middleware,
+// Update gets an mysql cluster entity that contains the given id from the middleware,
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
@@ -103,7 +121,7 @@ func (mcs *MySQLClusterService) Update(id string, fields map[string]interface{})
 	return mcs.Repository.Update(mcs.Entities[constant.ZeroInt])
 }
 
-// Delete deletes the environment entity that contains the given id in the middleware
+// Delete deletes the mysql cluster entity that contains the given id in the middleware
 func (mcs *MySQLClusterService) Delete(id string) error {
 	return mcs.Repository.Delete(id)
 }

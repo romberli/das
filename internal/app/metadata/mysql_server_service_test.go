@@ -56,8 +56,12 @@ func TestMySQLServerService_Create(t *testing.T) {
 
 	s := NewMySQLServerService(mysqlServerRepo)
 	err := s.Create(map[string]interface{}{
-		hostIPStruct:    testInsertHostIP,
-		mSPortNumStruct: testInitPortNum})
+		clusterIDStruct: defaultMySQLServerInfoClusterID,
+		serverNameStruct: defaultMySQLServerInfoServerName,
+		hostIPStruct:  testInsertHostIP,
+		portNumStruct: testInitPortNum,
+		deploymentTypeStruct: defaultMySQLServerInfoDeploymentType,
+		versionStruct: defaultMySQLServerInfoVersion})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteMySQLServerByID(s.Entities[0].Identity())
@@ -71,15 +75,15 @@ func TestMySQLServerService_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	s := NewMySQLServerService(mysqlServerRepo)
 	err = s.Update(entity.Identity(), map[string]interface{}{
-		hostIPStruct:    testUpdateHostIP,
-		mSPortNumStruct: testUpdatePortNum})
+		hostIPStruct:  testUpdateHostIP,
+		portNumStruct: testUpdatePortNum})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	hostIP, err := s.GetEntities()[constant.ZeroInt].Get(hostIPStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(testUpdateHostIP, hostIP)
-	portNum, err := s.GetEntities()[constant.ZeroInt].Get(mSPortNumStruct)
+	portNum, err := s.GetEntities()[constant.ZeroInt].Get(portNumStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(testUpdatePortNum, portNum)
 	// delete

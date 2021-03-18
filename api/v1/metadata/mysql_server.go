@@ -14,6 +14,7 @@ import (
 
 const (
 	clusterIDStruct      = "ClusterID"
+	serverNameStruct     = "ServerName"
 	hostIPStruct         = "HostIP"
 	portNumStruct        = "PortNum"
 	deploymentTypeStruct = "DeploymentType"
@@ -69,7 +70,7 @@ func GetMySQLServerByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -98,6 +99,14 @@ func AddMySQLServer(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
+	if _, ok := fields[clusterIDStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, clusterIDStruct)
+		return
+	}
+	if _, ok := fields[serverNameStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, serverNameStruct)
+		return
+	}
 	if _, ok := fields[hostIPStruct]; !ok {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, hostIPStruct)
 		return
@@ -106,18 +115,27 @@ func AddMySQLServer(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, portNumStruct)
 		return
 	}
+	if _, ok := fields[deploymentTypeStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, deploymentTypeStruct)
+		return
+	}
+	if _, ok := fields[versionStruct]; !ok {
+		fields[versionStruct] = constant.DefaultRandomString
+	}
 	// init service
 	s := metadata.NewMySQLServerServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMySQLServer, hostIPStruct, portNumStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMySQLServer,
+			clusterIDStruct, serverNameStruct, hostIPStruct, portNumStruct,
+			deploymentTypeStruct, versionStruct, err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, hostIPStruct, portNumStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -150,11 +168,30 @@ func UpdateMySQLServerByID(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
+	_, clusterIDExists := fields[clusterIDStruct]
+	_, serverNameExists := fields[serverNameStruct]
 	_, hostIPExists := fields[hostIPStruct]
 	_, portNumExists := fields[portNumStruct]
+	_, deploymentTypeExists := fields[deploymentTypeStruct]
+	_, versionExists := fields[versionStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !hostIPExists && !portNumExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s:%s and %s", hostIPStruct, portNumStruct, delFlagStruct))
+	if !clusterIDExists &&
+		!serverNameExists &&
+		!hostIPExists &&
+		!portNumExists &&
+		!deploymentTypeExists &&
+		!versionExists &&
+		!delFlagExists {
+		resp.ResponseNOK(
+			c, message.ErrFieldNotExists,
+			fmt.Sprintf("%s, %s, %s, %s, %s, %s and %s",
+				fields[clusterIDStruct],
+				fields[serverNameStruct],
+				fields[hostIPStruct],
+				fields[portNumStruct],
+				fields[deploymentTypeStruct],
+				fields[versionStruct],
+				fields[delFlagStruct]))
 		return
 	}
 	// init service
@@ -168,7 +205,7 @@ func UpdateMySQLServerByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// resp
