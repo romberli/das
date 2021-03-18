@@ -56,8 +56,8 @@ func NewEmptyMiddlewareClusterInfoWithGlobal() *MiddlewareClusterInfo {
 func NewMiddlewareClusterInfoWithDefault(middlewareClusterName string, envID int) *MiddlewareClusterInfo {
 	return &MiddlewareClusterInfo{
 		Repository:  NewMiddlewareClusterRepoWithGlobal(),
-		ClusterName: constant.DefaultRandomString,
-		EnvID:       constant.DefaultRandomInt,
+		ClusterName: middlewareClusterName,
+		EnvID:       envID,
 	}
 }
 

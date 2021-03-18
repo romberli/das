@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"encoding/json"
-
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
