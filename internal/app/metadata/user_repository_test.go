@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	onlineUserName = "1"
+	onlineUserName = "test"
 	newUserName    = "nun"
 )
 

@@ -15,9 +15,10 @@ import (
 const (
 	userNameStruct       = "UserName"
 	departmentNameStruct = "DepartmentName"
-	employeeIdStruct     = "EmployeeId"
+	employeeIDStruct     = "EmployeeID"
 	accountNameStruct    = "AccountName"
 	emailStruct          = "Email"
+	telephoneStruct      = "Telephone"
 	roleStruct           = "Role"
 )
 
@@ -71,7 +72,7 @@ func GetUserByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -110,9 +111,14 @@ func AddUser(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, departmentNameStruct)
 		return
 	}
-	_, ok = fields[employeeIdStruct]
+	_, ok = fields[employeeIDStruct]
 	if !ok {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, employeeIdStruct)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, employeeIDStruct)
+		return
+	}
+	_, ok = fields[accountNameStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, accountNameStruct)
 		return
 	}
 	_, ok = fields[roleStruct]
@@ -125,19 +131,19 @@ func AddUser(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddUser, userNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddUser, fields[userNameStruct], err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, userNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddUser, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddUser, userNameStruct)
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddUser, fields[userNameStruct])
 }
 
 // @Tags user
@@ -165,8 +171,14 @@ func UpdateUserByID(c *gin.Context) {
 		return
 	}
 	_, userNameExists := fields[userNameStruct]
+	_, departmentNameExists := fields[departmentNameStruct]
+	_, employeeIDExists := fields[employeeIDStruct]
+	_, accountNameExists := fields[accountNameStruct]
+	_, emailExists := fields[emailStruct]
+	_, telephoneExists := fields[telephoneStruct]
+	_, roleExists := fields[roleStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !userNameExists && !delFlagExists {
+	if !userNameExists && !departmentNameExists && !employeeIDExists && !accountNameExists && !emailExists && !telephoneExists && !roleExists && !delFlagExists {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", userNameStruct, delFlagStruct))
 		return
 	}
@@ -175,7 +187,7 @@ func UpdateUserByID(c *gin.Context) {
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateUser, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateUser, err.Error())
 		return
 	}
 	// marshal service
