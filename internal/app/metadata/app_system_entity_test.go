@@ -14,7 +14,7 @@ import (
 
 const (
 	defaultAppSystemInfoID                   = 1
-	defaultAppSystemInfoAppSystemName        = "kkkk"
+	defaultAppSystemInfoAppSystemName        = "dfname"
 	defaultAppSystemInfoLevel                = 8
 	defaultAppSystemInfoOwnerID              = 8
 	defaultAppSystemInfoOwnerGroup           = "k"
@@ -32,14 +32,15 @@ func initNewAppSystemInfo() *AppSystemInfo {
 	return NewAppSystemInfoWithGlobal(
 		defaultAppSystemInfoID,
 		defaultAppSystemInfoAppSystemName,
-		defaultAppSystemInfoDelFlag, createTime,
-		lastUpdateTime,
 		defaultAppSystemInfoLevel,
 		defaultAppSystemInfoOwnerID,
-		defaultAppSystemInfoOwnerGroup)
+		defaultAppSystemInfoOwnerGroup,
+		defaultAppSystemInfoDelFlag, createTime,
+		lastUpdateTime,
+	)
 }
 
-func appSystemEqual(a, b *AppSystemInfo) bool {
+func appSystemStructEqual(a, b *AppSystemInfo) bool {
 	return a.ID == b.ID && a.AppSystemName == b.AppSystemName && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime && a.Level == b.Level && a.OwnerID == b.OwnerID && a.OwnerGroup == b.OwnerGroup
 }
 
@@ -120,7 +121,7 @@ func TestAppSystemInfo_MarshalJSON(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
 	err = json.Unmarshal(data, &appSystemInfoUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
-	asst.True(appSystemEqual(appSystemInfo, appSystemInfoUnmarshal), "test MarshalJSON() failed")
+	asst.True(appSystemStructEqual(appSystemInfo, appSystemInfoUnmarshal), "test MarshalJSON() failed")
 }
 
 func TestAppSystemInfo_MarshalJSONWithFields(t *testing.T) {

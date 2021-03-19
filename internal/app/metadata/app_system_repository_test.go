@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	onlineAppSystemName = "kkk"
-	newAppSystemName    = "qqq"
+	onlineAppSystemName = "1"
+	newAppSystemName    = "dfname"
 )
 
 var appSystemRepo = initAppSystemRepo()

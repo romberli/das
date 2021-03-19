@@ -17,6 +17,7 @@ const (
 	// idJSON        = "id"
 	// delFlagStruct = "DelFlag"
 	appSystemNameStruct = "AppSystemName"
+	levelStruct         = "Level"
 )
 
 // @Tags application system
@@ -26,6 +27,7 @@ const (
 // @Router /api/v1/metadata/app-system [get]
 func GetAppSystem(c *gin.Context) {
 	// init service
+	fmt.Println(ownerGroupStruct)
 	s := metadata.NewAppSystemServiceWithDefault()
 	// get entities
 	err := s.GetAll()
@@ -102,24 +104,30 @@ func AddAppSystem(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, appSystemNameStruct)
 		return
 	}
+
+	_, ok = fields[levelStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, levelStruct)
+		return
+	}
 	// init service
 	s := metadata.NewAppSystemServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddAppSystem, appSystemNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddAppSystem, fields[appSystemNameStruct], err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, appSystemNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddAppSystem, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddAppSystem, appSystemNameStruct)
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddAppSystem, fields[appSystemNameStruct])
 }
 
 // @Tags application system
@@ -147,17 +155,18 @@ func UpdateAppSystemByID(c *gin.Context) {
 		return
 	}
 	_, appSystemNameExists := fields[appSystemNameStruct]
+	_, levelExists := fields[levelStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !appSystemNameExists && !delFlagExists {
+	if !appSystemNameExists && !delFlagExists && !levelExists {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", appSystemNameStruct, delFlagStruct))
 		return
 	}
 	// init service
 	s := metadata.NewAppSystemServiceWithDefault()
-	// update entity
+	// update entitys
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateAppSystem, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateAppSystem, err.Error())
 		return
 	}
 	// marshal service

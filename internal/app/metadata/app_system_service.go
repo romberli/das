@@ -20,6 +20,7 @@ const (
 
 var _ dependency.Service = (*AppSystemService)(nil)
 
+// AppSystemService service struct
 type AppSystemService struct {
 	dependency.Repository
 	Entities []dependency.Entity
@@ -68,24 +69,21 @@ func (ass *AppSystemService) GetByID(id string) error {
 // Create creates entity and insert it into the middleware
 func (ass *AppSystemService) Create(fields map[string]interface{}) error {
 	// generate new map
-	appSystemName, ok := fields[appSystemNameStruct]
-
+	_, ok := fields[appSystemNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, appSystemNameStruct)
 	}
-	level, ok := fields[appSystemLevelStruct]
+	_, ok = fields[appSystemLevelStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, appSystemLevelStruct)
 	}
-	ownerID, ok := fields[appSystemOwnerIDStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, appSystemOwnerIDStruct)
+
+	// create a new entity
+	appSystemInfo, err := NewAppSystemInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
 	}
-	ownerGroup, ok := fields[appSystemOwnerGroupStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, appSystemOwnerGroupStruct)
-	}
-	appSystemInfo := NewAppSystemInfoWithDefault(appSystemName.(string), level.(int), ownerID.(int), ownerGroup.(string))
+
 	// insert into middleware
 	entity, err := ass.Repository.Create(appSystemInfo)
 	if err != nil {
@@ -113,7 +111,7 @@ func (ass *AppSystemService) Update(id string, fields map[string]interface{}) er
 	return ass.Repository.Update(ass.Entities[constant.ZeroInt])
 }
 
-// Delete delet entity that contains the given id in the middleware
+// Delete delete entity that contains the given id in the middleware
 func (ass *AppSystemService) Delete(id string) error {
 	return ass.Repository.Delete(id)
 }
@@ -123,7 +121,7 @@ func (ass *AppSystemService) Marshal() ([]byte, error) {
 	return json.Marshal(ass.Entities)
 }
 
-// Marshal marshals service.Entities with given fields
+// MarshalWithFields marshals service.Entities with given fields
 func (ass *AppSystemService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(ass.Entities))
 	for i := range interfaceList {

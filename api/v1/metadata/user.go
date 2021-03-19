@@ -13,13 +13,19 @@ import (
 )
 
 const (
-	userNameStruct = "UserName"
+	userNameStruct       = "UserName"
+	departmentNameStruct = "DepartmentName"
+	employeeIDStruct     = "EmployeeID"
+	accountNameStruct    = "AccountName"
+	emailStruct          = "Email"
+	telephoneStruct      = "Telephone"
+	roleStruct           = "Role"
 )
 
 // @Tags user
 // @Summary get all users
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","domain_account": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
 // @Router /api/v1/metadata/user [get]
 
 func GetUser(c *gin.Context) {
@@ -46,7 +52,7 @@ func GetUser(c *gin.Context) {
 // @Tags user
 // @Summary get user by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","domain_account": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
 // @Router /api/v1/metadata/user/:id [get]
 func GetUserByID(c *gin.Context) {
 	// get param
@@ -66,7 +72,7 @@ func GetUserByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -78,7 +84,7 @@ func GetUserByID(c *gin.Context) {
 // @Tags user
 // @Summary add a new user
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","domain_account": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
 // @Router /api/v1/metadata/user [post]
 func AddUser(c *gin.Context) {
 	var fields map[string]interface{}
@@ -100,30 +106,50 @@ func AddUser(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, userNameStruct)
 		return
 	}
+	_, ok = fields[departmentNameStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, departmentNameStruct)
+		return
+	}
+	_, ok = fields[employeeIDStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, employeeIDStruct)
+		return
+	}
+	_, ok = fields[accountNameStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, accountNameStruct)
+		return
+	}
+	_, ok = fields[roleStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, roleStruct)
+		return
+	}
 	// init service
 	s := metadata.NewUserServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddUser, userNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddUser, fields[userNameStruct], err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, userNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddUser, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddUser, userNameStruct)
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddUser, fields[userNameStruct])
 }
 
 // @Tags user
 // @Summary update user by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","domain_account": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
 // @Router /api/v1/metadata/user/:id [post]
 func UpdateUserByID(c *gin.Context) {
 	var fields map[string]interface{}
@@ -145,8 +171,14 @@ func UpdateUserByID(c *gin.Context) {
 		return
 	}
 	_, userNameExists := fields[userNameStruct]
+	_, departmentNameExists := fields[departmentNameStruct]
+	_, employeeIDExists := fields[employeeIDStruct]
+	_, accountNameExists := fields[accountNameStruct]
+	_, emailExists := fields[emailStruct]
+	_, telephoneExists := fields[telephoneStruct]
+	_, roleExists := fields[roleStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !userNameExists && !delFlagExists {
+	if !userNameExists && !departmentNameExists && !employeeIDExists && !accountNameExists && !emailExists && !telephoneExists && !roleExists && !delFlagExists {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", userNameStruct, delFlagStruct))
 		return
 	}
@@ -155,7 +187,7 @@ func UpdateUserByID(c *gin.Context) {
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateUser, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateUser, err.Error())
 		return
 	}
 	// marshal service

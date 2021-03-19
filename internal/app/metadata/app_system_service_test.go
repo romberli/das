@@ -45,10 +45,10 @@ func TestAppSystemService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewAppSystemService(appSystemRepo)
-	err := s.GetByID("1")
+	err := s.GetByID("66")
 	asst.Nil(err, "test GetByID() failed")
 	id := s.Entities[constant.ZeroInt].Identity()
-	asst.Equal("1", id, "test GetByID() failed")
+	asst.Equal("66", id, "test GetByID() failed")
 }
 
 func TestAppSystemService_Create(t *testing.T) {
@@ -109,7 +109,7 @@ func TestAppSystemService_Marshal(t *testing.T) {
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(appSystemEqual(entity.(*AppSystemInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(appSystemStructEqual(entity.(*AppSystemInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 
