@@ -13,7 +13,7 @@ import (
 
 const (
 	newMiddlewareClusterName    = "ttt"
-	onlineMiddlewareClusterName = "ccc"
+	onlineMiddlewareClusterName = "test"
 )
 
 var middlewareClusterRepo = initMiddlewareClusterRepo()
@@ -110,7 +110,7 @@ func TestMiddlewareClusterRepo_GetAll(t *testing.T) {
 func TestMiddlewareClusterRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := middlewareClusterRepo.GetByID("1")
+	entity, err := middlewareClusterRepo.GetByID("3")
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	middlewareClusterName, err := entity.Get(middlewareClusterNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))

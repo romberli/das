@@ -61,6 +61,17 @@ func NewMiddlewareClusterInfoWithDefault(middlewareClusterName string, envID int
 	}
 }
 
+// NewMiddlewareClusterInfoWithMapAndRandom returns a new *MiddlewareClusterInfoInfo with given map
+func NewMiddlewareClusterInfoWithMapAndRandom(fields map[string]interface{}) (*MiddlewareClusterInfo, error) {
+	mci := &MiddlewareClusterInfo{}
+	err := common.SetValuesWithMapAndRandom(mci, fields)
+	if err != nil {
+		return nil, err
+	}
+
+	return mci, nil
+}
+
 // Identity returns ID of entity
 func (mci *MiddlewareClusterInfo) Identity() string {
 	return strconv.Itoa(mci.ID)

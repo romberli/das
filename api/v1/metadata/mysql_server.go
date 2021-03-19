@@ -14,6 +14,7 @@ import (
 
 const (
 	clusterIDStruct      = "ClusterID"
+	serverNameStruct     = "ServerName"
 	hostIPStruct         = "HostIP"
 	portNumStruct        = "PortNum"
 	deploymentTypeStruct = "DeploymentType"
@@ -27,11 +28,11 @@ const (
 // @Router /api/v1/metadata/mysql-server [get]
 func GetMySQLServer(c *gin.Context) {
 	// init service
-	s := metadata.NewMYSQLServerServiceWithDefault()
+	s := metadata.NewMySQLServerServiceWithDefault()
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMYSQLServerAll, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetMySQLServerAll, err.Error())
 		return
 	}
 	// marshal service
@@ -42,8 +43,8 @@ func GetMySQLServer(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMYSQLServerAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMYSQLServerAll)
+	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLServerAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerAll)
 }
 
 // @Tags mysql server
@@ -59,23 +60,23 @@ func GetMySQLServerByID(c *gin.Context) {
 		return
 	}
 	// init service
-	s := metadata.NewMYSQLServerServiceWithDefault()
+	s := metadata.NewMySQLServerServiceWithDefault()
 	// get entity
 	err := s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMYSQLServerByID, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetMySQLServerByID, id, err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMYSQLServerByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMYSQLServerByID, id)
+	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLServerByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerByID, id)
 }
 
 // @Tags mysql server
@@ -93,9 +94,17 @@ func AddMySQLServer(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MYSQLServerInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MySQLServerInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
+		return
+	}
+	if _, ok := fields[clusterIDStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, clusterIDStruct)
+		return
+	}
+	if _, ok := fields[serverNameStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, serverNameStruct)
 		return
 	}
 	if _, ok := fields[hostIPStruct]; !ok {
@@ -106,24 +115,33 @@ func AddMySQLServer(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, portNumStruct)
 		return
 	}
+	if _, ok := fields[deploymentTypeStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, deploymentTypeStruct)
+		return
+	}
+	if _, ok := fields[versionStruct]; !ok {
+		fields[versionStruct] = constant.DefaultRandomString
+	}
 	// init service
-	s := metadata.NewMYSQLServerServiceWithDefault()
+	s := metadata.NewMySQLServerServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMYSQLServer, hostIPStruct, portNumStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMySQLServer,
+			clusterIDStruct, serverNameStruct, hostIPStruct, portNumStruct,
+			deploymentTypeStruct, versionStruct, err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, hostIPStruct, portNumStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddMYSQLServer, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMYSQLServer, hostIPStruct, portNumStruct)
+	log.Debug(message.NewMessage(message.DebugMetadataAddMySQLServer, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMySQLServer, hostIPStruct, portNumStruct)
 }
 
 // @Tags mysql server
@@ -145,34 +163,53 @@ func UpdateMySQLServerByID(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MYSQLServerInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MySQLServerInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
+	_, clusterIDExists := fields[clusterIDStruct]
+	_, serverNameExists := fields[serverNameStruct]
 	_, hostIPExists := fields[hostIPStruct]
 	_, portNumExists := fields[portNumStruct]
+	_, deploymentTypeExists := fields[deploymentTypeStruct]
+	_, versionExists := fields[versionStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !hostIPExists && !portNumExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s:%s and %s", hostIPStruct, portNumStruct, delFlagStruct))
+	if !clusterIDExists &&
+		!serverNameExists &&
+		!hostIPExists &&
+		!portNumExists &&
+		!deploymentTypeExists &&
+		!versionExists &&
+		!delFlagExists {
+		resp.ResponseNOK(
+			c, message.ErrFieldNotExists,
+			fmt.Sprintf("%s, %s, %s, %s, %s, %s and %s",
+				fields[clusterIDStruct],
+				fields[serverNameStruct],
+				fields[hostIPStruct],
+				fields[portNumStruct],
+				fields[deploymentTypeStruct],
+				fields[versionStruct],
+				fields[delFlagStruct]))
 		return
 	}
 	// init service
-	s := metadata.NewMYSQLServerServiceWithDefault()
+	s := metadata.NewMySQLServerServiceWithDefault()
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMYSQLServer, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateMySQLServer, id, err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateMYSQLServer, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMYSQLServer, id)
+	log.Debug(message.NewMessage(message.DebugMetadataUpdateMySQLServer, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMySQLServer, id)
 }

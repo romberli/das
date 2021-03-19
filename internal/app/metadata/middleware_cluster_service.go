@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"encoding/json"
-
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
@@ -65,15 +64,19 @@ func (mcs *MiddlewareClusterService) GetByID(id string) error {
 // Create creates a new middleware cluster entity and insert it into the middleware
 func (mcs *MiddlewareClusterService) Create(fields map[string]interface{}) error {
 	// generate new map
-	middlewareClusterName, ok := fields[middlewareClusterNameStruct]
+	_, ok := fields[middlewareClusterNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, middlewareClusterNameStruct)
 	}
-	middlewareEnvID, ok := fields[middlewareClusterEnvIDStruct]
+	_, ok = fields[middlewareClusterEnvIDStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, middlewareClusterEnvIDStruct)
 	}
-	middlewareClusterInfo := NewMiddlewareClusterInfoWithDefault(middlewareClusterName.(string), middlewareEnvID.(int))
+	// create a new entity
+	middlewareClusterInfo, err := NewMiddlewareClusterInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
 	// insert into middleware
 	entity, err := mcs.Repository.Create(middlewareClusterInfo)
 	if err != nil {

@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	newMiddlewareServerName    = "test"
-	onlineMiddlewareServerName = "ccc"
+	newMiddlewareServerName    = "newTest"
+	onlineMiddlewareServerName = "test"
 )
 
 var middlewareServerRepo = initMiddlewareServerRepo()
@@ -72,7 +72,7 @@ func TestMiddlewareServerRepo_Execute(t *testing.T) {
 func TestMiddlewareServerRepo_Transaction(t *testing.T) {
 	asst := assert.New(t)
 
-	sql := `insert into t_meta_middleware_server_info(cluster_id_middleware, server_name, middleware_role, host_ip, port_num) values(?, ?, ?, ?, ?);`
+	sql := `insert into t_meta_middleware_server_info(cluster_id, server_name, middleware_role, host_ip, port_num) values(?, ?, ?, ?, ?);`
 	tx, err := middlewareServerRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
@@ -116,7 +116,7 @@ func TestMiddlewareServerRepo_GetAll(t *testing.T) {
 func TestMiddlewareServerRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := middlewareServerRepo.GetByID("1")
+	entity, err := middlewareServerRepo.GetByID("2")
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	middlewareServerName, err := entity.Get(middlewareServerNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))

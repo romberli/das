@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	middlewareClusterNameStruct = "ClusterName"
+	middlewareClusterNameStruct  = "ClusterName"
+	middlewareClusterEnvIDStruct = "EnvID"
 )
 
 // @Tags middleware cluster
@@ -64,7 +65,7 @@ func GetMiddlewareClusterByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
@@ -98,24 +99,29 @@ func AddMiddlewareCluster(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterNameStruct)
 		return
 	}
+	_, ok = fields[middlewareClusterEnvIDStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterEnvIDStruct)
+		return
+	}
 	// init service
 	s := metadata.NewMiddlewareClusterServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMiddlewareCluster, middlewareClusterNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMiddlewareCluster, fields[middlewareClusterNameStruct], err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, middlewareClusterNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataAddMiddlewareCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMiddlewareCluster, middlewareClusterNameStruct)
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMiddlewareCluster, fields[middlewareClusterNameStruct])
 }
 
 // @Tags middleware cluster
@@ -143,8 +149,9 @@ func UpdateMiddlewareClusterByID(c *gin.Context) {
 		return
 	}
 	_, middlewareClusterNameExists := fields[middlewareClusterNameStruct]
+	_, middlewareClusterEnvIDExists := fields[middlewareClusterEnvIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !middlewareClusterNameExists && !delFlagExists {
+	if !middlewareClusterNameExists && !middlewareClusterEnvIDExists && !delFlagExists {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", middlewareClusterNameStruct, delFlagStruct))
 		return
 	}
@@ -153,7 +160,7 @@ func UpdateMiddlewareClusterByID(c *gin.Context) {
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMiddlewareCluster, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateMiddlewareCluster, err.Error())
 		return
 	}
 	// marshal service

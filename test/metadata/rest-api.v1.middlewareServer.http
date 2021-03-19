@@ -1,0 +1,21 @@
+### get all middleware server
+GET http://{{baseURL}}/api/v1/metadata/middleware-server
+Accept: application/json
+
+### get middleware server by id
+GET http://{{baseURL}}/api/v1/metadata/middleware-server/2
+Accept: application/json
+
+### add new middleware server
+POST http://{{baseURL}}/api/v1/metadata/middleware-server
+Content-Type: application/json
+
+{"cluster_id": 3, "server_name": "connection_test", "middleware_role": 1, "host_ip": "123.123.123.1", "port_num": 12}
+
+### update middleware-cluster by id
+POST http://{{baseURL}}/api/v1/metadata/middleware-server/28
+Content-Type: application/json
+
+{"server_name": "ccc", "del_flag": 1}
+
+###

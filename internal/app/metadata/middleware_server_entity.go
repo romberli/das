@@ -73,6 +73,17 @@ func NewMiddlewareServerInfoWithDefault(clusterID int, serverName string, middle
 	}
 }
 
+// NewMiddlewareServerInfoWithMapAndRandom returns a new *MiddlewareServerInfo with given map
+func NewMiddlewareServerInfoWithMapAndRandom(fields map[string]interface{}) (*MiddlewareServerInfo, error) {
+	msi := &MiddlewareServerInfo{}
+	err := common.SetValuesWithMapAndRandom(msi, fields)
+	if err != nil {
+		return nil, err
+	}
+
+	return msi, nil
+}
+
 // Identity returns ID of entity
 func (msi *MiddlewareServerInfo) Identity() string {
 	return strconv.Itoa(msi.ID)

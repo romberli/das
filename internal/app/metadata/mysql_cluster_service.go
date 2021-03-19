@@ -20,104 +20,122 @@ const (
 	envIDStruct               = "EnvID"
 )
 
-var _ dependency.Service = (*MYSQLClusterService)(nil)
+var _ dependency.Service = (*MySQLClusterService)(nil)
 
-// MYSQLClusterService implements Service interface
-type MYSQLClusterService struct {
+// MySQLClusterService implements Service interface
+type MySQLClusterService struct {
 	dependency.Repository
 	Entities []dependency.Entity
 }
 
-// NewMYSQLClusterService returns a new *MYSQLClusterService
-func NewMYSQLClusterService(repo dependency.Repository) *MYSQLClusterService {
-	return &MYSQLClusterService{repo, []dependency.Entity{}}
+// NewMySQLClusterService returns a new *MySQLClusterService
+func NewMySQLClusterService(repo dependency.Repository) *MySQLClusterService {
+	return &MySQLClusterService{repo, []dependency.Entity{}}
 }
 
-// NewMYSQLClusterServiceWithDefault returns a new *MYSQLClusterService with default repository
-func NewMYSQLClusterServiceWithDefault() *MYSQLClusterService {
-	return NewMYSQLClusterService(NewMYSQLClusterRepoWithGlobal())
+// NewMySQLClusterServiceWithDefault returns a new *MySQLClusterService with default repository
+func NewMySQLClusterServiceWithDefault() *MySQLClusterService {
+	return NewMySQLClusterService(NewMySQLClusterRepoWithGlobal())
 }
 
 // GetEntities returns entities of the service
-func (es *MYSQLClusterService) GetEntities() []dependency.Entity {
-	entityList := make([]dependency.Entity, len(es.Entities))
+func (mcs *MySQLClusterService) GetEntities() []dependency.Entity {
+	entityList := make([]dependency.Entity, len(mcs.Entities))
 	for i := range entityList {
-		entityList[i] = es.Entities[i]
+		entityList[i] = mcs.Entities[i]
 	}
 
 	return entityList
 }
 
-// GetAll gets all environment entities from the middleware
-func (es *MYSQLClusterService) GetAll() error {
+// GetAll gets all mysql cluster entities from the middleware
+func (mcs *MySQLClusterService) GetAll() error {
 	var err error
-	es.Entities, err = es.Repository.GetAll()
+	mcs.Entities, err = mcs.Repository.GetAll()
 
 	return err
 }
 
-// GetByID gets an environment entity that contains the given id from the middleware
-func (es *MYSQLClusterService) GetByID(id string) error {
-	entity, err := es.Repository.GetByID(id)
+// GetByID gets an mysql cluster entity that contains the given id from the middleware
+func (mcs *MySQLClusterService) GetByID(id string) error {
+	entity, err := mcs.Repository.GetByID(id)
 	if err != nil {
 		return err
 	}
 
-	es.Entities = append(es.Entities, entity)
+	mcs.Entities = append(mcs.Entities, entity)
 
 	return err
 }
 
-// Create creates a new environment entity and insert it into the middleware
-func (es *MYSQLClusterService) Create(fields map[string]interface{}) error {
+// Create creates a new mysql cluster entity and insert it into the middleware
+func (mcs *MySQLClusterService) Create(fields map[string]interface{}) error {
 	// generate new map
-	clusterName, ok := fields[clusterNameStruct]
-	if !ok {
+	if _, ok := fields[clusterNameStruct]; !ok {
 		return message.NewMessage(message.ErrFieldNotExists, clusterNameStruct)
 	}
-	mysqlClusterInfo := NewMYSQLClusterInfoWithDefault(clusterName.(string))
+	if _, ok := fields[middlewareClusterIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, middlewareClusterIDStruct)
+	}
+	if _, ok := fields[monitorSystemIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, monitorSystemIDStruct)
+	}
+	if _, ok := fields[ownerIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, ownerIDStruct)
+	}
+	if _, ok := fields[ownerGroupStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, ownerGroupStruct)
+	}
+	if _, ok := fields[envIDStruct]; !ok {
+		return message.NewMessage(message.ErrFieldNotExists, envIDStruct)
+	}
+	// create a new entity
+	mysqlClusterInfo, err := NewMySQLClusterInfoWithMapAndRandom(fields)
+	if err != nil {
+		return err
+	}
 	// insert into middleware
-	entity, err := es.Repository.Create(mysqlClusterInfo)
+	entity, err := mcs.Repository.Create(mysqlClusterInfo)
 	if err != nil {
 		return err
 	}
 
-	es.Entities = append(es.Entities, entity)
+	mcs.Entities = append(mcs.Entities, entity)
 	return nil
 }
 
-// Update gets an environment entity that contains the given id from the middleware,
+// Update gets an mysql cluster entity that contains the given id from the middleware,
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (es *MYSQLClusterService) Update(id string, fields map[string]interface{}) error {
-	err := es.GetByID(id)
+func (mcs *MySQLClusterService) Update(id string, fields map[string]interface{}) error {
+	err := mcs.GetByID(id)
 	if err != nil {
 		return err
 	}
-	err = es.Entities[constant.ZeroInt].Set(fields)
+	err = mcs.Entities[constant.ZeroInt].Set(fields)
 	if err != nil {
 		return err
 	}
 
-	return es.Repository.Update(es.Entities[constant.ZeroInt])
+	return mcs.Repository.Update(mcs.Entities[constant.ZeroInt])
 }
 
-// Delete deletes the environment entity that contains the given id in the middleware
-func (es *MYSQLClusterService) Delete(id string) error {
-	return es.Repository.Delete(id)
+// Delete deletes the mysql cluster entity that contains the given id in the middleware
+func (mcs *MySQLClusterService) Delete(id string) error {
+	return mcs.Repository.Delete(id)
 }
 
 // Marshal marshals service.Entities
-func (es *MYSQLClusterService) Marshal() ([]byte, error) {
-	return json.Marshal(es.Entities)
+func (mcs *MySQLClusterService) Marshal() ([]byte, error) {
+	return json.Marshal(mcs.Entities)
 }
 
 // MarshalWithFields marshals service.Entities with given fields
-func (es *MYSQLClusterService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(es.Entities))
+func (mcs *MySQLClusterService) MarshalWithFields(fields ...string) ([]byte, error) {
+	interfaceList := make([]interface{}, len(mcs.Entities))
 	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(es.Entities[i], fields...)
+		entity, err := common.CopyStructWithFields(mcs.Entities[i], fields...)
 		if err != nil {
 			return nil, err
 		}

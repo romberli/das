@@ -28,11 +28,11 @@ const (
 // @Router /api/v1/metadata/mysql-cluster [get]
 func GetMySQLCluster(c *gin.Context) {
 	// init service
-	s := metadata.NewMYSQLClusterServiceWithDefault()
+	s := metadata.NewMySQLClusterServiceWithDefault()
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMYSQLClusterAll, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetMySQLClusterAll, err.Error())
 		return
 	}
 	// marshal service
@@ -45,9 +45,9 @@ func GetMySQLCluster(c *gin.Context) {
 	// response
 
 	jsonStr := string(jsonBytes)
-	fmt.Println(message.DebugMetadataGetMYSQLClusterAll, jsonStr)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMYSQLClusterAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMYSQLClusterAll)
+	fmt.Println(message.DebugMetadataGetMySQLClusterAll, jsonStr)
+	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLClusterAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLClusterAll)
 }
 
 // @Tags mysql cluster
@@ -63,23 +63,23 @@ func GetMySQLClusterByID(c *gin.Context) {
 		return
 	}
 	// init service
-	s := metadata.NewMYSQLClusterServiceWithDefault()
+	s := metadata.NewMySQLClusterServiceWithDefault()
 	// get entity
 	err := s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMYSQLClusterByID, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataGetMySQLClusterByID, id, err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMYSQLClusterByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMYSQLClusterByID, id)
+	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLClusterByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLClusterByID, id)
 }
 
 // @Tags mysql cluster
@@ -97,34 +97,50 @@ func AddMySQLCluster(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MYSQLClusterInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MySQLClusterInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, ok := fields[clusterNameStruct]
-	if !ok {
+	if _, ok := fields[clusterNameStruct]; !ok {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, clusterNameStruct)
 		return
 	}
+	if _, ok := fields[middlewareClusterIDStruct]; !ok {
+		fields[middlewareClusterIDStruct] = constant.DefaultRandomInt
+	}
+	if _, ok := fields[monitorSystemIDStruct]; !ok {
+		fields[monitorSystemIDStruct] = constant.DefaultRandomInt
+	}
+	if _, ok := fields[ownerIDStruct]; !ok {
+		fields[ownerIDStruct] = constant.DefaultRandomInt
+	}
+	if _, ok := fields[ownerGroupStruct]; !ok {
+		fields[ownerGroupStruct] = constant.DefaultRandomString
+	}
+	if _, ok := fields[envIDStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, envIDStruct)
+		return
+	}
+
 	// init service
-	s := metadata.NewMYSQLClusterServiceWithDefault()
+	s := metadata.NewMySQLClusterServiceWithDefault()
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMYSQLCluster, clusterNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataAddMySQLCluster, clusterNameStruct, err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, clusterNameStruct, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddMYSQLCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMYSQLCluster, clusterNameStruct)
+	log.Debug(message.NewMessage(message.DebugMetadataAddMySQLCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMySQLCluster, clusterNameStruct)
 }
 
 // @Tags mysql cluster
@@ -146,33 +162,53 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 		return
 	}
 	// unmarshal data
-	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MYSQLClusterInfo{}, constant.DefaultMiddlewareTag)
+	fields, err = common.UnmarshalToMapWithStructTag(data, &metadata.MySQLClusterInfo{}, constant.DefaultMiddlewareTag)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
 	_, clusterNameExists := fields[clusterNameStruct]
+	_, middlewareClusterIDExists := fields[middlewareClusterIDStruct]
+	_, monitorSystemIDExists := fields[monitorSystemIDStruct]
+	_, ownerIDExists := fields[ownerIDStruct]
+	_, ownerGroupExists := fields[ownerGroupStruct]
+	_, envIDExists := fields[envIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !clusterNameExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", clusterNameStruct, delFlagStruct))
+	if !clusterNameExists &&
+		!middlewareClusterIDExists &&
+		!monitorSystemIDExists &&
+		!ownerGroupExists &&
+		!ownerIDExists &&
+		!envIDExists &&
+		!delFlagExists {
+		resp.ResponseNOK(
+			c, message.ErrFieldNotExists,
+			fmt.Sprintf("%s, %s, %s, %s, %s, %s and %s",
+				clusterNameStruct,
+				middlewareClusterIDStruct,
+				monitorSystemIDStruct,
+				ownerIDStruct,
+				ownerGroupStruct,
+				envIDStruct,
+				delFlagStruct))
 		return
 	}
 	// init service
-	s := metadata.NewMYSQLClusterServiceWithDefault()
+	s := metadata.NewMySQLClusterServiceWithDefault()
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMYSQLCluster, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMetadataUpdateMySQLCluster, id, err.Error())
 		return
 	}
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateMYSQLCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMYSQLCluster, id)
+	log.Debug(message.NewMessage(message.DebugMetadataUpdateMySQLCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMySQLCluster, id)
 }
