@@ -72,59 +72,59 @@ func NewAppInfoWithDefault(appName string, level int) *AppInfo {
 
 // NewAppInfoWithMapAndRandom returns a new *AppInfoInfo with given map
 func NewAppInfoWithMapAndRandom(fields map[string]interface{}) (*AppInfo, error) {
-	asi := &AppInfo{}
-	err := common.SetValuesWithMapAndRandom(asi, fields)
+	ai := &AppInfo{}
+	err := common.SetValuesWithMapAndRandom(ai, fields)
 	if err != nil {
 		return nil, err
 	}
 
-	return asi, nil
+	return ai, nil
 }
 
 // Identity returns the identity
-func (asi *AppInfo) Identity() int {
-	return asi.ID
+func (ai *AppInfo) Identity() int {
+	return ai.ID
 }
 
 // GetSystemName returns the app name
-func (asi *AppInfo) GetAppName() string {
-	return asi.AppName
+func (ai *AppInfo) GetAppName() string {
+	return ai.AppName
 }
 
 // GetLevel returns the level
-func (asi *AppInfo) GetLevel() int {
-	return asi.Level
+func (ai *AppInfo) GetLevel() int {
+	return ai.Level
 }
 
 // GetOwnerID returns the owner id
-func (asi *AppInfo) GetOwnerID() int {
-	return asi.OwnerID
+func (ai *AppInfo) GetOwnerID() int {
+	return ai.OwnerID
 }
 
 // GetDelFlag returns the delete flag
-func (asi *AppInfo) GetDelFlag() int {
-	return asi.DelFlag
+func (ai *AppInfo) GetDelFlag() int {
+	return ai.DelFlag
 }
 
 // GetCreateTime returns the create time
-func (asi *AppInfo) GetCreateTime() time.Time {
-	return asi.CreateTime
+func (ai *AppInfo) GetCreateTime() time.Time {
+	return ai.CreateTime
 }
 
 // GetLastUpdateTime returns the last update time
-func (asi *AppInfo) GetLastUpdateTime() time.Time {
-	return asi.LastUpdateTime
+func (ai *AppInfo) GetLastUpdateTime() time.Time {
+	return ai.LastUpdateTime
 }
 
 // GetDBIDList gets database identity list that the app uses
-func (asi *AppInfo) GetDBIDList() ([]int, error) {
-	return asi.AppRepo.GetDBIDList(asi.Identity())
+func (ai *AppInfo) GetDBIDList() ([]int, error) {
+	return ai.AppRepo.GetDBIDList(ai.Identity())
 }
 
 // Set sets App with given fields, key is the field name and value is the relevant value of the key
-func (asi *AppInfo) Set(fields map[string]interface{}) error {
+func (ai *AppInfo) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {
-		err := common.SetValueOfStruct(asi, fieldName, fieldValue)
+		err := common.SetValueOfStruct(ai, fieldName, fieldValue)
 		if err != nil {
 			return err
 		}
@@ -134,26 +134,26 @@ func (asi *AppInfo) Set(fields map[string]interface{}) error {
 }
 
 // Delete sets DelFlag to 1
-func (asi *AppInfo) Delete() {
-	asi.DelFlag = 1
+func (ai *AppInfo) Delete() {
+	ai.DelFlag = 1
 }
 
 // AddDB adds a new map of the app and database in the middleware
-func (asi *AppInfo) AddDB(dbID int) error {
-	return asi.AppRepo.AddDB(asi.Identity(), dbID)
+func (ai *AppInfo) AddDB(dbID int) error {
+	return ai.AppRepo.AddDB(ai.Identity(), dbID)
 }
 
 // DeleteDB deletes the map of the app and database in the middleware
-func (asi *AppInfo) DeleteDB(dbID int) error {
-	return asi.AppRepo.DeleteDB(asi.Identity(), dbID)
+func (ai *AppInfo) DeleteDB(dbID int) error {
+	return ai.AppRepo.DeleteDB(ai.Identity(), dbID)
 }
 
 // MarshalJSON marshals App to json bytes
-func (asi *AppInfo) MarshalJSON() ([]byte, error) {
-	return common.MarshalStructWithTag(asi, constant.DefaultMarshalTag)
+func (ai *AppInfo) MarshalJSON() ([]byte, error) {
+	return common.MarshalStructWithTag(ai, constant.DefaultMarshalTag)
 }
 
 // MarshalJSONWithFields marshals only specified fields of the App to json string
-func (asi *AppInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
-	return common.MarshalStructWithFields(asi, fields...)
+func (ai *AppInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
+	return common.MarshalStructWithFields(ai, fields...)
 }

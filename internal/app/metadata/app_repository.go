@@ -30,8 +30,8 @@ func NewAppRepoWithGlobal() *AppRepo {
 }
 
 // Execute executes command with arguments on the middleware
-func (asr *AppRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
-	conn, err := asr.Database.Get()
+func (ar *AppRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
+	conn, err := ar.Database.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -46,12 +46,12 @@ func (asr *AppRepo) Execute(command string, args ...interface{}) (middleware.Res
 }
 
 // Transaction returns a middleware.Transaction that could execute multiple commands as a transaction
-func (asr *AppRepo) Transaction() (middleware.Transaction, error) {
-	return asr.Database.Transaction()
+func (ar *AppRepo) Transaction() (middleware.Transaction, error) {
+	return ar.Database.Transaction()
 }
 
 // GetAll gets all apps from the middleware
-func (asr *AppRepo) GetAll() ([]metadata.App, error) {
+func (ar *AppRepo) GetAll() ([]metadata.App, error) {
 	sql := `
 		select id, app_name, level,owner_id, del_flag, create_time, last_update_time
 		from t_meta_app_info
@@ -60,7 +60,7 @@ func (asr *AppRepo) GetAll() ([]metadata.App, error) {
 	`
 	log.Debugf("metadata AppRepo.GetAll() sql: \n%s", sql)
 
-	result, err := asr.Execute(sql)
+	result, err := ar.Execute(sql)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (asr *AppRepo) GetAll() ([]metadata.App, error) {
 }
 
 // GetByID gets an app by the identity from the middleware
-func (asr *AppRepo) GetByID(id int) (metadata.App, error) {
+func (ar *AppRepo) GetByID(id int) (metadata.App, error) {
 	sql := `
 		select id, app_name, level,owner_id, del_flag, create_time, last_update_time
 		from t_meta_app_info
@@ -93,7 +93,7 @@ func (asr *AppRepo) GetByID(id int) (metadata.App, error) {
 	`
 	log.Debugf("metadata AppRepo.GetByID() sql: \n%s\nplaceholders: %s", sql, id)
 
-	result, err := asr.Execute(sql, id)
+	result, err := ar.Execute(sql, id)
 	if err != nil {
 		return nil, err
 	}
@@ -115,10 +115,10 @@ func (asr *AppRepo) GetByID(id int) (metadata.App, error) {
 }
 
 // GetID gets the identity with given app name from the middleware
-func (asr *AppRepo) GetID(systemName string) (int, error) {
+func (ar *AppRepo) GetID(systemName string) (int, error) {
 	sql := `select id from t_meta_app_info where del_flag = 0 and app_name = ?;`
 	log.Debugf("metadata AppRepo.GetID() select sql: %s", sql)
-	result, err := asr.Execute(sql, systemName)
+	result, err := ar.Execute(sql, systemName)
 	if err != nil {
 		return constant.ZeroInt, err
 	}
@@ -127,10 +127,10 @@ func (asr *AppRepo) GetID(systemName string) (int, error) {
 }
 
 // GetAppSystemByName gets the app by name from the middleware
-func (asr *AppRepo) GetAppByName(appName string) (metadata.App, error) {
+func (ar *AppRepo) GetAppByName(appName string) (metadata.App, error) {
 	sql := `select id from t_meta_app_info where del_flag = 0 and app_name = ?;`
 	log.Debugf("metadata AppRepo.GetAppByName() select sql: %s", sql)
-	result, err := asr.Execute(sql, appName)
+	result, err := ar.Execute(sql, appName)
 	if err != nil {
 		return nil, err
 	}
@@ -140,11 +140,11 @@ func (asr *AppRepo) GetAppByName(appName string) (metadata.App, error) {
 		return nil, err
 	}
 
-	return asr.GetByID(id)
+	return ar.GetByID(id)
 }
 
 // GetDBIDList gets a database identity list that app uses
-func (asr *AppRepo) GetDBIDList(id int) ([]int, error) {
+func (ar *AppRepo) GetDBIDList(id int) ([]int, error) {
 	sql := `
 		select db_id
 		from t_meta_app_info ai
@@ -154,7 +154,7 @@ func (asr *AppRepo) GetDBIDList(id int) ([]int, error) {
 		  and ai.id = ?;
 	`
 	log.Debugf("metadata AppRepo.GetDBIDList() select sql: %s", sql)
-	result, err := asr.Execute(sql, id)
+	result, err := ar.Execute(sql, id)
 	if err != nil {
 		return nil, err
 	}
@@ -176,35 +176,35 @@ func (asr *AppRepo) GetDBIDList(id int) ([]int, error) {
 }
 
 // Create creates an app in the middleware
-func (asr *AppRepo) Create(app metadata.App) (metadata.App, error) {
+func (ar *AppRepo) Create(app metadata.App) (metadata.App, error) {
 	sql := `insert into t_meta_app_info(app_name, level, owner_id) values(?, ?, ?);`
 	log.Debugf("metadata AppRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := asr.Execute(sql, app.GetAppName(), app.GetLevel(), app.GetOwnerID())
+	_, err := ar.Execute(sql, app.GetAppName(), app.GetLevel(), app.GetOwnerID())
 	if err != nil {
 		return nil, err
 	}
 	// get id
-	id, err := asr.GetID(app.GetAppName())
+	id, err := ar.GetID(app.GetAppName())
 	if err != nil {
 		return nil, err
 	}
 	// get entity
-	return asr.GetByID(id)
+	return ar.GetByID(id)
 }
 
 // Update updates the app in the middleware
-func (asr *AppRepo) Update(app metadata.App) error {
+func (ar *AppRepo) Update(app metadata.App) error {
 	sql := `update t_meta_app_info set app_name = ?, level = ?, owner_id = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata AppRepo.Update() update sql: %s", sql)
-	_, err := asr.Execute(sql, app.GetAppName(), app.GetLevel(), app.GetOwnerID(), app.GetDelFlag(), app.Identity())
+	_, err := ar.Execute(sql, app.GetAppName(), app.GetLevel(), app.GetOwnerID(), app.GetDelFlag(), app.Identity())
 
 	return err
 }
 
 // Delete deletes the app in the middleware
-func (asr *AppRepo) Delete(id int) error {
-	tx, err := asr.Transaction()
+func (ar *AppRepo) Delete(id int) error {
+	tx, err := ar.Transaction()
 	if err != nil {
 		return err
 	}
@@ -236,19 +236,19 @@ func (asr *AppRepo) Delete(id int) error {
 }
 
 // AddDB adds a new map of app and database in the middleware
-func (asr *AppRepo) AddDB(appID, dbID int) error {
+func (ar *AppRepo) AddDB(appID, dbID int) error {
 	sql := `insert into t_meta_app_db_map(app_id, db_id) values(?, ?);`
 	log.Debugf("metadata AppRepo.AddDB() insert sql: %s", sql)
-	_, err := asr.Execute(sql, appID, dbID)
+	_, err := ar.Execute(sql, appID, dbID)
 
 	return err
 }
 
 // DeleteDB delete the map of app and database in the middleware
-func (asr *AppRepo) DeleteDB(appID, dbID int) error {
+func (ar *AppRepo) DeleteDB(appID, dbID int) error {
 	sql := `delete from t_meta_app_db_map where app_id = ? and db_id = ?;`
 	log.Debugf("metadata AppRepo.DeleteDB() delete sql: %s", sql)
-	_, err := asr.Execute(sql, appID, dbID)
+	_, err := ar.Execute(sql, appID, dbID)
 
 	return err
 }
