@@ -31,11 +31,11 @@ func initNewDBInfo() *DBInfo {
 
 	createTime, _ := now.Parse(defaultDBInfoCreateTimeString)
 	lastUpdateTime, _ := now.Parse(defaultDBInfoLastUpdateTimeString)
-	return NewDBInfoWithGlobal(defaultDBInfoID, defaultDBInfoDBName, defaultDBInfoClusterID, defaultDBInfoClusterType, defaultDBInfoOwnerID, defaultDBInfoOwnerGroup, defaultDBInfoEnvID, defaultDBInfoDelFlag, createTime, lastUpdateTime)
+	return NewDBInfoWithGlobal(defaultDBInfoID, defaultDBInfoDBName, defaultDBInfoClusterID, defaultDBInfoClusterType, defaultDBInfoOwnerID, defaultDBInfoEnvID, defaultDBInfoDelFlag, createTime, lastUpdateTime)
 }
 
 func dbEqual(a, b *DBInfo) bool {
-	return a.ID == b.ID && a.DBName == b.DBName && a.ClusterID == b.ClusterID && a.ClusterType == b.ClusterType && a.OwnerID == b.OwnerID && a.OwnerGroup == b.OwnerGroup && a.EnvID == b.EnvID && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
+	return a.ID == b.ID && a.DBName == b.DBName && a.ClusterID == b.ClusterID && a.ClusterType == b.ClusterType && a.OwnerID == b.OwnerID && a.EnvID == b.EnvID && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
 }
 
 func TestDBEntityAll(t *testing.T) {
@@ -43,7 +43,6 @@ func TestDBEntityAll(t *testing.T) {
 	TestDBInfo_IsDeleted(t)
 	TestDBInfo_GetCreateTime(t)
 	TestDBInfo_GetLastUpdateTime(t)
-	TestDBInfo_Get(t)
 	TestDBInfo_Set(t)
 	TestDBInfo_Delete(t)
 	TestDBInfo_MarshalJSON(t)
@@ -61,7 +60,7 @@ func TestDBInfo_IsDeleted(t *testing.T) {
 	asst := assert.New(t)
 
 	dbInfo := initNewDBInfo()
-	asst.False(dbInfo.IsDeleted(), "test IsDeleted() failed")
+	asst.Equal(0, dbInfo.GetDelFlag(), "test IsDeleted() failed")
 }
 
 func TestDBInfo_GetCreateTime(t *testing.T) {
@@ -76,15 +75,6 @@ func TestDBInfo_GetLastUpdateTime(t *testing.T) {
 
 	dbInfo := initNewDBInfo()
 	asst.True(reflect.DeepEqual(dbInfo.LastUpdateTime, dbInfo.GetLastUpdateTime()), "test GetLastUpdateTime() failed")
-}
-
-func TestDBInfo_Get(t *testing.T) {
-	asst := assert.New(t)
-
-	dbInfo := initNewDBInfo()
-	dbName, err := dbInfo.Get(dbNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(dbInfo.DBName, dbName, "test Get() failed")
 }
 
 func TestDBInfo_Set(t *testing.T) {
@@ -102,7 +92,8 @@ func TestDBInfo_Delete(t *testing.T) {
 
 	dbInfo := initNewDBInfo()
 	dbInfo.Delete()
-	asst.True(dbInfo.IsDeleted(), "test Delete() failed")
+
+	asst.Equal(1, dbInfo.GetDelFlag(), "test Delete() failed")
 }
 
 func TestDBInfo_MarshalJSON(t *testing.T) {
@@ -122,7 +113,7 @@ func TestDBInfo_MarshalJSONWithFields(t *testing.T) {
 	asst := assert.New(t)
 
 	dbInfo := initNewDBInfo()
-	data, err := dbInfo.MarshalJSONWithFields(dbNameStruct)
+	data, err := dbInfo.MarshalJSONWithFields(dbDBNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	expect, err := json.Marshal(map[string]interface{}{dbNameJSON: "das"})
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))

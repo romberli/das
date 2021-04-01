@@ -26,9 +26,9 @@ func TestUserService_GetEntities(t *testing.T) {
 
 	s := NewUserService(userRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestUserService_GetAll(t *testing.T) {
@@ -36,19 +36,19 @@ func TestUserService_GetAll(t *testing.T) {
 
 	s := NewUserService(userRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestUserService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewUserService(userRepo)
-	err := s.GetByID("1")
+	err := s.GetByID("66")
 	asst.Nil(err, "test GetByID() failed")
 	id := s.Entities[constant.ZeroInt].Identity()
-	asst.Equal("1", id, "test GetByID() failed")
+	asst.Equal("66", id, "test GetByID() failed")
 }
 
 func TestUserService_Create(t *testing.T) {
@@ -59,11 +59,11 @@ func TestUserService_Create(t *testing.T) {
 		userNameStruct:       defaultUserInfoUserName,
 		departmentNameStruct: defaultUserInfoDepartmentName,
 		employeeIDStruct:     defaultUserInfoEmployeeID,
-		domainAccountStruct:  defaultUserInfoDomainAccount,
-		emailStruct:          defaultUserInfoEmail,
-		telephoneStruct:      defaultUserInfoTelephone,
-		mobileStruct:         defaultUserInfoMobile,
-		roleStruct:           defaultUserInfoRole,
+		//	accountNameStruct:    defaultUserInfoAccountName,
+		emailStruct:     defaultUserInfoEmail,
+		telephoneStruct: defaultUserInfoTelephone,
+		mobileStruct:    defaultUserInfoMobile,
+		roleStruct:      defaultUserInfoRole,
 	})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
@@ -118,7 +118,7 @@ func TestUserService_Marshal(t *testing.T) {
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(userEqual(entity.(*UserInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(userStructEqual(entity.(*UserInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 

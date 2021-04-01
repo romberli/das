@@ -26,9 +26,9 @@ func TestMiddlewareServerService_GetEntities(t *testing.T) {
 
 	s := NewMiddlewareServerService(middlewareServerRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMiddlewareServerService_GetAll(t *testing.T) {
@@ -36,19 +36,19 @@ func TestMiddlewareServerService_GetAll(t *testing.T) {
 
 	s := NewMiddlewareServerService(middlewareServerRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMiddlewareServerService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMiddlewareServerService(middlewareServerRepo)
-	err := s.GetByID("1")
+	err := s.GetByID("2")
 	asst.Nil(err, "test GetByID() failed")
 	id := s.Entities[constant.ZeroInt].Identity()
-	asst.Equal("1", id, "test GetByID() failed")
+	asst.Equal("2", id, "test GetByID() failed")
 }
 
 func TestMiddlewareServerService_Create(t *testing.T) {
@@ -70,11 +70,12 @@ func TestMiddlewareServerService_Create(t *testing.T) {
 
 func TestMiddlewareServerService_Update(t *testing.T) {
 	asst := assert.New(t)
-
 	entity, err := createMiddlewareServer()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	s := NewMiddlewareServerService(middlewareClusterRepo)
-	err = s.Update(entity.Identity(), map[string]interface{}{middlewareServerNameStruct: newMiddlewareServerName})
+	s := NewMiddlewareServerService(middlewareServerRepo)
+	err = s.Update(entity.Identity(), map[string]interface{}{
+		middlewareServerNameStruct: newMiddlewareServerName,
+	})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))

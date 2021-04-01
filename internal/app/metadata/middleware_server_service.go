@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"encoding/json"
-
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
@@ -125,12 +124,12 @@ func (mss *MiddlewareServerService) Delete(id string) error {
 	return mss.Repository.Delete(id)
 }
 
-// Marshal marshals service.Entities
+// Marshal marshals service.Envs
 func (mss *MiddlewareServerService) Marshal() ([]byte, error) {
 	return json.Marshal(mss.Entities)
 }
 
-// Marshal marshals service.Entities with given fields
+// Marshal marshals service.Envs with given fields
 func (mss *MiddlewareServerService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(mss.Entities))
 	for i := range interfaceList {

@@ -117,12 +117,12 @@ func (mss *MonitorSystemService) Delete(id string) error {
 	return mss.Repository.Delete(id)
 }
 
-// Marshal marshals service.Entities
+// Marshal marshals service.Envs
 func (mss *MonitorSystemService) Marshal() ([]byte, error) {
 	return json.Marshal(mss.Entities)
 }
 
-// Marshal marshals service.Entities with given fields
+// Marshal marshals service.Envs with given fields
 func (mss *MonitorSystemService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(mss.Entities))
 	for i := range interfaceList {

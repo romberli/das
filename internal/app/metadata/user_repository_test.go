@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	onlineUserName = "un"
+	onlineUserName = "test"
 	newUserName    = "nun"
 )
 
@@ -33,7 +33,7 @@ func createUser() (dependency.Entity, error) {
 		defaultUserInfoUserName,
 		defaultUserInfoDepartmentName,
 		defaultUserInfoEmployeeID,
-		defaultUserInfoDomainAccount,
+		defaultUserInfoAccountName,
 		defaultUserInfoEmail,
 		defaultUserInfoTelephone,
 		defaultUserInfoMobile,
@@ -76,7 +76,7 @@ func TestUserRepo_Execute(t *testing.T) {
 func TestUserRepo_Transaction(t *testing.T) {
 	asst := assert.New(t)
 
-	sql := `insert into t_meta_user_info(user_name,department_name,employee_id,domain_account,email,telephone,mobile,role) values(?,?,?,?,?,?,?,?);`
+	sql := `insert into t_meta_user_info(user_name,department_name,employee_id,account_name,email,telephone,mobile,role) values(?,?,?,?,?,?,?,?);`
 	tx, err := userRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
@@ -85,7 +85,7 @@ func TestUserRepo_Transaction(t *testing.T) {
 		defaultUserInfoUserName,
 		defaultUserInfoDepartmentName,
 		defaultUserInfoEmployeeID,
-		defaultUserInfoDomainAccount,
+		defaultUserInfoAccountName,
 		defaultUserInfoEmail,
 		defaultUserInfoTelephone,
 		defaultUserInfoMobile,
@@ -130,7 +130,7 @@ func TestUserRepo_GetAll(t *testing.T) {
 func TestUserRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := userRepo.GetByID("1")
+	entity, err := userRepo.GetByID("66")
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	userName, err := entity.Get(userNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))

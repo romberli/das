@@ -26,9 +26,9 @@ func TestEnvService_GetEntities(t *testing.T) {
 
 	s := NewEnvService(envRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestEnvService_GetAll(t *testing.T) {
@@ -36,9 +36,9 @@ func TestEnvService_GetAll(t *testing.T) {
 
 	s := NewEnvService(envRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestEnvService_GetByID(t *testing.T) {
@@ -47,7 +47,7 @@ func TestEnvService_GetByID(t *testing.T) {
 	s := NewEnvService(envRepo)
 	err := s.GetByID("1")
 	asst.Nil(err, "test GetByID() failed")
-	id := s.Entities[constant.ZeroInt].Identity()
+	id := s.Envs[constant.ZeroInt].Identity()
 	asst.Equal("1", id, "test GetByID() failed")
 }
 
@@ -58,7 +58,7 @@ func TestEnvService_Create(t *testing.T) {
 	err := s.Create(map[string]interface{}{envNameStruct: defaultEnvInfoEnvName})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteMSByID(s.Entities[0].Identity())
+	err = deleteEnvByID(s.Envs[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
@@ -76,7 +76,7 @@ func TestEnvService_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(newEnvName, envName)
 	// delete
-	err = deleteEnvByID(s.Entities[0].Identity())
+	err = deleteEnvByID(s.Envs[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 

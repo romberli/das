@@ -8,7 +8,6 @@ import (
 
 	"github.com/jinzhu/now"
 	"github.com/romberli/go-util/common"
-	"github.com/romberli/go-util/constant"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +21,7 @@ const (
 )
 
 func initNewEnvInfo() *EnvInfo {
-	now.TimeFormats = append(now.TimeFormats, constant.DefaultTimeLayout)
+	// now.TimeFormats = append(now.TimeFormats, constant.DefaultTimeLayout)
 
 	createTime, _ := now.Parse(defaultEnvInfoCreateTimeString)
 	lastUpdateTime, _ := now.Parse(defaultEnvInfoLastUpdateTimeString)

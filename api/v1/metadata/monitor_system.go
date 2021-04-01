@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
@@ -47,6 +48,10 @@ func GetMonitorSystem(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMonitorSystemAll)
 }
 
+func GetMonitorSystemByEnv(c *gin.Context) {
+
+}
+
 // @Tags monitor system
 // @Summary get monitor system by id
 // @Produce  application/json
@@ -77,6 +82,10 @@ func GetMonitorSystemByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataGetMonitorSystemByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMonitorSystemByID, id)
+}
+
+func GetMonitorSystemByHostInfo(c *gin.Context) {
+
 }
 
 // @Tags monitor system
@@ -182,4 +191,8 @@ func UpdateMonitorSystemByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataUpdateMonitorSystem, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMonitorSystem, id)
+}
+
+func DeleteMonitorSystemByID(c *gin.Context) {
+
 }

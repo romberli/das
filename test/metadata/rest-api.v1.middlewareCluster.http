@@ -3,7 +3,7 @@ GET http://{{baseURL}}/api/v1/metadata/middleware-cluster
 Accept: application/json
 
 ### get middleware cluster by id
-GET http://{{baseURL}}/api/v1/metadata/middleware-cluster/1
+GET http://{{baseURL}}/api/v1/metadata/middleware-cluster/3
 Accept: application/json
 
 ### add new middleware cluster
@@ -13,8 +13,10 @@ Content-Type: application/json
 {"cluster_name": "connection_test", "env_id": 1}
 
 ### update middleware-cluster by id
-POST http://{{baseURL}}/api/v1/metadata/middleware-cluster/29
+POST http://{{baseURL}}/api/v1/metadata/middleware-cluster/14
 Content-Type: application/json
 
 {"cluster_name": "ccc", "del_flag": 1}
+
+###
 

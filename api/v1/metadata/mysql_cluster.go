@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/romberli/das/internal/app/metadata"
-	"github.com/romberli/das/pkg/message"
-	"github.com/romberli/das/pkg/resp"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/log"
+
+	"github.com/romberli/das/internal/app/metadata"
+	"github.com/romberli/das/pkg/message"
+	"github.com/romberli/das/pkg/resp"
 )
 
 const (
@@ -50,6 +51,10 @@ func GetMySQLCluster(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLClusterAll)
 }
 
+func GetMySQLClusterByEnv(c *gin.Context) {
+
+}
+
 // @Tags mysql cluster
 // @Summary get mysql cluster by id
 // @Produce  application/json
@@ -80,6 +85,14 @@ func GetMySQLClusterByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLClusterByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLClusterByID, id)
+}
+
+func GetMySQLClusterByName(c *gin.Context) {
+
+}
+
+func GetMySQLServerIDList(c *gin.Context) {
+
 }
 
 // @Tags mysql cluster
@@ -211,4 +224,8 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataUpdateMySQLCluster, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMySQLCluster, id)
+}
+
+func DeleteMySQLClusterByID(c *gin.Context) {
+
 }

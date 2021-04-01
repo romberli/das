@@ -2,13 +2,15 @@ package metadata
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
-	"github.com/romberli/das/internal/app/metadata"
-	"github.com/romberli/das/pkg/message"
-	"github.com/romberli/das/pkg/resp"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/log"
+
+	"github.com/romberli/das/internal/app/metadata"
+	"github.com/romberli/das/pkg/message"
+	"github.com/romberli/das/pkg/resp"
 )
 
 const (
@@ -42,6 +44,10 @@ func GetMiddlewareCluster(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMiddlewareClusterAll)
 }
 
+func GetMiddlewareClusterByEnv(c *gin.Context) {
+
+}
+
 // @Tags middleware cluster
 // @Summary get middleware cluster by id
 // @Produce  application/json
@@ -72,6 +78,14 @@ func GetMiddlewareClusterByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataGetMiddlewareClusterByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMiddlewareClusterByID, id)
+}
+
+func GetMiddlewareClusterByName(c *gin.Context) {
+
+}
+
+func GetMiddlewareServerIDList(c *gin.Context) {
+
 }
 
 // @Tags middleware cluster
@@ -173,4 +187,8 @@ func UpdateMiddlewareClusterByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataUpdateMiddlewareCluster, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataUpdateMiddlewareCluster, id)
+}
+
+func DeleteMiddlewareClusterByID(c *gin.Context) {
+
 }

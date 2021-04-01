@@ -16,6 +16,7 @@ import (
 
 var _ dependency.Repository = (*UserRepo)(nil)
 
+// UserRepo struct
 type UserRepo struct {
 	Database middleware.Pool
 }
@@ -25,7 +26,7 @@ func NewUserRepo(db middleware.Pool) *UserRepo {
 	return &UserRepo{db}
 }
 
-// NewUserRepo returns *UserRepo with global mysql pool
+// NewUserRepoWithGlobal returns *UserRepo with global mysql pool
 func NewUserRepoWithGlobal() *UserRepo {
 	return NewUserRepo(global.MySQLPool)
 }
@@ -47,6 +48,7 @@ func (ur *UserRepo) Execute(command string, args ...interface{}) (middleware.Res
 	return conn.Execute(command, args...)
 }
 
+// Transaction ..
 func (ur *UserRepo) Transaction() (middleware.Transaction, error) {
 	return ur.Database.Transaction()
 }
@@ -54,7 +56,7 @@ func (ur *UserRepo) Transaction() (middleware.Transaction, error) {
 // GetAll returns all available entities
 func (ur *UserRepo) GetAll() ([]dependency.Entity, error) {
 	sql := `
-		select id, user_name, del_flag, create_time, last_update_time ,department_name,employee_id,domain_account,email,telephone,mobile,role
+		select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time 
 		from t_meta_user_info
 		where del_flag = 0
 		order by id;
@@ -84,9 +86,10 @@ func (ur *UserRepo) GetAll() ([]dependency.Entity, error) {
 	return entityList, nil
 }
 
+// GetByID get userinfo by id
 func (ur *UserRepo) GetByID(id string) (dependency.Entity, error) {
 	sql := `
-		select id, user_name, del_flag, create_time, last_update_time, department_name,employee_id,domain_account,email,telephone,mobile,role
+		select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
 		from t_meta_user_info
 		where del_flag = 0
 		and id = ?;
@@ -128,10 +131,10 @@ func (ur *UserRepo) GetID(entity dependency.Entity) (string, error) {
 
 // Create creates data with given entity in the middleware
 func (ur *UserRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
-	sql := `insert into t_meta_user_info(user_name,department_name, employee_id, domain_account, email , telephone , mobile, role) values(?,?,?,?,?,?,?,?);`
+	sql := `insert into t_meta_user_info(user_name, department_name, employee_id, account_name, email , telephone , mobile, role) values(?,?,?,?,?,?,?,?);`
 	log.Debugf("metadata UserRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := ur.Execute(sql, entity.(*UserInfo).UserName, entity.(*UserInfo).DepartmentName, entity.(*UserInfo).EmployeeID, entity.(*UserInfo).DomainAccount, entity.(*UserInfo).Email, entity.(*UserInfo).Telephone, entity.(*UserInfo).Mobile, entity.(*UserInfo).Role)
+	_, err := ur.Execute(sql, entity.(*UserInfo).UserName, entity.(*UserInfo).DepartmentName, entity.(*UserInfo).EmployeeID, entity.(*UserInfo).AccountName, entity.(*UserInfo).Email, entity.(*UserInfo).Telephone, entity.(*UserInfo).Mobile, entity.(*UserInfo).Role)
 	if err != nil {
 		return nil, err
 	}
@@ -146,10 +149,10 @@ func (ur *UserRepo) Create(entity dependency.Entity) (dependency.Entity, error) 
 
 // Update updates data with given entity in the middleware
 func (ur *UserRepo) Update(entity dependency.Entity) error {
-	sql := `update t_meta_user_info set user_name = ?, del_flag = ?, department_name = ?, employee_id = ?, domain_account = ?, email = ?, telephone = ?, mobile = ?, role = ? where id = ?;`
+	sql := `update t_meta_user_info set user_name = ?, del_flag = ?, department_name = ?, employee_id = ?, account_name = ?, email = ?, telephone = ?, mobile = ?, role = ? where id = ?;`
 	log.Debugf("metadata UserRepo.Update() update sql: %s", sql)
 	userInfo := entity.(*UserInfo)
-	_, err := ur.Execute(sql, userInfo.UserName, userInfo.DelFlag, userInfo.DepartmentName, userInfo.EmployeeID, userInfo.DomainAccount, userInfo.Email, userInfo.Telephone, userInfo.Mobile, userInfo.Role, userInfo.ID)
+	_, err := ur.Execute(sql, userInfo.UserName, userInfo.DelFlag, userInfo.DepartmentName, userInfo.EmployeeID, userInfo.AccountName, userInfo.Email, userInfo.Telephone, userInfo.Mobile, userInfo.Role, userInfo.ID)
 
 	return err
 }

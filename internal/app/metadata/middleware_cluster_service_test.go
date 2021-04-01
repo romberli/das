@@ -26,9 +26,9 @@ func TestMiddlewareClusterService_GetEntities(t *testing.T) {
 
 	s := NewMiddlewareClusterService(middlewareClusterRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMiddlewareClusterService_GetAll(t *testing.T) {
@@ -36,26 +36,29 @@ func TestMiddlewareClusterService_GetAll(t *testing.T) {
 
 	s := NewMiddlewareClusterService(middlewareClusterRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMiddlewareClusterService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMiddlewareClusterService(middlewareClusterRepo)
-	err := s.GetByID("1")
+	err := s.GetByID("3")
 	asst.Nil(err, "test GetByID() failed")
 	id := s.Entities[constant.ZeroInt].Identity()
-	asst.Equal("1", id, "test GetByID() failed")
+	asst.Equal("3", id, "test GetByID() failed")
 }
 
 func TestMiddlewareClusterService_Create(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMiddlewareClusterService(middlewareClusterRepo)
-	err := s.Create(map[string]interface{}{middlewareClusterNameStruct: defaultMiddlewareClusterInfoClusterName, middlewareClusterEnvIDStruct: defaultMiddlewareClusterInfoEnvID})
+	err := s.Create(map[string]interface{}{
+		middlewareClusterNameStruct:  defaultMiddlewareClusterInfoClusterName,
+		middlewareClusterEnvIDStruct: defaultMiddlewareClusterInfoEnvID,
+	})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteMiddlewareClusterByID(s.Entities[0].Identity())
@@ -68,7 +71,9 @@ func TestMiddlewareClusterService_Update(t *testing.T) {
 	entity, err := createMiddlewareCluster()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	s := NewMiddlewareClusterService(middlewareClusterRepo)
-	err = s.Update(entity.Identity(), map[string]interface{}{middlewareClusterNameStruct: newMiddlewareClusterName})
+	err = s.Update(entity.Identity(), map[string]interface{}{
+		middlewareClusterNameStruct: newMiddlewareClusterName,
+	})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
@@ -109,7 +114,7 @@ func TestMiddlewareClusterService_Marshal(t *testing.T) {
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(middlewareClusterStuctEqual(entity.(*MiddlewareClusterInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(middlewareClusterStructEqual(entity.(*MiddlewareClusterInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 

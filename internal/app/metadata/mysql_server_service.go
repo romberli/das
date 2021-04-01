@@ -126,12 +126,12 @@ func (mss *MySQLServerService) Delete(id string) error {
 	return mss.Repository.Delete(id)
 }
 
-// Marshal marshals service.Entities
+// Marshal marshals service.Envs
 func (mss *MySQLServerService) Marshal() ([]byte, error) {
 	return json.Marshal(mss.Entities)
 }
 
-// MarshalWithFields marshals service.Entities with given fields
+// MarshalWithFields marshals service.Envs with given fields
 func (mss *MySQLServerService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(mss.Entities))
 	for i := range interfaceList {

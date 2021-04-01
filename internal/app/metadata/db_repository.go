@@ -3,7 +3,6 @@ package metadata
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware"
@@ -11,10 +10,10 @@ import (
 	"github.com/romberli/log"
 
 	"github.com/romberli/das/global"
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-var _ dependency.Repository = (*DBRepo)(nil)
+var _ metadata.DBRepo = (*DBRepo)(nil)
 
 type DBRepo struct {
 	Database middleware.Pool
@@ -30,10 +29,9 @@ func NewDBRepoWithGlobal() *DBRepo {
 	return NewDBRepo(global.MySQLPool)
 }
 
-// Execute implements dependency.Repository interface,
-// it executes command with arguments on database
-func (dbr *DBRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
-	conn, err := dbr.Database.Get()
+// Execute executes given command and placeholders on the middleware
+func (dr *DBRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
+	conn, err := dr.Database.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -47,22 +45,22 @@ func (dbr *DBRepo) Execute(command string, args ...interface{}) (middleware.Resu
 	return conn.Execute(command, args...)
 }
 
-// Transaction implements dependency.Repository interface
-func (dbr *DBRepo) Transaction() (middleware.Transaction, error) {
-	return dbr.Database.Transaction()
+// Transaction returns a middleware.Transaction that could execute multiple commands as a transaction
+func (dr *DBRepo) Transaction() (middleware.Transaction, error) {
+	return dr.Database.Transaction()
 }
 
-// GetAll returns all available entities
-func (dbr *DBRepo) GetAll() ([]dependency.Entity, error) {
+// GetAll gets all databases from the middleware
+func (dr *DBRepo) GetAll() ([]metadata.DB, error) {
 	sql := `
-		select id, db_name, cluster_id, cluster_type, owner_id, owner_group, env_id, del_flag, create_time, last_update_time
+		select id, db_name, cluster_id, cluster_type, owner_id, env_id, del_flag, create_time, last_update_time
 		from t_meta_db_info
 		where del_flag = 0
 		order by id;
 	`
 	log.Debugf("metadata DBRepo.GetAll() sql: \n%s", sql)
 
-	result, err := dbr.Execute(sql)
+	result, err := dr.Execute(sql)
 	if err != nil {
 		return nil, err
 	}
@@ -76,31 +74,66 @@ func (dbr *DBRepo) GetAll() ([]dependency.Entity, error) {
 	if err != nil {
 		return nil, err
 	}
-	// init []dependency.Entity
-	entityList := make([]dependency.Entity, result.RowNumber())
-	for i := range entityList {
-		entityList[i] = dbInfoList[i]
+	// init []metadata.DB
+	dbList := make([]metadata.DB, result.RowNumber())
+	for i := range dbList {
+		dbList[i] = dbInfoList[i]
 	}
 
-	return entityList, nil
+	return dbList, nil
 }
 
-func (dbr *DBRepo) GetByID(id string) (dependency.Entity, error) {
+// GetByEnv gets databases of given env id from the middleware
+func (dr *DBRepo) GetByEnv(envID int) ([]metadata.DB, error) {
 	sql := `
-		select id, db_name, cluster_id, cluster_type, owner_id, owner_group, env_id, del_flag, create_time, last_update_time
+		select id, db_name, cluster_id, cluster_type, owner_id, env_id, del_flag, create_time, last_update_time
+		from t_meta_db_info
+		where del_flag = 0
+		and env_id = ?
+		order by id;
+	`
+	log.Debugf("metadata DBRepo.GetAll() sql: \n%s", sql, envID)
+
+	result, err := dr.Execute(sql)
+	if err != nil {
+		return nil, err
+	}
+	// init []*DBInfo
+	dbInfoList := make([]*DBInfo, result.RowNumber())
+	for i := range dbInfoList {
+		dbInfoList[i] = NewEmptyDBInfoWithGlobal()
+	}
+	// map to struct
+	err = result.MapToStructSlice(dbInfoList, constant.DefaultMiddlewareTag)
+	if err != nil {
+		return nil, err
+	}
+	// init []metadata.DB
+	dbList := make([]metadata.DB, result.RowNumber())
+	for i := range dbList {
+		dbList[i] = dbInfoList[i]
+	}
+
+	return dbList, nil
+}
+
+// GetByID gets a database by the identity from the middleware
+func (dr *DBRepo) GetByID(id int) (metadata.DB, error) {
+	sql := `
+		select id, db_name, cluster_id, cluster_type, owner_id, env_id, del_flag, create_time, last_update_time
 		from t_meta_db_info
 		where del_flag = 0
 		and id = ?;
 	`
 	log.Debugf("metadata DBRepo.GetByID() sql: \n%s\nplaceholders: %s", sql, id)
 
-	result, err := dbr.Execute(sql, id)
+	result, err := dr.Execute(sql, id)
 	if err != nil {
 		return nil, err
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByID(): data does not exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByID(): data does not exists, id: %d", id))
 	case 1:
 		dbInfo := NewEmptyDBInfoWithGlobal()
 		// map to struct
@@ -111,60 +144,120 @@ func (dbr *DBRepo) GetByID(id string) (dependency.Entity, error) {
 
 		return dbInfo, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByID(): duplicate key exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByID(): duplicate key exists, id: %d", id))
 	}
 }
 
-// GetID checks identity of given entity from the middleware
-func (dbr *DBRepo) GetID(entity dependency.Entity) (string, error) {
+// GetID gets the identity with given database name, cluster id and cluster type from the middleware
+func (dr *DBRepo) GetID(dbName string, clusterID int, clusterType int) (int, error) {
 	sql := `select id from t_meta_db_info where del_flag = 0 and db_name = ? and cluster_id = ? and cluster_type = ?;`
 	log.Debugf("metadata DBRepo.GetID() select sql: %s", sql)
-	result, err := dbr.Execute(sql, entity.(*DBInfo).DBName, entity.(*DBInfo).ClusterID, entity.(*DBInfo).ClusterType)
+	result, err := dr.Execute(sql, dbName, clusterID, clusterType)
 	if err != nil {
-		return constant.EmptyString, err
+		return constant.ZeroInt, err
 	}
 
-	return result.GetString(constant.ZeroInt, constant.ZeroInt)
+	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
-// Create creates data with given entity in the middleware
-func (dbr *DBRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
-	sql := `insert into t_meta_db_info(db_name, cluster_id, cluster_type, owner_id, owner_group, env_id) values(?, ?, ?, ?, ?, ?);`
+// GetAppIDList gets an app identity list that uses this db
+func (dr *DBRepo) GetAppIDList(dbID int) ([]int, error) {
+	sql := `select app_id from t_meta_app_db_map where del_flag = 0 and db_id = ?;`
+	log.Debugf("metadata AppRepo.GetDBIDList() select sql: %s", sql)
+	result, err := dr.Execute(sql, dbID)
+	if err != nil {
+		return nil, err
+	}
+
+	resultNum := result.RowNumber()
+	appIDList := make([]int, resultNum)
+
+	for row := 0; row < resultNum; row++ {
+		appID, err := result.GetInt(row, constant.ZeroInt)
+		if err != nil {
+			return nil, err
+		}
+
+		appIDList = append(appIDList, appID)
+	}
+
+	return appIDList, nil
+}
+
+// Create creates a database in the middleware
+func (dr *DBRepo) Create(db metadata.DB) (metadata.DB, error) {
+	sql := `insert into t_meta_db_info(db_name, cluster_id, cluster_type, owner_id, env_id) values(?, ?, ?, ?, ?);`
 	log.Debugf("metadata DBRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := dbr.Execute(sql, entity.(*DBInfo).DBName, entity.(*DBInfo).ClusterID, entity.(*DBInfo).ClusterType, entity.(*DBInfo).OwnerID, entity.(*DBInfo).OwnerGroup, entity.(*DBInfo).EnvID)
+	_, err := dr.Execute(sql, db.GetDBName(), db.GetClusterID(), db.GetClusterType(), db.GetOwnerID(), db.GetEnvID())
 	if err != nil {
 		return nil, err
 	}
 	// get id
-	id, err := dbr.GetID(entity)
+	id, err := dr.GetID(db.GetDBName(), db.GetClusterID(), db.GetClusterType())
 	if err != nil {
 		return nil, err
 	}
 	// get entity
-	return dbr.GetByID(id)
+	return dr.GetByID(id)
 }
 
-// Update updates data with given entity in the middleware
-func (dbr *DBRepo) Update(entity dependency.Entity) error {
-	sql := `update t_meta_db_info set db_name = ?, cluster_id = ?, cluster_type = ?, owner_id = ?, owner_group = ?, env_id = ?, del_flag = ? where id = ?;`
+// Update updates the database in the middleware
+func (dr *DBRepo) Update(db metadata.DB) error {
+	sql := `update t_meta_db_info set db_name = ?, cluster_id = ?, cluster_type = ?, owner_id = ?, env_id = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata DBRepo.Update() update sql: %s", sql)
-	dbInfo := entity.(*DBInfo)
-	_, err := dbr.Execute(sql, dbInfo.DBName, dbInfo.ClusterID, dbInfo.ClusterType, dbInfo.OwnerID, dbInfo.OwnerGroup, dbInfo.EnvID, dbInfo.DelFlag, dbInfo.ID)
+	_, err := dr.Execute(sql, db.GetDBName(), db.GetClusterID(), db.GetClusterType(), db.GetOwnerID(), db.GetEnvID(), db.GetDelFlag(), db.Identity())
 
 	return err
 }
 
-// Delete deletes data in the middleware, it is recommended to use soft deletion,
-// therefore use update instead of delete
-func (dbr *DBRepo) Delete(id string) error {
-	sql := `update t_meta_db_info set del_flag = 1 where id = ?;`
-	log.Debugf("metadata DBRepo.Delete() update sql: %s", sql)
-	idInt, err := strconv.Atoi(id)
+// Delete deletes the database in the middleware
+func (dr *DBRepo) Delete(id int) error {
+	tx, err := dr.Transaction()
 	if err != nil {
 		return err
 	}
-	_, err = dbr.Execute(sql, idInt)
+	defer func() {
+		err = tx.Close()
+		if err != nil {
+			log.Errorf("metadata AppRepo.Delete(): close database connection failed.\n%s", err.Error())
+		}
+	}()
+
+	err = tx.Begin()
+	if err != nil {
+		return err
+	}
+	sql := `delete from t_meta_db_info where id = ?;`
+	log.Debugf("metadata DBRepo.Delete() update sql: %s", sql)
+	_, err = dr.Execute(sql, id)
+	if err != nil {
+		return err
+	}
+	sql = `delete from t_meta_app_db_map where db_id = ?;`
+	log.Debugf("metadata DBRepo.Delete() update sql: %s", sql)
+	_, err = dr.Execute(sql, id)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+// AddApp adds a new map of the app and database in the middleware
+func (dr *DBRepo) AddApp(appID, dbID int) error {
+	sql := `insert into t_meta_app_db_map(app_id, db_id) values(?, ?);`
+	log.Debugf("metadata AppRepo.AddDB() insert sql: %s", sql)
+	_, err := dr.Execute(sql, appID, dbID)
+
+	return err
+}
+
+// DeleteApp deletes a map of the app and database in the middleware
+func (dr *DBRepo) DeleteApp(appID, dbID int) error {
+	sql := `delete from t_meta_app_db_map where app_id = ? and db_id = ?;`
+	log.Debugf("metadata AppRepo.DeleteDB() delete sql: %s", sql)
+	_, err := dr.Execute(sql, appID, dbID)
 
 	return err
 }

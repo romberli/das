@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	defaultMiddlewareClusterInfoID                   = 8
+	defaultMiddlewareClusterInfoID                   = 1
 	defaultMiddlewareClusterInfoClusterName          = "ttt"
-	defaultMiddlewareClusterInfoEnvID                = 8
+	defaultMiddlewareClusterInfoEnvID                = 1
 	defaultMiddlewareClusterInfoDelFlag              = 0
 	defaultMiddlewareClusterInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
 	defaultMiddlewareClusterInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"

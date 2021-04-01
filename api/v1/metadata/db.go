@@ -1,24 +1,33 @@
 package metadata
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/log"
 
 	"github.com/romberli/das/internal/app/metadata"
+	msgmeta "github.com/romberli/das/pkg/message/metadata"
+
 	"github.com/romberli/das/pkg/message"
 	"github.com/romberli/das/pkg/resp"
 )
 
 const (
-	dbNameStruct        = "DBName"
+	dbIDJSON    = "id"
+	dbEnvIDJSON = "env_id"
+	dbAppIDJSON = "app_id"
+
+	dbDBNameStruct      = "DBName"
 	dbClusterIDStruct   = "ClusterID"
 	dbClusterTypeStruct = "ClusterType"
 	dbOwnerIDStruct     = "OwnerID"
-	dbOwnerGroupStruct  = "OwnerGroup"
 	dbEnvIDStruct       = "EnvID"
+	dbAppIDListStruct   = "AppIDList"
 )
 
 // @Tags database
@@ -32,7 +41,7 @@ func GetDB(c *gin.Context) {
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetDBAll, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetDBAll, err.Error())
 		return
 	}
 	// marshal service
@@ -43,8 +52,46 @@ func GetDB(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetDBAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetDBAll)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetDBAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetDBAll)
+}
+
+// @Tags database
+// @Summary get database by id
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "db_name": "db1", "cluster_id": 1, "cluster_type": 1, "owner_id": 1, "owner_group": "2,3,4", "env_id": 1, "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Router /api/v1/metadata/db/env/:env_id [get]
+func GetDBByEnv(c *gin.Context) {
+	// get param
+	envIDStr := c.Param(dbEnvIDJSON)
+	if envIDStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbIDJSON)
+		return
+	}
+	envID, err := strconv.Atoi(envIDStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+
+	}
+	// init service
+	s := metadata.NewDBServiceWithDefault()
+	// get entity
+	err = s.GetByID(envID)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetDBByEnv, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetDBByEnv, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetDBByEnv, envID)
 }
 
 // @Tags database
@@ -54,17 +101,22 @@ func GetDB(c *gin.Context) {
 // @Router /api/v1/metadata/db/:id [get]
 func GetDBByID(c *gin.Context) {
 	// get param
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+	idStr := c.Param(dbIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
 		return
 	}
 	// init service
 	s := metadata.NewDBServiceWithDefault()
 	// get entity
-	err := s.GetByID(id)
+	err = s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetDBByID, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetDBByID, id, err.Error())
 		return
 	}
 	// marshal service
@@ -75,8 +127,44 @@ func GetDBByID(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetDBByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetDBByID, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetDBByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetDBByID, id)
+}
+
+// @Tags db
+// @Summary get app id list
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [1, 2]}"
+// @Router /api/v1/metadata/db/apps/:id [get]
+func GetAppIDList(c *gin.Context) {
+	// get params
+	idStr := c.Param(dbIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbIDJSON)
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	// init service
+	s := metadata.NewDBServiceWithDefault()
+	// get entity
+	err = s.GetAppIDList(id)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetAppIDList, id, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.MarshalWithFields(dbAppIDListStruct)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetDBIDList, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetDBIDList, id)
 }
 
 // @Tags database
@@ -99,12 +187,12 @@ func AddDB(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, dbNameExists := fields[dbNameStruct]
+	_, dbNameExists := fields[dbDBNameStruct]
 	_, clusterIDExists := fields[dbClusterIDStruct]
 	_, clusterTypeExists := fields[dbClusterTypeStruct]
 	_, envIDExists := fields[dbEnvIDStruct]
-	if !dbNameExists && !clusterIDExists && !clusterTypeExists && !envIDExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
+	if !dbNameExists || !clusterIDExists || !clusterTypeExists || !envIDExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbDBNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
 		return
 	}
 	// init service
@@ -112,7 +200,8 @@ func AddDB(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddDB, fields[dbNameStruct], err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataAddDB,
+			fields[dbDBNameStruct], fields[dbClusterIDStruct], fields[dbClusterTypeStruct], fields[envIDStruct], err.Error())
 		return
 	}
 	// marshal service
@@ -123,8 +212,8 @@ func AddDB(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddDB, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddDB, fmt.Sprintf("%s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataAddDB, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataAddDB, fields[dbDBNameStruct], fields[dbClusterIDStruct], fields[dbClusterTypeStruct], fields[envIDStruct])
 }
 
 // @Tags database
@@ -136,9 +225,15 @@ func UpdateDBByID(c *gin.Context) {
 	var fields map[string]interface{}
 
 	// get params
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+	idStr := c.Param(dbIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
 	}
 	data, err := c.GetRawData()
 	if err != nil {
@@ -151,15 +246,16 @@ func UpdateDBByID(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, dbNameExists := fields[dbNameStruct]
+	_, dbNameExists := fields[dbDBNameStruct]
 	_, clusterIDExists := fields[dbClusterIDStruct]
 	_, clusterTypeExists := fields[dbClusterTypeStruct]
 	_, ownerIDExists := fields[dbOwnerIDStruct]
-	_, ownerGroupExists := fields[dbOwnerGroupStruct]
 	_, envIDExists := fields[dbEnvIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !dbNameExists && !clusterIDExists && !clusterTypeExists && !ownerIDExists && !ownerGroupExists && !envIDExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s and %s", dbNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbOwnerIDStruct, dbOwnerGroupStruct, dbEnvIDStruct, delFlagStruct))
+	if !dbNameExists && !clusterIDExists && !clusterTypeExists && !ownerIDExists && !envIDExists && !delFlagExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists,
+			fmt.Sprintf("%s, %s, %s, %s, %s, %s",
+				dbDBNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbOwnerIDStruct, dbEnvIDStruct, delFlagStruct))
 		return
 	}
 	// init service
@@ -167,7 +263,7 @@ func UpdateDBByID(c *gin.Context) {
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateDB, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataUpdateDB, id, err.Error())
 		return
 	}
 	// marshal service
@@ -178,6 +274,149 @@ func UpdateDBByID(c *gin.Context) {
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateDB, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateDB, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataUpdateDB, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.DebugMetadataUpdateDB, id)
+}
+
+// @Tags database
+// @Summary delete database by id
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "db_name": "db1", "cluster_id": 1, "cluster_type": 1, "owner_id": 1, "owner_group": "2,3,4", "env_id": 1, "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Router /api/v1/metadata/db/:id [post]
+func DeleteDBByID(c *gin.Context) {
+	// get params
+	idStr := c.Param(dbIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	// init service
+	s := metadata.NewDBServiceWithDefault()
+	// update entity
+	err = s.Delete(id)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDeleteDB, id, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// resp
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataDeleteDB, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.DebugMetadataDeleteDB, id)
+}
+
+// @Tags database
+// @Summary add application map
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [1, 2, 3]}"
+// @Router /api/v1/metadata/db/add-app/:id [post]
+func DBAddApp(c *gin.Context) {
+	// get params
+	idStr := c.Param(dbIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	data, err := c.GetRawData()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrGetRawData, err.Error())
+		return
+	}
+	dataMap := make(map[string]int)
+	err = json.Unmarshal(data, &dataMap)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDBAddApp, id, err.Error())
+		return
+	}
+	appID, appIDExists := dataMap[dbAppIDJSON]
+	if !appIDExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbAppIDJSON)
+		return
+	}
+	// init service
+	s := metadata.NewDBServiceWithDefault()
+	// update entities
+	err = s.AddApp(id, appID)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDBAddApp, id, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.MarshalWithFields(dbAppIDListStruct)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataDBAddApp, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataDBAddApp, id, appID)
+}
+
+// @Tags database
+// @Summary delete application map
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [1]}"
+// @Router /api/v1/metadata/db/delete-app/:id [post]
+func DBDeleteApp(c *gin.Context) {
+	// get params
+	idStr := c.Param(dbIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	data, err := c.GetRawData()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrGetRawData, err.Error())
+		return
+	}
+	dataMap := make(map[string]int)
+	err = json.Unmarshal(data, &dataMap)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDBDeleteApp, id, err.Error())
+		return
+	}
+	appID, appIDExists := dataMap[dbAppIDJSON]
+	if !appIDExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, dbAppIDJSON)
+		return
+	}
+	// init service
+	s := metadata.NewDBServiceWithDefault()
+	// update entities
+	err = s.DeleteApp(id, appID)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDBDeleteApp, id, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.MarshalWithFields(dbAppIDListStruct)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataDBAddApp, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataDBDeleteApp, id, appID)
 }

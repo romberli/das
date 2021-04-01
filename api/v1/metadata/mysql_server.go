@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/romberli/das/internal/app/metadata"
-	"github.com/romberli/das/pkg/message"
-	"github.com/romberli/das/pkg/resp"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/log"
+
+	"github.com/romberli/das/internal/app/metadata"
+	"github.com/romberli/das/pkg/message"
+	"github.com/romberli/das/pkg/resp"
 )
 
 const (
@@ -47,6 +48,10 @@ func GetMySQLServer(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerAll)
 }
 
+func GetMySQLServerByClusterID(c *gin.Context) {
+
+}
+
 // @Tags mysql server
 // @Summary get mysql server by id
 // @Produce  application/json
@@ -77,6 +82,10 @@ func GetMySQLServerByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLServerByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerByID, id)
+}
+
+func GetMySQLServerByHostInfo(c *gin.Context) {
+
 }
 
 // @Tags mysql server
@@ -212,4 +221,8 @@ func UpdateMySQLServerByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataUpdateMySQLServer, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMySQLServer, id)
+}
+
+func DeleteMySQLServerByID(c *gin.Context) {
+
 }
