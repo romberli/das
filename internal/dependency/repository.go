@@ -11,6 +11,8 @@ type Repository interface {
 	Transaction() (middleware.Transaction, error)
 	// SelectAll returns all entities
 	GetAll() ([]Entity, error)
+	// GetID checks identity of given entity from the middleware
+	GetID(entity Entity) (string, error)
 	// Select returns an entity of the given id
 	GetByID(id string) (Entity, error)
 	// Create creates data with given entity in the middleware

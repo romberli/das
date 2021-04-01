@@ -26,9 +26,9 @@ func TestMySQLServerService_GetEntities(t *testing.T) {
 
 	s := NewMySQLServerService(mysqlServerRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMySQLServerService_GetAll(t *testing.T) {
@@ -36,9 +36,9 @@ func TestMySQLServerService_GetAll(t *testing.T) {
 
 	s := NewMySQLServerService(mysqlServerRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMySQLServerService_GetByID(t *testing.T) {
@@ -56,12 +56,12 @@ func TestMySQLServerService_Create(t *testing.T) {
 
 	s := NewMySQLServerService(mysqlServerRepo)
 	err := s.Create(map[string]interface{}{
-		clusterIDStruct: defaultMySQLServerInfoClusterID,
-		serverNameStruct: defaultMySQLServerInfoServerName,
-		hostIPStruct:  testInsertHostIP,
-		portNumStruct: testInitPortNum,
+		clusterIDStruct:      defaultMySQLServerInfoClusterID,
+		serverNameStruct:     defaultMySQLServerInfoServerName,
+		hostIPStruct:         testInsertHostIP,
+		portNumStruct:        testInitPortNum,
 		deploymentTypeStruct: defaultMySQLServerInfoDeploymentType,
-		versionStruct: defaultMySQLServerInfoVersion})
+		versionStruct:        defaultMySQLServerInfoVersion})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteMySQLServerByID(s.Entities[0].Identity())

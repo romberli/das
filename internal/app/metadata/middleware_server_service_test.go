@@ -26,9 +26,9 @@ func TestMiddlewareServerService_GetEntities(t *testing.T) {
 
 	s := NewMiddlewareServerService(middlewareServerRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMiddlewareServerService_GetAll(t *testing.T) {
@@ -36,9 +36,9 @@ func TestMiddlewareServerService_GetAll(t *testing.T) {
 
 	s := NewMiddlewareServerService(middlewareServerRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMiddlewareServerService_GetByID(t *testing.T) {

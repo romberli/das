@@ -26,9 +26,9 @@ func TestMonitorSystemService_GetEntities(t *testing.T) {
 
 	s := NewMonitorSystemService(monitorSystemRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMonitorSystemService_GetAll(t *testing.T) {
@@ -36,9 +36,9 @@ func TestMonitorSystemService_GetAll(t *testing.T) {
 
 	s := NewMonitorSystemService(monitorSystemRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMonitorSystemService_GetByID(t *testing.T) {

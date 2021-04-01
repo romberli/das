@@ -8,7 +8,7 @@ import (
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
 const (
@@ -28,7 +28,7 @@ func initDBRepo() *DBRepo {
 	return NewDBRepo(pool)
 }
 
-func createDB() (dependency.Entity, error) {
+func createDB() (metadata.DB, error) {
 	dbInfo := NewDBInfoWithDefault(defaultDBInfoDBName, defaultDBInfoClusterID, defaultDBInfoClusterType, defaultDBInfoEnvID)
 	entity, err := dbRepo.Create(dbInfo)
 	if err != nil {
@@ -38,7 +38,7 @@ func createDB() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteDBByID(id string) error {
+func deleteDBByID(id int) error {
 	sql := `delete from t_meta_db_info where id = ?`
 	_, err := dbRepo.Execute(sql, id)
 	return err
@@ -89,7 +89,7 @@ func TestDBRepo_Transaction(t *testing.T) {
 	entities, err := dbRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		dbName, err := entity.Get(dbNameStruct)
+		dbName := entity.GetDBName()
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 		if dbName == defaultDBInfoDBName {
 			asst.Fail("test Transaction() failed")
@@ -103,19 +103,19 @@ func TestDBRepo_GetAll(t *testing.T) {
 
 	entities, err := dbRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	dbName, err := entities[0].Get("DBName")
+	dbName := entities[0].GetDBName()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(onlineDBName, dbName.(string), "test GetAll() failed")
+	asst.Equal(onlineDBName, dbName, "test GetAll() failed")
 }
 
 func TestDBRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := dbRepo.GetByID("1")
+	entity, err := dbRepo.GetByID(1)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	dbName, err := entity.Get(dbNameStruct)
+	dbName := entity.GetDBName()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(onlineDBName, dbName.(string), "test GetByID() failed")
+	asst.Equal(onlineDBName, dbName, "test GetByID() failed")
 }
 
 func TestDBRepo_Create(t *testing.T) {
@@ -133,13 +133,13 @@ func TestDBRepo_Update(t *testing.T) {
 
 	entity, err := createDB()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	err = entity.Set(map[string]interface{}{dbNameStruct: newDBName})
+	err = entity.Set(map[string]interface{}{dbDBNameStruct: newDBName})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = dbRepo.Update(entity)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	entity, err = dbRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	dbName, err := entity.Get(dbNameStruct)
+	dbName := entity.GetDBName()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(newDBName, dbName, "test Update() failed")
 	// delete

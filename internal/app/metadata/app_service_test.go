@@ -10,122 +10,122 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDBServiceAll(t *testing.T) {
-	TestDBService_GetDBs(t)
-	TestDBService_GetAll(t)
-	TestDBService_GetByID(t)
-	TestDBService_Create(t)
-	TestDBService_Update(t)
-	TestDBService_Delete(t)
-	TestDBService_Marshal(t)
-	TestDBService_MarshalWithFields(t)
+func TestAppServiceAll(t *testing.T) {
+	TestAppService_GetEntities(t)
+	TestAppService_GetAll(t)
+	TestAppService_GetByID(t)
+	TestAppService_Create(t)
+	TestAppService_Update(t)
+	TestAppService_Delete(t)
+	TestAppService_Marshal(t)
+	TestAppService_MarshalWithFields(t)
 }
 
-func TestDBService_GetDBs(t *testing.T) {
+func TestAppService_GetEntities(t *testing.T) {
 	asst := assert.New(t)
 
-	s := NewDBService(dbRepo)
+	s := NewAppService(appRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetDBs()
+	entities := s.GetApps()
 	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
-func TestDBService_GetAll(t *testing.T) {
+func TestAppService_GetAll(t *testing.T) {
 	asst := assert.New(t)
 
-	s := NewDBService(dbRepo)
+	s := NewAppService(appRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetDBs()
+	entities := s.GetApps()
 	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
-func TestDBService_GetByID(t *testing.T) {
+func TestAppService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	s := NewDBService(dbRepo)
-	err := s.GetByID(1)
+	s := NewAppService(appRepo)
+	err := s.GetByID(66)
 	asst.Nil(err, "test GetByID() failed")
-	id := s.DBs[constant.ZeroInt].Identity()
-	asst.Equal("1", id, "test GetByID() failed")
+	id := s.Apps[constant.ZeroInt].Identity()
+	asst.Equal("66", id, "test GetByID() failed")
 }
 
-func TestDBService_Create(t *testing.T) {
+func TestAppService_Create(t *testing.T) {
 	asst := assert.New(t)
 
-	s := NewDBService(dbRepo)
-	err := s.Create(map[string]interface{}{dbDBNameStruct: defaultDBInfoDBName, dbClusterIDStruct: defaultDBInfoClusterID, dbClusterTypeStruct: defaultDBInfoClusterType, dbEnvIDStruct: defaultDBInfoEnvID})
+	s := NewAppService(appRepo)
+	err := s.Create(map[string]interface{}{appAppNameStruct: defaultAppInfoAppName, appLevelStruct: defaultAppInfoLevel})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteDBByID(s.DBs[0].Identity())
+	err = deleteAppByID(s.Apps[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
-func TestDBService_Update(t *testing.T) {
+func TestAppService_Update(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createDB()
+	entity, err := createApp()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	s := NewDBService(dbRepo)
-	err = s.Update(entity.Identity(), map[string]interface{}{dbDBNameStruct: newDBName})
+	s := NewAppService(appRepo)
+	err = s.Update(entity.Identity(), map[string]interface{}{appAppNameStruct: newAppName})
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	dbName := s.GetDBs()[constant.ZeroInt].GetDBName()
+	appName := s.Apps[constant.ZeroInt].GetAppName()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	asst.Equal(newDBName, dbName)
+	asst.Equal(newAppName, appName)
 	// delete
-	err = deleteDBByID(s.DBs[0].Identity())
+	err = deleteAppByID(s.Apps[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
-func TestDBService_Delete(t *testing.T) {
+func TestAppService_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createDB()
+	entity, err := createApp()
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
-	s := NewDBService(dbRepo)
+	s := NewAppService(appRepo)
 	err = s.Delete(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	// delete
-	err = deleteDBByID(entity.Identity())
+	err = deleteAppByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }
 
-func TestDBService_Marshal(t *testing.T) {
-	var entitiesUnmarshal []*DBInfo
+func TestAppService_Marshal(t *testing.T) {
+	var entitiesUnmarshal []*AppInfo
 
 	asst := assert.New(t)
 
-	s := NewDBService(dbRepo)
+	s := NewAppService(appRepo)
 	err := s.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
 	data, err := s.Marshal()
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
 	err = json.Unmarshal(data, &entitiesUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
-	entities := s.GetDBs()
+	entities := s.GetApps()
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(dbEqual(entity.(*DBInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(appSystemStructEqual(entity.(*AppInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 
-func TestDBService_MarshalWithFields(t *testing.T) {
+func TestAppService_MarshalWithFields(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createDB()
+	entity, err := createApp()
 	asst.Nil(err, common.CombineMessageWithError("test MarshalWithFields() failed", err))
-	s := NewDBService(dbRepo)
+	s := NewAppService(appRepo)
 	err = s.GetByID(entity.Identity())
-	dataService, err := s.MarshalWithFields(dbDBNameStruct)
+	dataService, err := s.MarshalWithFields(appAppNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalWithFields() failed", err))
-	dataEntity, err := entity.MarshalJSONWithFields(dbDBNameStruct)
+	dataEntity, err := entity.MarshalJSONWithFields(appAppNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalWithFields() failed", err))
 	asst.Equal(string(dataService), fmt.Sprintf("[%s]", string(dataEntity)))
 	// delete
-	err = deleteDBByID(entity.Identity())
+	err = deleteAppByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }

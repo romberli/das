@@ -26,9 +26,9 @@ func TestMySQLClusterService_GetEntities(t *testing.T) {
 
 	s := NewMySQLClusterService(mysqlClusterRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMySQLClusterService_GetAll(t *testing.T) {
@@ -36,9 +36,9 @@ func TestMySQLClusterService_GetAll(t *testing.T) {
 
 	s := NewMySQLClusterService(mysqlClusterRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEntities() failed")
+	asst.Nil(err, "test GetEnvs() failed")
 	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEntities() failed")
+	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestMySQLClusterService_GetByID(t *testing.T) {

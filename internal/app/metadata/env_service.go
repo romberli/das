@@ -6,9 +6,8 @@ import (
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/pkg/message"
-
 	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/pkg/message"
 )
 
 const envNameStruct = "EnvName"
@@ -18,7 +17,7 @@ var _ dependency.Service = (*EnvService)(nil)
 // EnvService implements Service interface
 type EnvService struct {
 	dependency.Repository
-	Entities []dependency.Entity
+	Envs []dependency.Entity
 }
 
 // NewEnvService returns a new *EnvService
@@ -33,20 +32,40 @@ func NewEnvServiceWithDefault() *EnvService {
 
 // GetEntities returns entities of the service
 func (es *EnvService) GetEntities() []dependency.Entity {
-	entityList := make([]dependency.Entity, len(es.Entities))
-	for i := range entityList {
-		entityList[i] = es.Entities[i]
+	envList := make([]dependency.Entity, len(es.Envs))
+	for i := range envList {
+		envList[i] = es.Envs[i]
 	}
 
-	return entityList
+	return envList
 }
 
 // GetAll gets all environment entities from the middleware
 func (es *EnvService) GetAll() error {
 	var err error
-	es.Entities, err = es.Repository.GetAll()
+	es.Envs, err = es.Repository.GetAll()
 
 	return err
+}
+
+// GetID gets identity of an entity with given fields
+func (es *EnvService) GetID(fields map[string]interface{}) (string, error) {
+	_, ok := fields[envNameStruct]
+	if !ok {
+		return constant.EmptyString, message.NewMessage(message.ErrFieldNotExists, envNameStruct)
+	}
+	// create a new entity
+	envInfo, err := NewEnvInfoWithMapAndRandom(fields)
+	if err != nil {
+		return constant.EmptyString, err
+	}
+	// get identity from the middleware
+	id, err := es.Repository.GetID(envInfo)
+	if err != nil {
+		return constant.EmptyString, err
+	}
+
+	return id, nil
 }
 
 // GetByID gets an environment entity that contains the given id from the middleware
@@ -56,7 +75,7 @@ func (es *EnvService) GetByID(id string) error {
 		return err
 	}
 
-	es.Entities = append(es.Entities, entity)
+	es.Envs = append(es.Envs, entity)
 
 	return err
 }
@@ -74,12 +93,13 @@ func (es *EnvService) Create(fields map[string]interface{}) error {
 		return err
 	}
 	// insert into middleware
-	entity, err := es.Repository.Create(envInfo)
+	env, err := es.Repository.Create(envInfo)
 	if err != nil {
 		return err
 	}
 
-	es.Entities = append(es.Entities, entity)
+	es.Envs = append(es.Envs, env)
+
 	return nil
 }
 
@@ -92,12 +112,12 @@ func (es *EnvService) Update(id string, fields map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = es.Entities[constant.ZeroInt].Set(fields)
+	err = es.Envs[constant.ZeroInt].Set(fields)
 	if err != nil {
 		return err
 	}
 
-	return es.Repository.Update(es.Entities[constant.ZeroInt])
+	return es.Repository.Update(es.Envs[constant.ZeroInt])
 }
 
 // Delete deletes the environment entity that contains the given id in the middleware
@@ -105,20 +125,20 @@ func (es *EnvService) Delete(id string) error {
 	return es.Repository.Delete(id)
 }
 
-// Marshal marshals service.Entities
+// Marshal marshals service.Envs
 func (es *EnvService) Marshal() ([]byte, error) {
-	return json.Marshal(es.Entities)
+	return json.Marshal(es.Envs)
 }
 
-// MarshalWithFields marshals service.Entities with given fields
+// MarshalWithFields marshals service.Envs with given fields
 func (es *EnvService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(es.Entities))
+	interfaceList := make([]interface{}, len(es.Envs))
 	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(es.Entities[i], fields...)
+		env, err := common.CopyStructWithFields(es.Envs[i], fields...)
 		if err != nil {
 			return nil, err
 		}
-		interfaceList[i] = entity
+		interfaceList[i] = env
 	}
 
 	return json.Marshal(interfaceList)

@@ -45,6 +45,10 @@ func GetMiddlewareServer(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMiddlewareServerAll)
 }
 
+func GetMiddlewareServerByClusterID(c *gin.Context) {
+
+}
+
 // @Tags middleware server
 // @Summary get middleware server by id
 // @Produce  application/json
@@ -75,6 +79,10 @@ func GetMiddlewareServerByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataGetMiddlewareServerByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMiddlewareServerByID, id)
+}
+
+func GetMiddlewareServerByHostInfo(c *gin.Context) {
+
 }
 
 // @Tags middleware server
@@ -194,4 +202,8 @@ func UpdateMiddlewareServerByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataUpdateMiddlewareServer, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataUpdateMiddlewareServer, id)
+}
+
+func DeleteMiddlewareServerByID(c *gin.Context) {
+
 }

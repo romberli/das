@@ -3,7 +3,6 @@ package metadata
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware"
@@ -76,7 +75,7 @@ func (er *EnvRepo) GetAll() ([]dependency.Entity, error) {
 	if err != nil {
 		return nil, err
 	}
-	// init []dependency.Entity
+	// init []dependency.
 	entityList := make([]dependency.Entity, result.RowNumber())
 	for i := range entityList {
 		entityList[i] = envInfoList[i]
@@ -119,38 +118,55 @@ func (er *EnvRepo) GetByID(id string) (dependency.Entity, error) {
 func (er *EnvRepo) GetID(entity dependency.Entity) (string, error) {
 	sql := `select id from t_meta_env_info where del_flag = 0 and env_name = ?;`
 	log.Debugf("metadata EnvRepo.GetID() select sql: %s", sql)
-	result, err := er.Execute(sql, entity.(*EnvInfo).EnvName)
+	envName, err := entity.Get(envNameStruct)
+	if err != nil {
+		return constant.EmptyString, err
+	}
+	result, err := er.Execute(sql, envName)
 	if err != nil {
 		return constant.EmptyString, err
 	}
 
-	return result.GetString(constant.ZeroInt, constant.ZeroInt)
+	id, err := result.GetString(constant.ZeroInt, constant.ZeroInt)
+	if err != nil {
+		return constant.EmptyString, err
+	}
+
+	return id, err
 }
 
 // Create creates data with given entity in the middleware
-func (er *EnvRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
+func (er *EnvRepo) Create(env dependency.Entity) (dependency.Entity, error) {
 	sql := `insert into t_meta_env_info(env_name) values(?);`
 	log.Debugf("metadata EnvRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := er.Execute(sql, entity.(*EnvInfo).EnvName)
+	envName, err := env.Get(envNameStruct)
+	if err != nil {
+		return nil, err
+	}
+	_, err = er.Execute(sql, envName)
 	if err != nil {
 		return nil, err
 	}
 	// get id
-	id, err := er.GetID(entity)
+	id, err := er.GetID(env)
 	if err != nil {
 		return nil, err
 	}
-	// get entity
+	// get env
 	return er.GetByID(id)
 }
 
 // Update updates data with given entity in the middleware
-func (er *EnvRepo) Update(entity dependency.Entity) error {
-	sql := `update t_meta_env_info set env_name = ?, del_flag = ? where id = ?;`
+func (er *EnvRepo) Update(env dependency.Entity) error {
+	sql := `update t_meta_env_info set env_name = ? where id = ?;`
 	log.Debugf("metadata EnvRepo.Update() update sql: %s", sql)
-	envInfo := entity.(*EnvInfo)
-	_, err := er.Execute(sql, envInfo.EnvName, envInfo.DelFlag, envInfo.ID)
+	envName, err := env.Get(envNameStruct)
+	if err != nil {
+		return err
+	}
+
+	_, err = er.Execute(sql, envName, env.Identity())
 
 	return err
 }
@@ -160,11 +176,37 @@ func (er *EnvRepo) Update(entity dependency.Entity) error {
 func (er *EnvRepo) Delete(id string) error {
 	sql := `update t_meta_env_info set del_flag = 1 where id = ?;`
 	log.Debugf("metadata EnvRepo.Delete() update sql: %s", sql)
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return err
-	}
-	_, err = er.Execute(sql, idInt)
+	_, err := er.Execute(sql, id)
 
 	return err
+}
+
+func (er *EnvRepo) GetEnvByName(envName string) (dependency.Entity, error) {
+	sql := `
+		select id, env_name, del_flag, create_time, last_update_time
+		from t_meta_env_info
+		where del_flag = 0
+		and env_name = ?;
+	`
+	log.Debugf("metadata EnvRepo.GetEnvByName() sql: \n%s\nplaceholders: %s", sql, envName)
+
+	result, err := er.Execute(sql, envName)
+	if err != nil {
+		return nil, err
+	}
+	switch result.RowNumber() {
+	case 0:
+		return nil, errors.New(fmt.Sprintf("metadata EnvInfo.GetEnvByName(): data does not exists, env_name: %s", envName))
+	case 1:
+		envInfo := NewEmptyEnvInfoWithGlobal()
+		// map to struct
+		err = result.MapToStructByRowIndex(envInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+		if err != nil {
+			return nil, err
+		}
+
+		return envInfo, nil
+	default:
+		return nil, errors.New(fmt.Sprintf("metadata EnvInfo.GetEnvByName(): duplicate key exists, env_name: %s", envName))
+	}
 }

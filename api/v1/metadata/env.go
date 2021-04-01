@@ -80,6 +80,10 @@ func GetEnvByID(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetEnvByID, id)
 }
 
+func GetEnvByName(c *gin.Context) {
+
+}
+
 // @Tags	environment
 // @Summary add a new environment
 // @Accept	application/json
@@ -178,4 +182,8 @@ func UpdateEnvByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataUpdateEnv, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateEnv, id)
+}
+
+func DeleteEnvByID(c *gin.Context) {
+
 }

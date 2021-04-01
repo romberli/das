@@ -49,6 +49,10 @@ func GetUser(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetUserAll)
 }
 
+func GetUserByName(c *gin.Context) {
+
+}
+
 // @Tags user
 // @Summary get user by id
 // @Produce  application/json
@@ -79,6 +83,26 @@ func GetUserByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataGetUserByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetUserByID, id)
+}
+
+func GetUserByEmployeeID(c *gin.Context) {
+
+}
+
+func GetUserByAccountName(c *gin.Context) {
+
+}
+
+func GetUserByEmail(c *gin.Context) {
+
+}
+
+func GetUserByTelephone(c *gin.Context) {
+
+}
+
+func GetUserByMobile(c *gin.Context) {
+
 }
 
 // @Tags user
@@ -200,4 +224,8 @@ func UpdateUserByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataUpdateUser, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateUser, id)
+}
+
+func DeleteUserByID(c *gin.Context) {
+
 }

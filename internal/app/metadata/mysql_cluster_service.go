@@ -126,12 +126,12 @@ func (mcs *MySQLClusterService) Delete(id string) error {
 	return mcs.Repository.Delete(id)
 }
 
-// Marshal marshals service.Entities
+// Marshal marshals service.Envs
 func (mcs *MySQLClusterService) Marshal() ([]byte, error) {
 	return json.Marshal(mcs.Entities)
 }
 
-// MarshalWithFields marshals service.Entities with given fields
+// MarshalWithFields marshals service.Envs with given fields
 func (mcs *MySQLClusterService) MarshalWithFields(fields ...string) ([]byte, error) {
 	interfaceList := make([]interface{}, len(mcs.Entities))
 	for i := range interfaceList {

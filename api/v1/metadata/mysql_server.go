@@ -47,6 +47,10 @@ func GetMySQLServer(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerAll)
 }
 
+func GetMySQLServerByClusterID(c *gin.Context) {
+
+}
+
 // @Tags mysql server
 // @Summary get mysql server by id
 // @Produce  application/json
@@ -77,6 +81,10 @@ func GetMySQLServerByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLServerByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerByID, id)
+}
+
+func GetMySQLServerByHostInfo(c *gin.Context) {
+
 }
 
 // @Tags mysql server
@@ -212,4 +220,8 @@ func UpdateMySQLServerByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(message.DebugMetadataUpdateMySQLServer, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMySQLServer, id)
+}
+
+func DeleteMySQLServerByID(c *gin.Context) {
+
 }
