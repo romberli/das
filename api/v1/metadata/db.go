@@ -69,9 +69,10 @@ func GetDBByEnv(c *gin.Context) {
 		return
 	}
 	envID, err := strconv.Atoi(envIDStr)
-	if envIDStr == constant.EmptyString {
+	if err != nil {
 		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
 		return
+
 	}
 	// init service
 	s := metadata.NewDBServiceWithDefault()
