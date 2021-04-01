@@ -56,7 +56,7 @@ type EnvService interface {
 	// GetByID gets an environment of the given id from the middleware
 	GetByID(id int) error
 	// GetEnvByName returns Env of given env name
-	GetEnvByName(envName string) (Env, error)
+	GetEnvByName(envName string) error
 	// Create creates an environment in the middleware
 	Create(fields map[string]interface{}) error
 	// Update gets the environment of the given id from the middleware,

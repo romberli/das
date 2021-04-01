@@ -64,7 +64,7 @@ type MiddlewareClusterService interface {
 	// GetAll gets all middleware clusters from the middleware
 	GetAll() error
 	// GetByEnv gets middleware clusters of given env id
-	GetByEnv(envID int) ([]MiddlewareClusterService, error)
+	GetByEnv(envID int) error
 	// GetByID gets a middleware cluster of the given id from the middleware
 	GetByID(id int) error
 	// GetByName gets a middleware cluster of given cluster name
