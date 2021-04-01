@@ -72,7 +72,7 @@ type MonitorSystemService interface {
 	// GetByID gets a monitor system of the given id from the middleware
 	GetByID(id int) error
 	// GetByHostInfo gets a monitor system with given host ip and port number
-	GetByHostInfo(hostIP string, portNum int) (MonitorSystem, error)
+	GetByHostInfo(hostIP string, portNum int) error
 	// Create creates a monitor system in the middleware
 	Create(fields map[string]interface{}) error
 	// Update gets a monitor system of the given id from the middleware,
