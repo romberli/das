@@ -53,7 +53,7 @@ func (ar *AppRepo) Transaction() (middleware.Transaction, error) {
 // GetAll gets all apps from the middleware
 func (ar *AppRepo) GetAll() ([]metadata.App, error) {
 	sql := `
-		select id, app_name, level,owner_id, del_flag, create_time, last_update_time
+		select id, app_name, level, owner_id, del_flag, create_time, last_update_time
 		from t_meta_app_info
 		where del_flag = 0
 		order by id;

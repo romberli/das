@@ -2,6 +2,8 @@ package metadata
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/romberli/das/internal/dependency/metadata"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
@@ -9,21 +11,17 @@ import (
 	"github.com/romberli/das/pkg/message"
 )
 
-const (
-	middlewareClusterNameStruct  = "ClusterName"
-	middlewareClusterEnvIDStruct = "EnvID"
-)
-
-var _ dependency.Service = (*MiddlewareClusterService)(nil)
+var _ metadata.MiddlewareClusterService = (*MiddlewareClusterService)(nil)
 
 type MiddlewareClusterService struct {
-	dependency.Repository
-	Entities []dependency.Entity
+	metadata.MiddlewareClusterRepo
+	MiddlewareClusters   []metadata.MiddlewareCluster
+	MiddlewareServerList []int
 }
 
 // NewMiddlewareClusterService returns a new *MiddlewareClusterService
-func NewMiddlewareClusterService(repo dependency.Repository) *MiddlewareClusterService {
-	return &MiddlewareClusterService{repo, []dependency.Entity{}}
+func NewMiddlewareClusterService(repo metadata.MiddlewareClusterRepo) *MiddlewareClusterService {
+	return &MiddlewareClusterService{repo, []metadata.MiddlewareCluster{}, []int{}}
 }
 
 // NewMiddlewareClusterServiceWithDefault returns a new *MiddlewareClusterService with default repository
@@ -32,45 +30,65 @@ func NewMiddlewareClusterServiceWithDefault() *MiddlewareClusterService {
 }
 
 // GetEntities returns entities of the service
-func (mcs *MiddlewareClusterService) GetEntities() []dependency.Entity {
-	entityList := make([]dependency.Entity, len(mcs.Entities))
-	for i := range entityList {
-		entityList[i] = mcs.Entities[i]
-	}
-
-	return entityList
+func (mcs *MiddlewareClusterService) GetMiddlewareClusters() []metadata.MiddlewareCluster {
+	return mcs.MiddlewareClusters
 }
 
 // GetAll gets all middleware cluster entities from the middleware
 func (mcs *MiddlewareClusterService) GetAll() error {
 	var err error
-	mcs.Entities, err = mcs.Repository.GetAll()
+	mcs.MiddlewareClusters, err = mcs.MiddlewareClusterRepo.GetAll()
 
 	return err
 }
 
+// GetByEnv gets middleware clusters of given env id
+func (mcs *MiddlewareClusterService) GetByEnv(envID int) error {
+	var err error
+	mcs.MiddlewareClusters, err = mcs.MiddlewareClusterRepo.GetByEnv(envID)
+	return err
+}
+
 // GetByID gets an middleware cluster entity that contains the given id from the middleware
-func (mcs *MiddlewareClusterService) GetByID(id string) error {
-	entity, err := mcs.Repository.GetByID(id)
+func (mcs *MiddlewareClusterService) GetByID(id int) error {
+	middlewareCluster, err := mcs.MiddlewareClusterRepo.GetByID(id)
 	if err != nil {
 		return err
 	}
 
-	mcs.Entities = append(mcs.Entities, entity)
+	mcs.MiddlewareClusters = append(mcs.MiddlewareClusters, middlewareCluster)
 
 	return err
+}
+
+// GetByName gets a middleware cluster of given cluster name
+func (mcs *MiddlewareClusterService) GetByName(clusterName string) error {
+	middlewareCluster, err := mcs.MiddlewareClusterRepo.GetByName(clusterName)
+	if err != nil {
+		return err
+	}
+	mcs.MiddlewareClusters = append(mcs.MiddlewareClusters, middlewareCluster)
+	return nil
+}
+
+// GetMiddlewareServerIDList gets the middleware server id list of given cluster id
+func (mcs *MiddlewareClusterService) GetMiddlewareServerIDList(clusterID int) ([]int, error) {
+	middlewareCluster, err := mcs.MiddlewareClusterRepo.GetByID(clusterID)
+	if err != nil {
+		return nil, err
+	}
+	mcs.MiddlewareServerList, err = middlewareCluster.GetMiddlewareServerIDList()
+	return mcs.MiddlewareServerList, err
 }
 
 // Create creates a new middleware cluster entity and insert it into the middleware
 func (mcs *MiddlewareClusterService) Create(fields map[string]interface{}) error {
 	// generate new map
-	_, ok := fields[middlewareClusterNameStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, middlewareClusterNameStruct)
-	}
-	_, ok = fields[middlewareClusterEnvIDStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, middlewareClusterEnvIDStruct)
+	_, clusterNameExists := fields[middlewareClusterNameStruct]
+	_, ownerIDExists := fields[middlewareClusterOwnerIDStruct]
+	_, envIDExists := fields[middlewareClusterNameStruct]
+	if !clusterNameExists || !ownerIDExists || envIDExists {
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s", middlewareClusterNameStruct, middlewareClusterOwnerIDStruct, middlewareClusterNameStruct))
 	}
 	// create a new entity
 	middlewareClusterInfo, err := NewMiddlewareClusterInfoWithMapAndRandom(fields)
@@ -78,12 +96,11 @@ func (mcs *MiddlewareClusterService) Create(fields map[string]interface{}) error
 		return err
 	}
 	// insert into middleware
-	entity, err := mcs.Repository.Create(middlewareClusterInfo)
+	middlewareCluster, err := mcs.MiddlewareClusterRepo.Create(middlewareClusterInfo)
 	if err != nil {
 		return err
 	}
-
-	mcs.Entities = append(mcs.Entities, entity)
+	mcs.MiddlewareClusters = append(mcs.MiddlewareClusters, middlewareCluster)
 	return nil
 }
 
@@ -91,34 +108,34 @@ func (mcs *MiddlewareClusterService) Create(fields map[string]interface{}) error
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (mcs *MiddlewareClusterService) Update(id string, fields map[string]interface{}) error {
+func (mcs *MiddlewareClusterService) Update(id int, fields map[string]interface{}) error {
 	err := mcs.GetByID(id)
 	if err != nil {
 		return err
 	}
-	err = mcs.Entities[constant.ZeroInt].Set(fields)
+	err = mcs.MiddlewareClusters[constant.ZeroInt].Set(fields)
 	if err != nil {
 		return err
 	}
 
-	return mcs.Repository.Update(mcs.Entities[constant.ZeroInt])
+	return mcs.MiddlewareClusterRepo.Update(mcs.MiddlewareClusters[constant.ZeroInt])
 }
 
 // Delete deletes the middleware cluster entity that contains the given id in the middleware
-func (mcs *MiddlewareClusterService) Delete(id string) error {
-	return mcs.Repository.Delete(id)
+func (mcs *MiddlewareClusterService) Delete(id int) error {
+	return mcs.MiddlewareClusterRepo.Delete(id)
 }
 
 // Marshal marshals service.Envs
 func (mcs *MiddlewareClusterService) Marshal() ([]byte, error) {
-	return json.Marshal(mcs.Entities)
+	return json.Marshal(mcs.MiddlewareClusters)
 }
 
 // Marshal marshals service.Envs with given fields
 func (mcs *MiddlewareClusterService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(mcs.Entities))
+	interfaceList := make([]interface{}, len(mcs.MiddlewareClusters))
 	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(mcs.Entities[i], fields...)
+		entity, err := common.CopyStructWithFields(mcs.MiddlewareClusters[i], fields...)
 		if err != nil {
 			return nil, err
 		}

@@ -69,11 +69,6 @@ const (
 	ErrMetadataAddMySQLServer     = 400803
 	ErrMetadataUpdateMySQLServer  = 400804
 
-	ErrMetadataGetMiddlewareClusterAll  = 400501
-	ErrMetadataGetMiddlewareClusterByID = 400502
-	ErrMetadataAddMiddlewareCluster     = 400503
-	ErrMetadataUpdateMiddlewareCluster  = 400504
-
 	ErrMetadataGetMiddlewareServerAll  = 400601
 	ErrMetadataGetMiddlewareServerByID = 400602
 	ErrMetadataAddMiddlewareServer     = 400603
