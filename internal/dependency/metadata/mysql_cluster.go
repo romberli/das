@@ -6,10 +6,11 @@ import (
 	"github.com/romberli/go-util/middleware"
 )
 
+// MySQLCluster is the entity interface
 type MySQLCluster interface {
 	// Identity returns the identity
 	Identity() int
-	// ClusterName returns the env name
+	// GetClusterName returns the env name
 	GetClusterName() string
 	// GetMiddlewareClusterID returns the middleware cluster id
 	GetMiddlewareClusterID() int
@@ -37,6 +38,7 @@ type MySQLCluster interface {
 	MarshalJSONWithFields(fields ...string) ([]byte, error)
 }
 
+// MySQLClusterRepo is the repository interface
 type MySQLClusterRepo interface {
 	// Execute executes given command and placeholders on the middleware
 	Execute(command string, args ...interface{}) (middleware.Result, error)
@@ -49,7 +51,7 @@ type MySQLClusterRepo interface {
 	// GetByID gets a mysql cluster by the identity from the middleware
 	GetByID(id int) (MySQLCluster, error)
 	// GetByName gets a mysql cluster of given cluster name from the middle ware
-	GetByName(clusterName string, envID int) error
+	GetByName(clusterName string) (MySQLCluster, error)
 	// GetID gets the identity with given cluster name from the middleware
 	GetID(clusterName string) (int, error)
 	// GetMySQLServerIDList gets the mysql server id list of given cluster id
@@ -62,6 +64,7 @@ type MySQLClusterRepo interface {
 	Delete(id int) error
 }
 
+// MySQLClusterService is the service interface
 type MySQLClusterService interface {
 	// GetMySQLClusters returns mysql clusters of the service
 	GetMySQLClusters() []MySQLCluster
@@ -74,14 +77,14 @@ type MySQLClusterService interface {
 	// GetByName gets a mysql cluster of given cluster name
 	GetByName(clusterName string) error
 	// GetMySQLServerIDList gets the mysql server id list of given cluster id
-	GetMySQLServerIDList(clusterID int) ([]int, error)
+	GetMySQLServerIDList(clusterID int) error
 	// Create creates a mysql cluster in the middleware
 	Create(fields map[string]interface{}) error
 	// Update gets a mysql cluster of the given id from the middleware,
 	// and then updates its fields that was specified in fields argument,
 	// key is the filed name and value is the new field value,
 	// it saves the changes to the middleware
-	Update(id int, fields map[string]interface{})
+	Update(id int, fields map[string]interface{}) error
 	// Delete deletes the mysql cluster of given id in the middleware
 	Delete(id int) error
 	// Marshal marshals MySQLClusterService.MySQLClusters to json bytes

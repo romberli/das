@@ -8,7 +8,7 @@ import (
 
 	"github.com/romberli/das/pkg/message"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
 const (
@@ -20,17 +20,17 @@ const (
 	versionStruct        = "Version"
 )
 
-var _ dependency.Service = (*MySQLServerService)(nil)
+var _ metadata.MySQLServerService = (*MySQLServerService)(nil)
 
 // MySQLServerService implements Service interface
 type MySQLServerService struct {
-	dependency.Repository
-	Entities []dependency.Entity
+	MySQLServerRepo metadata.MySQLServerRepo
+	MySQLServers    []metadata.MySQLServer
 }
 
 // NewMySQLServerService returns a new *MySQLServerService
-func NewMySQLServerService(repo dependency.Repository) *MySQLServerService {
-	return &MySQLServerService{repo, []dependency.Entity{}}
+func NewMySQLServerService(repo metadata.MySQLServerRepo) *MySQLServerService {
+	return &MySQLServerService{repo, []metadata.MySQLServer{}}
 }
 
 // NewMySQLServerServiceWithDefault returns a new *MySQLServerService with default repository
@@ -38,11 +38,11 @@ func NewMySQLServerServiceWithDefault() *MySQLServerService {
 	return NewMySQLServerService(NewMySQLServerRepoWithGlobal())
 }
 
-// GetEntities returns entities of the service
-func (mss *MySQLServerService) GetEntities() []dependency.Entity {
-	entityList := make([]dependency.Entity, len(mss.Entities))
+// GetMySQLServers returns entities of the service
+func (mss *MySQLServerService) GetMySQLServers() []metadata.MySQLServer {
+	entityList := make([]metadata.MySQLServer, len(mss.MySQLServers))
 	for i := range entityList {
-		entityList[i] = mss.Entities[i]
+		entityList[i] = mss.MySQLServers[i]
 	}
 
 	return entityList
@@ -51,21 +51,46 @@ func (mss *MySQLServerService) GetEntities() []dependency.Entity {
 // GetAll gets all mysql server entities from the middleware
 func (mss *MySQLServerService) GetAll() error {
 	var err error
-	mss.Entities, err = mss.Repository.GetAll()
+	mss.MySQLServers, err = mss.MySQLServerRepo.GetAll()
 
 	return err
 }
 
-// GetByID gets an mysql server entity that contains the given id from the middleware
-func (mss *MySQLServerService) GetByID(id string) error {
-	entity, err := mss.Repository.GetByID(id)
+// GetByClusterID gets mysql servers with given cluster id
+func (mss *MySQLServerService) GetByClusterID(clusterID int) error {
+	// FIXME: 这里这么写有问题吗？
+	mysqlServers, err := mss.MySQLServerRepo.GetByClusterID(clusterID)
 	if err != nil {
 		return err
 	}
 
-	mss.Entities = append(mss.Entities, entity)
+	mss.MySQLServers = mysqlServers
+
+	return nil
+}
+
+// GetByID gets an mysql server entity that contains the given id from the middleware
+func (mss *MySQLServerService) GetByID(id int) error {
+	entity, err := mss.MySQLServerRepo.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	mss.MySQLServers = append(mss.MySQLServers, entity)
 
 	return err
+}
+
+// GetByHostInfo gets a mysql server with given host ip and port number
+func (mss *MySQLServerService) GetByHostInfo(hostIP string, portNum int) error {
+	mysqlServer, err := mss.MySQLServerRepo.GetByHostInfo(hostIP, portNum)
+	if err != nil {
+		return err
+	}
+
+	mss.MySQLServers = append(mss.MySQLServers, mysqlServer)
+
+	return nil
 }
 
 // Create creates a new mysql server entity and insert it into the middleware
@@ -95,12 +120,12 @@ func (mss *MySQLServerService) Create(fields map[string]interface{}) error {
 		return err
 	}
 	// insert into middleware
-	entity, err := mss.Repository.Create(mysqlServerInfo)
+	entity, err := mss.MySQLServerRepo.Create(mysqlServerInfo)
 	if err != nil {
 		return err
 	}
 
-	mss.Entities = append(mss.Entities, entity)
+	mss.MySQLServers = append(mss.MySQLServers, entity)
 	return nil
 }
 
@@ -108,34 +133,34 @@ func (mss *MySQLServerService) Create(fields map[string]interface{}) error {
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (mss *MySQLServerService) Update(id string, fields map[string]interface{}) error {
+func (mss *MySQLServerService) Update(id int, fields map[string]interface{}) error {
 	err := mss.GetByID(id)
 	if err != nil {
 		return err
 	}
-	err = mss.Entities[constant.ZeroInt].Set(fields)
+	err = mss.MySQLServers[constant.ZeroInt].Set(fields)
 	if err != nil {
 		return err
 	}
 
-	return mss.Repository.Update(mss.Entities[constant.ZeroInt])
+	return mss.MySQLServerRepo.Update(mss.MySQLServers[constant.ZeroInt])
 }
 
 // Delete deletes the mysql server entity that contains the given id in the middleware
-func (mss *MySQLServerService) Delete(id string) error {
-	return mss.Repository.Delete(id)
+func (mss *MySQLServerService) Delete(id int) error {
+	return mss.MySQLServerRepo.Delete(id)
 }
 
 // Marshal marshals service.Envs
 func (mss *MySQLServerService) Marshal() ([]byte, error) {
-	return json.Marshal(mss.Entities)
+	return json.Marshal(mss.MySQLServers)
 }
 
 // MarshalWithFields marshals service.Envs with given fields
 func (mss *MySQLServerService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(mss.Entities))
+	interfaceList := make([]interface{}, len(mss.MySQLServers))
 	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(mss.Entities[i], fields...)
+		entity, err := common.CopyStructWithFields(mss.MySQLServers[i], fields...)
 		if err != nil {
 			return nil, err
 		}

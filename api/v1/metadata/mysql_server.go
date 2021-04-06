@@ -48,8 +48,21 @@ func GetMySQLServer(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerAll)
 }
 
+// TODO: Modify Swagger commment
+// @Tags mysql server
+// @Summary get mysql servers by clutster id
+// @Produce  application/json
+// @Success
+// @Router /api/v1/metadata/mysql-server/:id [get]
 func GetMySQLServerByClusterID(c *gin.Context) {
-
+	// get param
+	id := c.Param(idJSON)
+	if id == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+		return
+	}
+	// init service
+	s := metadata.NewMySQLServerServiceWithDefault()
 }
 
 // @Tags mysql server

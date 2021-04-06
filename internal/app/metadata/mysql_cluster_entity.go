@@ -1,26 +1,24 @@
 package metadata
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-var _ dependency.Entity = (*MySQLClusterInfo)(nil)
+var _ metadata.MySQLCluster = (*MySQLClusterInfo)(nil)
 
 // MySQLClusterInfo is a struct map to table in the database
 type MySQLClusterInfo struct {
-	dependency.Repository
+	MySQLClusterRepo    metadata.MySQLClusterRepo
 	ID                  int       `middleware:"id" json:"id"`
 	ClusterName         string    `middleware:"cluster_name" json:"cluster_name"`
 	MiddlewareClusterID int       `middleware:"middleware_cluster_id" json:"middleware_cluster_id"`
 	MonitorSystemID     int       `middleware:"monitor_system_id" json:"monitor_system_id"`
 	OwnerID             int       `middleware:"owner_id" json:"owner_id"`
-	OwnerGroup          string    `middleware:"owner_group" json:"owner_group"`
 	EnvID               int       `middleware:"env_id" json:"env_id"`
 	DelFlag             int       `middleware:"del_flag" json:"del_flag"`
 	CreateTime          time.Time `middleware:"create_time" json:"create_time"`
@@ -44,7 +42,6 @@ func NewMySQLClusterInfo(repo *MySQLClusterRepo,
 		middlewareClusterID,
 		monitorSystemID,
 		ownerID,
-		ownerGroup,
 		envID,
 		delFlag,
 		createTime,
@@ -69,7 +66,6 @@ func NewMySQLClusterInfoWithGlobal(
 		middlewareClusterID,
 		monitorSystemID,
 		ownerID,
-		ownerGroup,
 		envID,
 		delFlag,
 		createTime,
@@ -79,7 +75,7 @@ func NewMySQLClusterInfoWithGlobal(
 
 // NewEmptyMySQLClusterInfoWithGlobal returns a new MySQLClusterInfo with default MySQLClusterRepo
 func NewEmptyMySQLClusterInfoWithGlobal() *MySQLClusterInfo {
-	return &MySQLClusterInfo{Repository: NewMySQLClusterRepoWithGlobal()}
+	return &MySQLClusterInfo{MySQLClusterRepo: NewMySQLClusterRepoWithGlobal()}
 }
 
 // NewMySQLClusterInfoWithDefault returns a new MySQLClusterInfo with default MySQLClusterRepo
@@ -87,12 +83,11 @@ func NewMySQLClusterInfoWithDefault(
 	clusterName string,
 	envID int) *MySQLClusterInfo {
 	return &MySQLClusterInfo{
-		Repository:          NewMySQLClusterRepoWithGlobal(),
+		MySQLClusterRepo:    NewMySQLClusterRepoWithGlobal(),
 		ClusterName:         clusterName,
 		MiddlewareClusterID: constant.DefaultRandomInt,
 		MonitorSystemID:     constant.DefaultRandomInt,
 		OwnerID:             constant.DefaultRandomInt,
-		OwnerGroup:          constant.DefaultRandomString,
 		EnvID:               envID,
 	}
 }
@@ -107,32 +102,57 @@ func NewMySQLClusterInfoWithMapAndRandom(fields map[string]interface{}) (*MySQLC
 	return mci, nil
 }
 
-// Identity returns ID of entity
-func (mci *MySQLClusterInfo) Identity() string {
-	return strconv.Itoa(mci.ID)
+// Identity cluster returns ID of mysql cluster
+func (mci *MySQLClusterInfo) Identity() int {
+	return mci.ID
 }
 
-// IsDeleted checks if delete flag had been set
-func (mci *MySQLClusterInfo) IsDeleted() bool {
-	return mci.DelFlag != constant.ZeroInt
+// GetClusterName returns the env name
+func (mci *MySQLClusterInfo) GetClusterName() string {
+	return mci.ClusterName
 }
 
-// GetCreateTime returns created time of entity
+// GetMiddlewareClusterID returns the middleware cluster id
+func (mci *MySQLClusterInfo) GetMiddlewareClusterID() int {
+	return mci.MiddlewareClusterID
+}
+
+// GetMonitorSystemID returns the monitor system id
+func (mci *MySQLClusterInfo) GetMonitorSystemID() int {
+	return mci.MonitorSystemID
+}
+
+// GetOwnerID returns the owner id
+func (mci *MySQLClusterInfo) GetOwnerID() int {
+	return mci.OwnerID
+}
+
+// GetEnvID returns the env id
+func (mci *MySQLClusterInfo) GetEnvID() int {
+	return mci.EnvID
+}
+
+// GetDelFlag returns the delete flag
+func (mci *MySQLClusterInfo) GetDelFlag() int {
+	return mci.DelFlag
+}
+
+// GetCreateTime returns created time of mysql cluster
 func (mci *MySQLClusterInfo) GetCreateTime() time.Time {
 	return mci.CreateTime
 }
 
-// GetLastUpdateTime returns last updated time of entity
+// GetLastUpdateTime returns last updated time of mysql cluster
 func (mci *MySQLClusterInfo) GetLastUpdateTime() time.Time {
 	return mci.LastUpdateTime
 }
 
-// Get returns value of given field
-func (mci *MySQLClusterInfo) Get(field string) (interface{}, error) {
-	return common.GetValueOfStruct(mci, field)
+// GetMySQLServerIDList gets the mysql server id list of this cluster
+func (mci *MySQLClusterInfo) GetMySQLServerIDList() ([]int, error) {
+	return mci.GetMySQLServerIDList()
 }
 
-// Set sets entity with given fields, key is the field name and value is the relevant value of the key
+// Set sets mysql cluster with given fields, key is the field name and value is the relevant value of the key
 func (mci *MySQLClusterInfo) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {
 		err := common.SetValueOfStruct(mci, fieldName, fieldValue)
@@ -149,12 +169,12 @@ func (mci *MySQLClusterInfo) Delete() {
 	mci.DelFlag = 1
 }
 
-// MarshalJSON marshals entity to json string, it only marshals fields that has default tag
+// MarshalJSON marshals mysql cluster to json string, it only marshals fields that has default tag
 func (mci *MySQLClusterInfo) MarshalJSON() ([]byte, error) {
 	return common.MarshalStructWithTag(mci, constant.DefaultMarshalTag)
 }
 
-// MarshalJSONWithFields marshals only with specified fields of entity to json string
+// MarshalJSONWithFields marshals only with specified fields of mysql cluster to json string
 func (mci *MySQLClusterInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
 	return common.MarshalStructWithFields(mci, fields...)
 }
