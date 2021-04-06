@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/romberli/go-util/common"
@@ -10,10 +11,15 @@ import (
 
 	"github.com/romberli/das/internal/app/metadata"
 	"github.com/romberli/das/pkg/message"
+	msgmeta "github.com/romberli/das/pkg/message/metadata"
 	"github.com/romberli/das/pkg/resp"
 )
 
 const (
+	middlewareClusterIDJSON   = "id"
+	middlewareClusterNameJSON = "cluster_name"
+	middlewareEnvIDJSON       = "env_id"
+
 	middlewareClusterNameStruct  = "ClusterName"
 	middlewareClusterEnvIDStruct = "EnvID"
 )
@@ -29,7 +35,7 @@ func GetMiddlewareCluster(c *gin.Context) {
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMiddlewareClusterAll, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMiddlewareClusterAll, err.Error())
 		return
 	}
 	// marshal service
@@ -40,12 +46,45 @@ func GetMiddlewareCluster(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMiddlewareClusterAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMiddlewareClusterAll)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMiddlewareClusterAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMiddlewareClusterAll)
 }
 
+// @Tags middleware cluster
+// @Summary get middleware cluster by env
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [{"create_time":"2021-02-20T09:25:48.192194+08:00","last_update_time":"2021-02-20T09:25:48.192194+08:00","id":1,"cluster_name":"online","env_id":1,"del_flag":0}]}"
+// @Router /api/v1/metadata/middleware-cluster/:id [get]
 func GetMiddlewareClusterByEnv(c *gin.Context) {
-
+	// get param
+	envIDStr := c.Param(middlewareClusterEnvIDStruct)
+	if envIDStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterIDJSON)
+		return
+	}
+	envID, err := strconv.Atoi(envIDStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	// init service
+	s := metadata.NewMiddlewareClusterServiceWithDefault()
+	// get entity
+	err = s.GetByID(envID)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMiddlewareClusterByEnv, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMiddlewareClusterByEnv, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMiddlewareClusterByEnv, envID)
 }
 
 // @Tags middleware cluster
@@ -55,17 +94,22 @@ func GetMiddlewareClusterByEnv(c *gin.Context) {
 // @Router /api/v1/metadata/middleware-cluster/:id [get]
 func GetMiddlewareClusterByID(c *gin.Context) {
 	// get param
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+	idStr := c.Param(middlewareClusterIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
 		return
 	}
 	// init service
 	s := metadata.NewMiddlewareClusterServiceWithDefault()
 	// get entity
-	err := s.GetByID(id)
+	err = s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMiddlewareClusterByID, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMiddlewareClusterByID, id, err.Error())
 		return
 	}
 	// marshal service
@@ -76,15 +120,66 @@ func GetMiddlewareClusterByID(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMiddlewareClusterByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMiddlewareClusterByID, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMiddlewareClusterByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMiddlewareClusterByID, id)
 }
 
+// @Tags middleware cluster
+// @Summary get middleware cluster by name
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [{"create_time":"2021-02-20T09:25:48.192194+08:00","last_update_time":"2021-02-20T09:25:48.192194+08:00","id":1,"cluster_name":"online","env_id":1,"del_flag":0}]}"
+// @Router /api/v1/metadata/middleware-cluster/:id [get]
 func GetMiddlewareClusterByName(c *gin.Context) {
-
+	// get params
+	middlewareClusterName := c.Param(middlewareClusterNameJSON)
+	if middlewareClusterName == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterNameJSON)
+		return
+	}
+	// init service
+	s := metadata.NewMiddlewareClusterServiceWithDefault()
+	// get entity
+	err := s.GetByName(middlewareClusterName)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMiddlewareClusterByName, middlewareClusterName, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMiddlewareClusterByName, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMiddlewareClusterByName, middlewareClusterName)
 }
 
+// @Tags application
+// @Summary get middleware cluster id list
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [1, 2]}"
+// @Router /api/vi/metadata/app/dbs/:id [get]
 func GetMiddlewareServerIDList(c *gin.Context) {
+	// get params
+	idStr := c.Param(middlewareClusterIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterIDJSON)
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	// init service
+	s := metadata.NewMiddlewareClusterServiceWithDefault()
+	// get entity
+	_, err = s.GetMiddlewareServerIDList(id)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMiddlewareServerIDList, id, err.Error())
+		return
+	}
 
 }
 
