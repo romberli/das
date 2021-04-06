@@ -102,24 +102,19 @@ func TestMySQLServerInfo_Get(t *testing.T) {
 
 	mysqlServerInfo := initNewMySQLServerInfo()
 
-	clusterID, err := mysqlServerInfo.Get(clusterIDStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
+	clusterID := mysqlServerInfo.GetClusterID()
 	asst.Equal(mysqlServerInfo.ClusterID, clusterID, "test Get() failed")
 
-	hostIP, err := mysqlServerInfo.Get(hostIPStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
+	hostIP := mysqlServerInfo.GetHostIP()
 	asst.Equal(mysqlServerInfo.HostIP, hostIP, "test Get() failed")
 
-	portNum, err := mysqlServerInfo.Get(portNumStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
+	portNum := mysqlServerInfo.GetPortNum()
 	asst.Equal(mysqlServerInfo.PortNum, portNum, "test Get() failed")
 
-	deploymentType, err := mysqlServerInfo.Get(deploymentTypeStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
+	deploymentType := mysqlServerInfo.GetDeploymentType()
 	asst.Equal(mysqlServerInfo.DeploymentType, deploymentType, "test Get() failed")
 
-	version, err := mysqlServerInfo.Get(versionStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
+	version := mysqlServerInfo.GetVersion()
 	asst.Equal(mysqlServerInfo.Version, version, "test Get() failed")
 }
 

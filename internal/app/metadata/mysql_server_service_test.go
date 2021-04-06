@@ -11,7 +11,7 @@ import (
 )
 
 func TestMySQLServerServiceAll(t *testing.T) {
-	TestMySQLServerService_GetEntities(t)
+	TestMySQLServerService_GetMySQLClusters(t)
 	TestMySQLServerService_GetAll(t)
 	TestMySQLServerService_GetByID(t)
 	TestMySQLServerService_Create(t)
@@ -21,13 +21,13 @@ func TestMySQLServerServiceAll(t *testing.T) {
 	TestMySQLServerService_MarshalWithFields(t)
 }
 
-func TestMySQLServerService_GetEntities(t *testing.T) {
+func TestMySQLServerService_GetMySQLClusters(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMySQLServerService(mysqlServerRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEntities()
+	entities := s.GetMySQLClusters()
 	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
@@ -37,7 +37,7 @@ func TestMySQLServerService_GetAll(t *testing.T) {
 	s := NewMySQLServerService(mysqlServerRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEntities()
+	entities := s.GetMySQLClusters()
 	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
 }
 
@@ -80,10 +80,10 @@ func TestMySQLServerService_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	hostIP, err := s.GetEntities()[constant.ZeroInt].Get(hostIPStruct)
+	hostIP, err := s.GetMySQLClusters()[constant.ZeroInt].Get(hostIPStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(testUpdateHostIP, hostIP)
-	portNum, err := s.GetEntities()[constant.ZeroInt].Get(portNumStruct)
+	portNum, err := s.GetMySQLClusters()[constant.ZeroInt].Get(portNumStruct)
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(testUpdatePortNum, portNum)
 	// delete
@@ -116,7 +116,7 @@ func TestMySQLServerService_Marshal(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
 	err = json.Unmarshal(data, &entitiesUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
-	entities := s.GetEntities()
+	entities := s.GetMySQLClusters()
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
