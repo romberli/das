@@ -83,11 +83,6 @@ const (
 	ErrMetadataGetUserByID = 400902
 	ErrMetadataAddUser     = 400903
 	ErrMetadataUpdateUser  = 400904
-
-	ErrMetadataGetMonitorSystemAll  = 400601
-	ErrMetadataGetMonitorSystemByID = 400602
-	ErrMetadataAddMonitorSystem     = 400603
-	ErrMetadataUpdateMonitorSystem  = 400604
 )
 
 func initErrorMessage() {
@@ -170,8 +165,4 @@ func initErrorMessage() {
 	Messages[ErrMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddUser, "metadata: add new user failed. user_name: %s\n%s")
 	Messages[ErrMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateUser, "metadata: update user failed. id: %s\n%s")
 
-	Messages[ErrMetadataGetMonitorSystemAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMonitorSystemAll, "metadata: get all monitor systems failed.\n%s")
-	Messages[ErrMetadataGetMonitorSystemByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMonitorSystemByID, "metadata: get monitor system by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMonitorSystem, "metadata: add new monitor system failed. system_name: %s\n%s")
-	Messages[ErrMetadataUpdateMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMonitorSystem, "metadata: update monitor system failed. id: %s\n%s")
 }

@@ -3,7 +3,6 @@ package metadata
 import (
 	"encoding/json"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/jinzhu/now"
@@ -14,11 +13,10 @@ import (
 
 const (
 	defaultDBInfoID                   = 1
-	defaultDBInfoDBName               = "das"
+	defaultDBInfoDBName               = "test"
 	defaultDBInfoClusterID            = 1
 	defaultDBInfoClusterType          = 1
 	defaultDBInfoOwnerID              = 1
-	defaultDBInfoOwnerGroup           = "2,5,6"
 	defaultDBInfoEnvID                = 2
 	defaultDBInfoDelFlag              = 0
 	defaultDBInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
@@ -31,20 +29,32 @@ func initNewDBInfo() *DBInfo {
 
 	createTime, _ := now.Parse(defaultDBInfoCreateTimeString)
 	lastUpdateTime, _ := now.Parse(defaultDBInfoLastUpdateTimeString)
-	return NewDBInfoWithGlobal(defaultDBInfoID, defaultDBInfoDBName, defaultDBInfoClusterID, defaultDBInfoClusterType, defaultDBInfoOwnerID, defaultDBInfoEnvID, defaultDBInfoDelFlag, createTime, lastUpdateTime)
+	return NewDBInfo(dbRepo, defaultDBInfoID, defaultDBInfoDBName, defaultDBInfoClusterID,
+		defaultDBInfoClusterType, defaultDBInfoOwnerID, defaultDBInfoEnvID, defaultDBInfoDelFlag,
+		createTime, lastUpdateTime)
 }
 
 func dbEqual(a, b *DBInfo) bool {
-	return a.ID == b.ID && a.DBName == b.DBName && a.ClusterID == b.ClusterID && a.ClusterType == b.ClusterType && a.OwnerID == b.OwnerID && a.EnvID == b.EnvID && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
+	return a.ID == b.ID && a.DBName == b.DBName && a.ClusterID == b.ClusterID && a.ClusterType == b.ClusterType &&
+		a.OwnerID == b.OwnerID && a.EnvID == b.EnvID && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime &&
+		a.LastUpdateTime == b.LastUpdateTime
 }
 
 func TestDBEntityAll(t *testing.T) {
 	TestDBInfo_Identity(t)
-	TestDBInfo_IsDeleted(t)
+	TestDBInfo_GetDBName(t)
+	TestDBInfo_GetClusterID(t)
+	TestDBInfo_GetClusterType(t)
+	TestDBInfo_GetOwnerID(t)
+	TestDBInfo_GetEnvID(t)
+	TestDBInfo_GetDelFlag(t)
 	TestDBInfo_GetCreateTime(t)
 	TestDBInfo_GetLastUpdateTime(t)
+	TestDBInfo_GetAppIDList(t)
 	TestDBInfo_Set(t)
 	TestDBInfo_Delete(t)
+	TestDBInfo_AddDBApp(t)
+	TestDBInfo_DeleteDBApp(t)
 	TestDBInfo_MarshalJSON(t)
 	TestDBInfo_MarshalJSONWithFields(t)
 }
@@ -53,14 +63,49 @@ func TestDBInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
 	dbInfo := initNewDBInfo()
-	asst.Equal(strconv.Itoa(defaultDBInfoID), dbInfo.Identity(), "test Identity() failed")
+	asst.Equal(defaultDBInfoID, dbInfo.Identity(), "test Identity() failed")
 }
 
-func TestDBInfo_IsDeleted(t *testing.T) {
+func TestDBInfo_GetDBName(t *testing.T) {
 	asst := assert.New(t)
 
 	dbInfo := initNewDBInfo()
-	asst.Equal(0, dbInfo.GetDelFlag(), "test IsDeleted() failed")
+	asst.Equal(defaultDBInfoDBName, dbInfo.GetDBName(), "test GetDBName() failed")
+}
+
+func TestDBInfo_GetClusterID(t *testing.T) {
+	asst := assert.New(t)
+
+	dbInfo := initNewDBInfo()
+	asst.Equal(defaultDBInfoClusterID, dbInfo.GetClusterID(), "test GetClusterID() failed")
+}
+
+func TestDBInfo_GetClusterType(t *testing.T) {
+	asst := assert.New(t)
+
+	dbInfo := initNewDBInfo()
+	asst.Equal(defaultDBInfoClusterType, dbInfo.GetClusterType(), "test GetClusterType() failed")
+}
+
+func TestDBInfo_GetOwnerID(t *testing.T) {
+	asst := assert.New(t)
+
+	dbInfo := initNewDBInfo()
+	asst.Equal(defaultDBInfoOwnerID, dbInfo.GetOwnerID(), "test GetOwnerID() failed")
+}
+
+func TestDBInfo_GetEnvID(t *testing.T) {
+	asst := assert.New(t)
+
+	dbInfo := initNewDBInfo()
+	asst.Equal(defaultDBInfoEnvID, dbInfo.GetEnvID(), "test GetEnvID() failed")
+}
+
+func TestDBInfo_GetDelFlag(t *testing.T) {
+	asst := assert.New(t)
+
+	dbInfo := initNewDBInfo()
+	asst.Equal(defaultDBInfoDelFlag, dbInfo.GetDelFlag(), "test GetDelFlag() failed")
 }
 
 func TestDBInfo_GetCreateTime(t *testing.T) {
@@ -75,6 +120,18 @@ func TestDBInfo_GetLastUpdateTime(t *testing.T) {
 
 	dbInfo := initNewDBInfo()
 	asst.True(reflect.DeepEqual(dbInfo.LastUpdateTime, dbInfo.GetLastUpdateTime()), "test GetLastUpdateTime() failed")
+}
+
+func TestDBInfo_GetAppIDList(t *testing.T) {
+	asst := assert.New(t)
+
+	dbInfo := initNewDBInfo()
+	appIDList, err := dbInfo.GetAppIDList()
+	asst.Nil(err, common.CombineMessageWithError("test GetAppIDList() failed", err))
+	defaultAppIDList := []int{1, 2}
+	for i := 0; i < len(appIDList); i++ {
+		asst.Equal(defaultAppIDList[i], appIDList[i], "test GetAppIDList() failed")
+	}
 }
 
 func TestDBInfo_Set(t *testing.T) {
@@ -92,8 +149,37 @@ func TestDBInfo_Delete(t *testing.T) {
 
 	dbInfo := initNewDBInfo()
 	dbInfo.Delete()
+	asst.Equal(1, dbInfo.DelFlag, "test Delete() failed")
+}
 
-	asst.Equal(1, dbInfo.GetDelFlag(), "test Delete() failed")
+func TestDBInfo_AddDBApp(t *testing.T) {
+	var appIDList []int
+
+	asst := assert.New(t)
+
+	dbInfo := initNewDBInfo()
+	err := dbInfo.AddApp(3)
+	appIDList, err = dbInfo.GetAppIDList()
+	asst.Nil(err, common.CombineMessageWithError("test AddApp() failed", err))
+	asst.Equal(3, len(appIDList), "test AddApp() failed")
+	// delete
+	err = dbInfo.DeleteApp(3)
+	asst.Nil(err, common.CombineMessageWithError("test AddApp() failed", err))
+}
+
+func TestDBInfo_DeleteDBApp(t *testing.T) {
+	var appIDList []int
+
+	asst := assert.New(t)
+
+	dbInfo := initNewDBInfo()
+	err := dbInfo.DeleteApp(2)
+	appIDList, err = dbInfo.GetAppIDList()
+	asst.Nil(err, common.CombineMessageWithError("test DeleteApp() failed", err))
+	asst.Equal(1, len(appIDList), "test DeleteApp() failed")
+	// add
+	err = dbInfo.AddApp(2)
+	asst.Nil(err, common.CombineMessageWithError("test DeleteApp() failed", err))
 }
 
 func TestDBInfo_MarshalJSON(t *testing.T) {
@@ -115,7 +201,7 @@ func TestDBInfo_MarshalJSONWithFields(t *testing.T) {
 	dbInfo := initNewDBInfo()
 	data, err := dbInfo.MarshalJSONWithFields(dbDBNameStruct)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
-	expect, err := json.Marshal(map[string]interface{}{dbNameJSON: "das"})
+	expect, err := json.Marshal(map[string]interface{}{dbNameJSON: "test"})
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSONWithFields() failed", err))
 	asst.Equal(string(expect), string(data), "test MarshalJSONWithFields() failed")
 }

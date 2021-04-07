@@ -34,11 +34,6 @@ const (
 	DebugMetadataGetUserByID = 100902
 	DebugMetadataAddUser     = 100903
 	DebugMetadataUpdateUser  = 100904
-
-	DebugMetadataGetMonitorSystemAll  = 100601
-	DebugMetadataGetMonitorSystemByID = 100602
-	DebugMetadataAddMonitorSystem     = 100603
-	DebugMetadataUpdateMonitorSystem  = 100604
 )
 
 func initDebugMessage() {
@@ -72,8 +67,4 @@ func initDebugMessage() {
 	Messages[DebugMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddUser, "metadata: add new user message: %s")
 	Messages[DebugMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateUser, "metadata: update user message: %s")
 
-	Messages[DebugMetadataGetMonitorSystemAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMonitorSystemAll, "metadata: get all monitor systems message: %s")
-	Messages[DebugMetadataGetMonitorSystemByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMonitorSystemByID, "metadata: get monitor system by id message: %s")
-	Messages[DebugMetadataAddMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddMonitorSystem, "metadata: add new monitor system message: %s")
-	Messages[DebugMetadataUpdateMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateMonitorSystem, "metadata: update monitor system message: %s")
 }

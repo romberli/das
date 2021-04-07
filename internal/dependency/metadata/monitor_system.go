@@ -10,11 +10,11 @@ type MonitorSystem interface {
 	// Identity returns the identity
 	Identity() int
 	// GetSystemName returns the system name
-	GetSystemName() int
+	GetSystemName() string
 	// GetSystemType returns the system type
 	GetSystemType() int
 	// GetHostIP returns the host ip
-	GetHostIP() int
+	GetHostIP() string
 	// GetPortNum returns the port number
 	GetPortNum() int
 	// GetPortNumSlow returns the slow log port number

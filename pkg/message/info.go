@@ -40,11 +40,6 @@ const (
 	InfoMetadataGetUserByID = 200902
 	InfoMetadataAddUser     = 200903
 	InfoMetadataUpdateUser  = 200904
-
-	InfoMetadataGetMonitorSystemAll  = 200601
-	InfoMetadataGetMonitorSystemByID = 200602
-	InfoMetadataAddMonitorSystem     = 200603
-	InfoMetadataUpdateMonitorSystem  = 200604
 )
 
 func initInfoMessage() {
@@ -84,8 +79,4 @@ func initInfoMessage() {
 	Messages[InfoMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddUser, "metadata: add new user completed. user_name: %s")
 	Messages[InfoMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateUser, "metadata: update user completed. id: %s")
 
-	Messages[InfoMetadataGetMonitorSystemAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMonitorSystemAll, "metadata: get monitor systems all completed")
-	Messages[InfoMetadataGetMonitorSystemByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMonitorSystemByID, "metadata: get monitor system by id completed. id: %s")
-	Messages[InfoMetadataAddMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMonitorSystem, "metadata: add new monitor system completed. host_ip and port_num: %s")
-	Messages[InfoMetadataUpdateMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMonitorSystem, "metadata: update monitor system completed. id: %s")
 }

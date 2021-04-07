@@ -32,7 +32,8 @@ type DBInfo struct {
 }
 
 // NewDBInfo returns a new *DBInfo
-func NewDBInfo(repo *DBRepo, id int, dbName string, clusterID int, clusterType int, ownerID int, envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *DBInfo {
+func NewDBInfo(repo *DBRepo, id int, dbName string, clusterID int, clusterType int, ownerID int,
+	envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *DBInfo {
 	return &DBInfo{
 		repo,
 		id,
@@ -47,8 +48,9 @@ func NewDBInfo(repo *DBRepo, id int, dbName string, clusterID int, clusterType i
 	}
 }
 
-// NewDBInfo returns a new *DBInfo with default DBRepo
-func NewDBInfoWithGlobal(id int, dbName string, clusterID, clusterType, ownerID, envID, delFlag int, createTime, lastUpdateTime time.Time) *DBInfo {
+// NewDBInfoWithGlobal NewDBInfo returns a new DBInfo with default DBRepo
+func NewDBInfoWithGlobal(id int, dbName string, clusterID, clusterType, ownerID, envID, delFlag int,
+	createTime, lastUpdateTime time.Time) *DBInfo {
 	return &DBInfo{
 		NewDBRepoWithGlobal(),
 		id,
@@ -63,7 +65,7 @@ func NewDBInfoWithGlobal(id int, dbName string, clusterID, clusterType, ownerID,
 	}
 }
 
-// NewEmptyDBInfoWithGlobal returns a new *DBInfo with global repository
+// NewEmptyDBInfoWithGlobal return a new DBInfo
 func NewEmptyDBInfoWithGlobal() *DBInfo {
 	return &DBInfo{DBRepo: NewDBRepoWithGlobal()}
 }
@@ -160,12 +162,12 @@ func (di *DBInfo) Delete() {
 
 // AddApp adds a new map of application system and database in the middleware
 func (di *DBInfo) AddApp(appID int) error {
-	return di.DBRepo.AddApp(appID, di.ID)
+	return di.DBRepo.AddApp(di.ID, appID)
 }
 
 // DeleteApp delete the map of application system and database in the middleware
 func (di *DBInfo) DeleteApp(appID int) error {
-	return di.DBRepo.DeleteApp(appID, di.ID)
+	return di.DBRepo.DeleteApp(di.ID, appID)
 }
 
 // MarshalJSON marshals DB to json string

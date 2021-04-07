@@ -11,9 +11,11 @@ import (
 )
 
 func TestMonitorSystemServiceAll(t *testing.T) {
-	TestMonitorSystemService_GetEntities(t)
+	TestMonitorSystemService_GetMonitorSystems(t)
 	TestMonitorSystemService_GetAll(t)
 	TestMonitorSystemService_GetByID(t)
+	TestMonitorSystemService_GetByEnv(t)
+	TestMonitorSystemService_GetByHostInfo(t)
 	TestMonitorSystemService_Create(t)
 	TestMonitorSystemService_Update(t)
 	TestMonitorSystemService_Delete(t)
@@ -21,44 +23,91 @@ func TestMonitorSystemServiceAll(t *testing.T) {
 	TestMonitorSystemService_MarshalWithFields(t)
 }
 
-func TestMonitorSystemService_GetEntities(t *testing.T) {
+func TestMonitorSystemService_GetMonitorSystems(t *testing.T) {
 	asst := assert.New(t)
 
+	entity, err := createMonitorSystem()
+	asst.Nil(err, common.CombineMessageWithError("test GetMonitorSystems() failed", err))
 	s := NewMonitorSystemService(monitorSystemRepo)
-	err := s.GetAll()
-	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
+	err = s.GetAll()
+	asst.Nil(err, "test GetMonitorSystems() failed")
+	entities := s.GetMonitorSystems()
+	asst.Greater(len(entities), constant.ZeroInt, "test GetMonitorSystems() failed")
+	// delete
+	err = deleteMonitorSystemByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetMonitorSystems() failed", err))
 }
 
 func TestMonitorSystemService_GetAll(t *testing.T) {
 	asst := assert.New(t)
-
+	entity, err := createMonitorSystem()
+	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
 	s := NewMonitorSystemService(monitorSystemRepo)
-	err := s.GetAll()
-	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
+	err = s.GetAll()
+	asst.Nil(err, "test GetAll() failed")
+	entities := s.GetMonitorSystems()
+	asst.Greater(len(entities), constant.ZeroInt, "test GetAll() failed")
+	// delete
+	err = deleteMonitorSystemByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
 }
 
 func TestMonitorSystemService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
+	entity, err := createMonitorSystem()
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	s := NewMonitorSystemService(monitorSystemRepo)
-	err := s.GetByID("1")
+	err = s.GetByID(entity.Identity())
 	asst.Nil(err, "test GetByID() failed")
-	id := s.Entities[constant.ZeroInt].Identity()
-	asst.Equal("1", id, "test GetByID() failed")
+	id := s.MonitorSystems[constant.ZeroInt].Identity()
+	asst.Equal(entity.Identity(), id, "test GetByID() failed")
+	// delete
+	err = deleteMonitorSystemByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
+}
+
+func TestMonitorSystemService_GetByEnv(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := createMonitorSystem()
+	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
+	s := NewMonitorSystemService(monitorSystemRepo)
+	err = s.GetByEnv(1)
+	asst.Nil(err, "test GetByEnv() failed")
+	envId := s.MonitorSystems[constant.ZeroInt].GetEnvID()
+	asst.Equal(1, envId, "test GetByEnv() failed")
+	// delete
+	err = deleteMonitorSystemByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
+}
+
+func TestMonitorSystemService_GetByHostInfo(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := createMonitorSystem()
+	asst.Nil(err, common.CombineMessageWithError("test GetByHostInfo() failed", err))
+	s := NewMonitorSystemService(monitorSystemRepo)
+	err = s.GetByHostInfo("0.0.0.0", 3306)
+	asst.Nil(err, "test GetByHostInfo() failed")
+	systemName := s.MonitorSystems[constant.ZeroInt].GetSystemName()
+	asst.Equal(defaultMonitorSystemInfoSystemName, systemName, "test GetByHostInfo() failed")
+	// delete
+	err = deleteMonitorSystemByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetByHostInfo() failed", err))
 }
 
 func TestMonitorSystemService_Create(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMonitorSystemService(monitorSystemRepo)
-	err := s.Create(map[string]interface{}{monitorSystemNameStruct: defaultMonitorSystemInfoSystemName, monitorSystemTypeStruct: defaultMonitorSystemInfoSystemType, monitorSystemHostIPStruct: defaultMonitorSystemInfoHostIP, monitorSystemPortNumStruct: defaultMonitorSystemInfoPortNum, portNumSlowStruct: defaultMonitorSystemInfoPortNumSlow, baseUrlStruct: defaultMonitorSystemInfoBaseUrl})
+	err := s.Create(map[string]interface{}{monitorSystemNameStruct: defaultMonitorSystemInfoSystemName,
+		monitorSystemTypeStruct: defaultMonitorSystemInfoSystemType, monitorSystemHostIPStruct: defaultMonitorSystemInfoHostIP,
+		monitorSystemPortNumStruct: defaultMonitorSystemInfoPortNum, monitorSystemPortNumSlowStruct: defaultMonitorSystemInfoPortNumSlow,
+		monitorSystemBaseUrlStruct: defaultMonitorSystemInfoBaseUrl, monitorSystemEnvIDStruct: defaultMonitorSystemInfoEnvID})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteMonitorSystemByID(s.Entities[0].Identity())
+	err = deleteMonitorSystemByID(s.MonitorSystems[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
@@ -72,11 +121,11 @@ func TestMonitorSystemService_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	monitorSystemName, err := s.GetEntities()[constant.ZeroInt].Get(monitorSystemNameStruct)
+	monitorSystemName := s.GetMonitorSystems()[constant.ZeroInt].GetSystemName()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(newMonitorSystemName, monitorSystemName)
 	// delete
-	err = deleteMonitorSystemByID(s.Entities[0].Identity())
+	err = deleteMonitorSystemByID(s.MonitorSystems[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
@@ -105,7 +154,7 @@ func TestMonitorSystemService_Marshal(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
 	err = json.Unmarshal(data, &entitiesUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
-	entities := s.GetEntities()
+	entities := s.GetMonitorSystems()
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]

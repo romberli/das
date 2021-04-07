@@ -1,33 +1,35 @@
 package metadata
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-var _ dependency.Entity = (*MonitorSystemInfo)(nil)
+var _ metadata.MonitorSystem = (*MonitorSystemInfo)(nil)
 
 type MonitorSystemInfo struct {
-	dependency.Repository
+	metadata.MonitorSystemRepo
 	ID                       int       `middleware:"id" json:"id"`
 	MonitorSystemName        string    `middleware:"system_name" json:"system_name"`
 	MonitorSystemType        int       `middleware:"system_type" json:"system_type"`
 	MonitorSystemHostIP      string    `middleware:"host_ip" json:"host_ip"`
 	MonitorSystemPortNum     int       `middleware:"port_num" json:"port_num"`
 	MonitorSystemPortNumSlow int       `middleware:"port_num_slow" json:"port_num_slow"`
-	BaseUrl                  string    `middleware:"base_url" json:"base_url"`
+	BaseURL                  string    `middleware:"base_url" json:"base_url"`
+	EnvID                    int       `middleware:"env_id" json:"env_id"`
 	DelFlag                  int       `middleware:"del_flag" json:"del_flag"`
 	CreateTime               time.Time `middleware:"create_time" json:"create_time"`
 	LastUpdateTime           time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
 // NewMonitorSystemInfo returns a new *MonitorSystemInfo
-func NewMonitorSystemInfo(repo *MonitorSystemRepo, id int, systemName string, systemType int, hostIP string, portNum int, portNumSlow int, baseUrl string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MonitorSystemInfo {
+func NewMonitorSystemInfo(repo *MonitorSystemRepo, id int, systemName string, systemType int,
+	hostIP string, portNum int, portNumSlow int, baseURL string, envID int, delFlag int,
+	createTime time.Time, lastUpdateTime time.Time) *MonitorSystemInfo {
 	return &MonitorSystemInfo{
 		repo,
 		id,
@@ -36,15 +38,17 @@ func NewMonitorSystemInfo(repo *MonitorSystemRepo, id int, systemName string, sy
 		hostIP,
 		portNum,
 		portNumSlow,
-		baseUrl,
+		baseURL,
+		envID,
 		delFlag,
 		createTime,
 		lastUpdateTime,
 	}
 }
 
-// NewMonitorSystemInfo returns a new *MonitorSystemInfo with default MonitorSystemRepo
-func NewMonitorSystemInfoWithGlobal(id int, monitorSystemName string, systemType int, hostIP string, portNum int, portNumSlow int, baseUrl string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MonitorSystemInfo {
+// NewMonitorSystemInfoWithGlobal NewMonitorSystemInfo returns a new MonitorSystemInfo with default MonitorSystemRepo
+func NewMonitorSystemInfoWithGlobal(id int, monitorSystemName string, systemType int, hostIP string, portNum int,
+	portNumSlow int, baseURL string, envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MonitorSystemInfo {
 	return &MonitorSystemInfo{
 		NewMonitorSystemRepoWithGlobal(),
 		id,
@@ -53,28 +57,31 @@ func NewMonitorSystemInfoWithGlobal(id int, monitorSystemName string, systemType
 		hostIP,
 		portNum,
 		portNumSlow,
-		baseUrl,
+		baseURL,
+		envID,
 		delFlag,
 		createTime,
 		lastUpdateTime,
 	}
 }
 
-// NewEmptyMonitorSystemInfoWithGlobal returns a new *MonitorSystemInfo with global repository
+// NewEmptyMonitorSystemInfoWithGlobal return a new MonitorSystemInfo
 func NewEmptyMonitorSystemInfoWithGlobal() *MonitorSystemInfo {
-	return &MonitorSystemInfo{Repository: NewMonitorSystemRepoWithGlobal()}
+	return &MonitorSystemInfo{MonitorSystemRepo: NewMonitorSystemRepoWithGlobal()}
 }
 
 // NewMonitorSystemInfoWithDefault returns a new *MonitorSystemInfo with default MonitorSystemRepo
-func NewMonitorSystemInfoWithDefault(monitorSystemName string, systemType int, hostIP string, portNum int, portNumSlow int, baseUrl string) *MonitorSystemInfo {
+func NewMonitorSystemInfoWithDefault(monitorSystemName string, systemType int, hostIP string, portNum int,
+	portNumSlow int, baseURL string, envID int) *MonitorSystemInfo {
 	return &MonitorSystemInfo{
-		Repository:               NewMonitorSystemRepoWithGlobal(),
+		MonitorSystemRepo:        NewMonitorSystemRepoWithGlobal(),
 		MonitorSystemName:        monitorSystemName,
 		MonitorSystemType:        systemType,
 		MonitorSystemHostIP:      hostIP,
 		MonitorSystemPortNum:     portNum,
 		MonitorSystemPortNumSlow: portNumSlow,
-		BaseUrl:                  baseUrl,
+		BaseURL:                  baseURL,
+		EnvID:                    envID,
 	}
 }
 
@@ -89,14 +96,49 @@ func NewMonitorSystemInfoWithMapAndRandom(fields map[string]interface{}) (*Monit
 	return msi, nil
 }
 
-// Identity returns ID of entity
-func (msi *MonitorSystemInfo) Identity() string {
-	return strconv.Itoa(msi.ID)
+// Identity returns the identity
+func (msi *MonitorSystemInfo) Identity() int {
+	return msi.ID
 }
 
-// IsDeleted checks if delete flag had been set
-func (msi *MonitorSystemInfo) IsDeleted() bool {
-	return msi.DelFlag != constant.ZeroInt
+// GetSystemName returns the monitor system name
+func (msi *MonitorSystemInfo) GetSystemName() string {
+	return msi.MonitorSystemName
+}
+
+// GetSystemType returns the monitor system type
+func (msi *MonitorSystemInfo) GetSystemType() int {
+	return msi.MonitorSystemType
+}
+
+// GetHostIP returns the monitor system hostIP
+func (msi *MonitorSystemInfo) GetHostIP() string {
+	return msi.MonitorSystemHostIP
+}
+
+// GetPortNum returns the monitor system portNum
+func (msi *MonitorSystemInfo) GetPortNum() int {
+	return msi.MonitorSystemPortNum
+}
+
+// GetPortNumSlow returns the monitor system portNumSlow
+func (msi *MonitorSystemInfo) GetPortNumSlow() int {
+	return msi.MonitorSystemPortNumSlow
+}
+
+// GetBaseURL returns the monitor system baseUrl
+func (msi *MonitorSystemInfo) GetBaseURL() string {
+	return msi.BaseURL
+}
+
+// GeEnvID returns the monitor system envID
+func (msi *MonitorSystemInfo) GetEnvID() int {
+	return msi.EnvID
+}
+
+// GetDelFlag returns the delete flag
+func (msi *MonitorSystemInfo) GetDelFlag() int {
+	return msi.DelFlag
 }
 
 // GetCreateTime returns created time of entity
@@ -109,12 +151,7 @@ func (msi *MonitorSystemInfo) GetLastUpdateTime() time.Time {
 	return msi.LastUpdateTime
 }
 
-// Get returns value of given field
-func (msi *MonitorSystemInfo) Get(field string) (interface{}, error) {
-	return common.GetValueOfStruct(msi, field)
-}
-
-// Set sets entity with given fields, key is the field name and value is the relevant value of the key
+// Set sets MonitorSystem with given fields, key is the field name and value is the relevant value of the key
 func (msi *MonitorSystemInfo) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {
 		err := common.SetValueOfStruct(msi, fieldName, fieldValue)

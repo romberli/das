@@ -3,7 +3,6 @@ package metadata
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware"
@@ -11,10 +10,10 @@ import (
 	"github.com/romberli/log"
 
 	"github.com/romberli/das/global"
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-var _ dependency.Repository = (*MonitorSystemRepo)(nil)
+var _ metadata.MonitorSystemRepo = (*MonitorSystemRepo)(nil)
 
 type MonitorSystemRepo struct {
 	Database middleware.Pool
@@ -30,8 +29,7 @@ func NewMonitorSystemRepoWithGlobal() *MonitorSystemRepo {
 	return NewMonitorSystemRepo(global.MySQLPool)
 }
 
-// Execute implements dependency.Repository interface,
-// it executes command with arguments on database
+// Execute executes given command and placeholders on the middleware
 func (msr *MonitorSystemRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
 	conn, err := msr.Database.Get()
 	if err != nil {
@@ -47,15 +45,15 @@ func (msr *MonitorSystemRepo) Execute(command string, args ...interface{}) (midd
 	return conn.Execute(command, args...)
 }
 
-// Transaction implements dependency.Repository interface
+// Transaction returns a middleware.Transaction that could execute multiple commands as a transaction
 func (msr *MonitorSystemRepo) Transaction() (middleware.Transaction, error) {
 	return msr.Database.Transaction()
 }
 
-// GetAll returns all available entities
-func (msr *MonitorSystemRepo) GetAll() ([]dependency.Entity, error) {
+// GetAll gets all monitor systems from the middleware
+func (msr *MonitorSystemRepo) GetAll() ([]metadata.MonitorSystem, error) {
 	sql := `
-		select id, system_name, system_type, host_ip, port_num, port_num_slow, base_url, del_flag, create_time, last_update_time
+		select id, system_name, system_type, host_ip, port_num, port_num_slow, base_url, env_id, del_flag, create_time, last_update_time
 		from t_meta_monitor_system_info
 		where del_flag = 0
 		order by id;
@@ -76,18 +74,53 @@ func (msr *MonitorSystemRepo) GetAll() ([]dependency.Entity, error) {
 	if err != nil {
 		return nil, err
 	}
-	// init []dependency.Entity
-	entityList := make([]dependency.Entity, result.RowNumber())
-	for i := range entityList {
-		entityList[i] = monitorSystemInfoList[i]
+	// init []metadata.MonitorSystem
+	monitorSystemList := make([]metadata.MonitorSystem, result.RowNumber())
+	for i := range monitorSystemList {
+		monitorSystemList[i] = monitorSystemInfoList[i]
 	}
 
-	return entityList, nil
+	return monitorSystemList, nil
 }
 
-func (msr *MonitorSystemRepo) GetByID(id string) (dependency.Entity, error) {
+// GetByEnv gets monitor systems of given env id from the middleware
+func (msr *MonitorSystemRepo) GetByEnv(envID int) ([]metadata.MonitorSystem, error) {
 	sql := `
-		select id, system_name, system_type, host_ip, port_num, port_num_slow, base_url, del_flag, create_time, last_update_time
+		select id, system_name, system_type, host_ip, port_num, port_num_slow, base_url, env_id, del_flag, create_time, last_update_time
+		from t_meta_monitor_system_info
+		where del_flag = 0
+		and env_id = ?
+		order by id;
+	`
+	log.Debugf("metadata MonitorSystemRepo.GetByEnv sql: \n%s", sql)
+
+	result, err := msr.Execute(sql, envID)
+	if err != nil {
+		return nil, err
+	}
+	// init []*MonitorSystemInfo
+	monitorSystemInfoList := make([]*MonitorSystemInfo, result.RowNumber())
+	for i := range monitorSystemInfoList {
+		monitorSystemInfoList[i] = NewEmptyMonitorSystemInfoWithGlobal()
+	}
+	// map to struct
+	err = result.MapToStructSlice(monitorSystemInfoList, constant.DefaultMiddlewareTag)
+	if err != nil {
+		return nil, err
+	}
+	// init []metadata.MonitorSystem
+	monitorSystemList := make([]metadata.MonitorSystem, result.RowNumber())
+	for i := range monitorSystemList {
+		monitorSystemList[i] = monitorSystemInfoList[i]
+	}
+
+	return monitorSystemList, nil
+}
+
+// GetByID gets a monitor system by the identity from the middleware
+func (msr *MonitorSystemRepo) GetByID(id int) (metadata.MonitorSystem, error) {
+	sql := `
+		select id, system_name, system_type, host_ip, port_num, port_num_slow, base_url, env_id, del_flag, create_time, last_update_time
 		from t_meta_monitor_system_info
 		where del_flag = 0
 		and id = ?;
@@ -100,7 +133,7 @@ func (msr *MonitorSystemRepo) GetByID(id string) (dependency.Entity, error) {
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, errors.New(fmt.Sprintf("metadata MonitorSystemInfo.GetByID(): data does not exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata MonitorSystemInfo.GetByID(): data does not exists, id: %d", id))
 	case 1:
 		monitorSystemInfo := NewEmptyMonitorSystemInfoWithGlobal()
 		// map to struct
@@ -111,33 +144,52 @@ func (msr *MonitorSystemRepo) GetByID(id string) (dependency.Entity, error) {
 
 		return monitorSystemInfo, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("metadata MonitorSystemInfo.GetByID(): duplicate key exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata MonitorSystemInfo.GetByID(): duplicate key exists, id: %d", id))
 	}
 }
 
-// GetID checks identity of given entity from the middleware
-func (msr *MonitorSystemRepo) GetID(entity dependency.Entity) (string, error) {
+// GetByID gets a monitor system by the identity from the middleware
+func (msr *MonitorSystemRepo) GetByHostInfo(hostIP string, portNum int) (metadata.MonitorSystem, error) {
+	sql := `select id from t_meta_monitor_system_info where del_flag = 0 and host_ip = ? and port_num = ?;`
+	log.Debugf("metadata MonitorSystemRepo.GetByHostInfo() sql: \n%s\nplaceholders: %s", sql)
+
+	result, err := msr.Execute(sql, hostIP, portNum)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := result.GetInt(constant.ZeroInt, constant.ZeroInt)
+	if err != nil {
+		return nil, err
+	}
+
+	return msr.GetByID(id)
+}
+
+// GetID gets the identity with given host ip and port num from the middleware
+func (msr *MonitorSystemRepo) GetID(monitorSystemHostIP string, monitorSystemPortNum int) (int, error) {
 	sql := `select id from t_meta_monitor_system_info where del_flag = 0 and host_ip = ? and port_num = ?;`
 	log.Debugf("metadata MonitorSystemRepo.GetID() select sql: %s", sql)
-	result, err := msr.Execute(sql, entity.(*MonitorSystemInfo).MonitorSystemHostIP, entity.(*MonitorSystemInfo).MonitorSystemPortNum)
+	result, err := msr.Execute(sql, monitorSystemHostIP, monitorSystemPortNum)
 	if err != nil {
-		return constant.EmptyString, err
+		return constant.ZeroInt, err
 	}
 
-	return result.GetString(constant.ZeroInt, constant.ZeroInt)
+	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
-// Create creates data with given entity in the middleware
-func (msr *MonitorSystemRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
-	sql := `insert into t_meta_monitor_system_info(system_name, system_type, host_ip, port_num, port_num_slow, base_url) values(?, ?, ?, ?, ?, ?);`
+// Create creates a monitor system in the middleware
+func (msr *MonitorSystemRepo) Create(monitorSystem metadata.MonitorSystem) (metadata.MonitorSystem, error) {
+	sql := `insert into t_meta_monitor_system_info(system_name, system_type, host_ip, port_num, port_num_slow, base_url, env_id) values(?, ?, ?, ?, ?, ?, ?);`
 	log.Debugf("metadata MonitorSystemRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := msr.Execute(sql, entity.(*MonitorSystemInfo).MonitorSystemName, entity.(*MonitorSystemInfo).MonitorSystemType, entity.(*MonitorSystemInfo).MonitorSystemHostIP, entity.(*MonitorSystemInfo).MonitorSystemPortNum, entity.(*MonitorSystemInfo).MonitorSystemPortNumSlow, entity.(*MonitorSystemInfo).BaseUrl)
+	_, err := msr.Execute(sql, monitorSystem.GetSystemName(), monitorSystem.GetSystemType(), monitorSystem.GetHostIP(),
+		monitorSystem.GetPortNum(), monitorSystem.GetPortNumSlow(), monitorSystem.GetBaseURL(), monitorSystem.GetEnvID())
 	if err != nil {
 		return nil, err
 	}
 	// get id
-	id, err := msr.GetID(entity)
+	id, err := msr.GetID(monitorSystem.GetHostIP(), monitorSystem.GetPortNum())
 	if err != nil {
 		return nil, err
 	}
@@ -145,26 +197,40 @@ func (msr *MonitorSystemRepo) Create(entity dependency.Entity) (dependency.Entit
 	return msr.GetByID(id)
 }
 
-// Update updates data with given entity in the middleware
-func (msr *MonitorSystemRepo) Update(entity dependency.Entity) error {
-	sql := `update t_meta_monitor_system_info set system_name = ?, system_type = ?, host_ip = ?, port_num = ?, port_num_slow = ?, base_url = ?, del_flag = ? where id = ?;`
+// Update updates the monitor system in the middleware
+func (msr *MonitorSystemRepo) Update(monitorSystem metadata.MonitorSystem) error {
+	sql := `update t_meta_monitor_system_info set system_name = ?, system_type = ?, host_ip = ?, port_num = ?, port_num_slow = ?, base_url = ?, env_id = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata MonitorSystemRepo.Update() update sql: %s", sql)
-	monitorSystemInfo := entity.(*MonitorSystemInfo)
-	_, err := msr.Execute(sql, monitorSystemInfo.MonitorSystemName, monitorSystemInfo.MonitorSystemType, monitorSystemInfo.MonitorSystemHostIP, monitorSystemInfo.MonitorSystemPortNum, monitorSystemInfo.MonitorSystemPortNumSlow, monitorSystemInfo.BaseUrl, monitorSystemInfo.DelFlag, monitorSystemInfo.ID)
+	_, err := msr.Execute(sql, monitorSystem.GetSystemName(), monitorSystem.GetSystemType(), monitorSystem.GetHostIP(),
+		monitorSystem.GetPortNum(), monitorSystem.GetPortNumSlow(), monitorSystem.GetBaseURL(), monitorSystem.GetEnvID(),
+		monitorSystem.GetDelFlag(), monitorSystem.Identity())
 
 	return err
 }
 
-// Delete deletes data in the middleware, it is recommended to use soft deletion,
-// therefore use update instead of delete
-func (msr *MonitorSystemRepo) Delete(id string) error {
-	sql := `update t_meta_monitor_system_info set del_flag = 1 where id = ?;`
-	log.Debugf("metadata MonitorSystemRepo.Delete() update sql: %s", sql)
-	idInt, err := strconv.Atoi(id)
+// Delete deletes the monitor system in the middleware
+func (msr *MonitorSystemRepo) Delete(id int) error {
+	tx, err := msr.Transaction()
 	if err != nil {
 		return err
 	}
-	_, err = msr.Execute(sql, idInt)
+	defer func() {
+		err = tx.Close()
+		if err != nil {
+			log.Errorf("metadata MonitorSystemRepo.Delete(): close database connection failed.\n%s", err.Error())
+		}
+	}()
 
-	return err
+	err = tx.Begin()
+	if err != nil {
+		return err
+	}
+	sql := `delete from t_meta_monitor_system_info where id = ?;`
+	log.Debugf("metadata MonitorSystemRepo.Delete() delete sql(t_meta_monitor_system_info): %s", sql)
+	_, err = msr.Execute(sql, id)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
