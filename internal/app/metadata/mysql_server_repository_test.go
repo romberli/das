@@ -59,9 +59,13 @@ func deleteMySQLServerByID(id int) error {
 
 func TestMySQLServerRepoAll(t *testing.T) {
 	TestMySQLServerRepo_Execute(t)
+	TestMySQLServerRepo_Transaction(t)
 	TestMySQLServerRepo_Create(t)
 	TestMySQLServerRepo_GetAll(t)
+	TestMySQLServerRepo_GetByClusterID(t)
 	TestMySQLServerRepo_GetByID(t)
+	TestMySQLServerRepo_GetByHostInfo(t)
+	TestMySQLServerRepo_GetID(t)
 	TestMySQLServerRepo_Update(t)
 	TestMySQLServerRepo_Delete(t)
 }
@@ -154,6 +158,20 @@ func TestMySQLServerRepo_GetAll(t *testing.T) {
 	asst.Equal(testInitPortNum, portNum, "test GetAll() failed")
 }
 
+func TestMySQLServerRepo_GetByClusterID(t *testing.T) {
+	asst := assert.New(t)
+
+	entitys, err := mysqlServerRepo.GetByClusterID(testInitClusterID)
+
+	for _, entity := range entitys {
+		asst.Nil(err, common.CombineMessageWithError("test GetByClusterID() failed", err))
+		hostIP := entity.GetHostIP()
+		asst.Equal(testInitHostIP, hostIP, "test GetByClusterID() failed")
+		portNum := entity.GetPortNum()
+		asst.Equal(testInitPortNum, portNum, "test GetByClusterID() failed")
+	}
+}
+
 func TestMySQLServerRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
@@ -163,6 +181,25 @@ func TestMySQLServerRepo_GetByID(t *testing.T) {
 	asst.Equal(testInitHostIP, hostIP, "test GetByID() failed")
 	portNum := entity.GetPortNum()
 	asst.Equal(testInitPortNum, portNum, "test GetByID() failed")
+}
+
+func TestMySQLServerRepo_GetByHostInfo(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := mysqlServerRepo.GetByHostInfo(testInitHostIP, testInitPortNum)
+	asst.Nil(err, common.CombineMessageWithError("test GetByHostInfo() failed", err))
+	hostIP := entity.GetHostIP()
+	asst.Equal(testInitHostIP, hostIP, "test GetByHostInfo() failed")
+	portNum := entity.GetPortNum()
+	asst.Equal(testInitPortNum, portNum, "test GetByHostInfo() failed")
+}
+
+func TestMySQLServerRepo_GetID(t *testing.T) {
+	asst := assert.New(t)
+
+	id, err := mysqlServerRepo.GetID(testInitHostIP, testInitPortNum)
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	asst.NotEqual(0, id, "test GetID() failed")
 }
 
 func TestMySQLServerRepo_Create(t *testing.T) {
