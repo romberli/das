@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/jinzhu/now v1.1.2
 	github.com/romberli/go-util v0.2.30
-	github.com/romberli/log v1.0.17
+	github.com/romberli/log v1.0.18
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.7.1
@@ -19,4 +19,5 @@ require (
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
+	go.uber.org/zap v1.16.0
 )
