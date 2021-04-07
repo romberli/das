@@ -87,13 +87,12 @@ func (msr *MySQLServerRepo) GetAll() ([]metadata.MySQLServer, error) {
 
 // GetByClusterID Select returns an available mysqlServer of the given cluster id
 func (msr *MySQLServerRepo) GetByClusterID(clusterID int) ([]metadata.MySQLServer, error) {
-	// TODO: 重写该语句
 	sql := `
 		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
 		from t_meta_mysql_server_info 
 		where del_flag = 0
-		and id = ?;
+		and cluster_id = ?;
 	`
 	log.Debugf("metadata MySQLServerRepo.GetByClusterID() sql: \n%s\nplaceholders: %s", sql, clusterID)
 
@@ -156,13 +155,12 @@ func (msr *MySQLServerRepo) GetByID(id int) (metadata.MySQLServer, error) {
 
 // GetByHostInfo gets a mysql server with given host ip and port number
 func (msr *MySQLServerRepo) GetByHostInfo(hostIP string, portNum int) (metadata.MySQLServer, error) {
-	// TODO: 重写该语句
 	sql := `
 		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
 		from t_meta_mysql_server_info
 		where del_flag = 0
-		and id = ? and ?;
+		and host_ip = ? and port_num = ?;
 	`
 	log.Debugf("metadata MySQLServerRepo.GetByHostInfo() sql: \n%s\nplaceholders: %s, %d", sql, hostIP, portNum)
 
@@ -252,35 +250,8 @@ func (msr *MySQLServerRepo) Update(mysqlServer metadata.MySQLServer) error {
 // Delete deletes data in the middleware, it is recommended to use soft deletion,
 // therefore use update instead of delete
 func (msr *MySQLServerRepo) Delete(id int) error {
-	tx, err := msr.Transaction()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		err = tx.Close()
-		if err != nil {
-			log.Errorf("metadata MySQLServerRepo.Delete(): close database connection failed.\n%s", err.Error())
-		}
-	}()
-
-	err = tx.Begin()
-	if err != nil {
-		return err
-	}
-	// TODO: 重写该语句
-	sql := `delete from t_meta_app_info where where id = ?;`
-	log.Debugf("metadata MySQLServerRepo.Delete() delete sql(t_meta_app_info): %s", sql)
-	_, err = tx.Execute(sql, id)
-	if err != nil {
-		return err
-	}
-	// TODO: 重写该语句
-	sql = `delete from t_meta_app_db_map where app_id = ?;`
-	log.Debugf("metadata MySQLServerRepo.Delete() delete sql(t_meta_app_db_map): %s", sql)
-	_, err = tx.Execute(sql, id)
-	if err != nil {
-		return err
-	}
-
-	return tx.Commit()
+	sql := `delete from t_meta_mysql_server_info where where id = ?;`
+	log.Debugf("metadata MySQLServerRepo.Delete() delete sql(t_meta_mysql_server_info): %s", sql)
+	_, err := msr.Execute(sql, id)
+	return err
 }

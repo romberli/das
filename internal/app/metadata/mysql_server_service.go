@@ -2,13 +2,13 @@ package metadata
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/pkg/message"
-
 	"github.com/romberli/das/internal/dependency/metadata"
+	"github.com/romberli/das/pkg/message"
 )
 
 const (
@@ -58,7 +58,6 @@ func (mss *MySQLServerService) GetAll() error {
 
 // GetByClusterID gets mysql servers with given cluster id
 func (mss *MySQLServerService) GetByClusterID(clusterID int) error {
-	// FIXME: 这里这么写有问题吗？
 	mysqlServers, err := mss.MySQLServerRepo.GetByClusterID(clusterID)
 	if err != nil {
 		return err
@@ -96,24 +95,27 @@ func (mss *MySQLServerService) GetByHostInfo(hostIP string, portNum int) error {
 // Create creates a new mysql server entity and insert it into the middleware
 func (mss *MySQLServerService) Create(fields map[string]interface{}) error {
 	// generate new map
-	if _, ok := fields[clusterIDStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, clusterIDStruct)
+	_, clusterIDExists := fields[clusterIDStruct]
+	_, serverNameExists := fields[serverNameStruct]
+	_, hostIPExists := fields[hostIPStruct]
+	_, portNumExists := fields[portNumStruct]
+	_, deploymentTypeExists := fields[deploymentTypeStruct]
+	_, versionExists := fields[versionStruct]
+
+	if !clusterIDExists || !serverNameExists || !hostIPExists || !portNumExists ||
+		!deploymentTypeExists || !versionExists {
+		return message.NewMessage(
+			message.ErrFieldNotExists,
+			fmt.Sprintf(
+				"%s and %s and %s and %s and %s and %s",
+				clusterIDStruct,
+				serverNameStruct,
+				hostIPStruct,
+				portNumStruct,
+				deploymentTypeStruct,
+				versionStruct))
 	}
-	if _, ok := fields[serverNameStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, serverNameStruct)
-	}
-	if _, ok := fields[hostIPStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, hostIPStruct)
-	}
-	if _, ok := fields[portNumStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, portNumStruct)
-	}
-	if _, ok := fields[deploymentTypeStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, deploymentTypeStruct)
-	}
-	if _, ok := fields[versionStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, versionStruct)
-	}
+
 	// create a new entity
 	mysqlServerInfo, err := NewMySQLServerInfoWithMapAndRandom(fields)
 	if err != nil {

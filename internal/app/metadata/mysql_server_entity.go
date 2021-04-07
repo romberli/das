@@ -131,11 +131,6 @@ func (msi *MySQLServerInfo) GetHostIP() string {
 	return msi.HostIP
 }
 
-// IsDeleted checks if delete flag had been set
-func (msi *MySQLServerInfo) IsDeleted() bool {
-	return msi.DelFlag != constant.ZeroInt
-}
-
 // GetPortNum returns the port number
 func (msi *MySQLServerInfo) GetPortNum() int {
 	return msi.PortNum
