@@ -18,7 +18,6 @@ const (
 	middlewareClusterIDStruct = "MiddlewareClusterID"
 	monitorSystemIDStruct     = "MonitorSystemID"
 	ownerIDStruct             = "OwnerID"
-	ownerGroupStruct          = "OwnerGroup"
 	envIDStruct               = "EnvID"
 )
 
@@ -128,9 +127,6 @@ func AddMySQLCluster(c *gin.Context) {
 	if _, ok := fields[ownerIDStruct]; !ok {
 		fields[ownerIDStruct] = constant.DefaultRandomInt
 	}
-	if _, ok := fields[ownerGroupStruct]; !ok {
-		fields[ownerGroupStruct] = constant.DefaultRandomString
-	}
 	if _, ok := fields[envIDStruct]; !ok {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, envIDStruct)
 		return
@@ -184,24 +180,21 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	_, middlewareClusterIDExists := fields[middlewareClusterIDStruct]
 	_, monitorSystemIDExists := fields[monitorSystemIDStruct]
 	_, ownerIDExists := fields[ownerIDStruct]
-	_, ownerGroupExists := fields[ownerGroupStruct]
 	_, envIDExists := fields[envIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
 	if !clusterNameExists &&
 		!middlewareClusterIDExists &&
 		!monitorSystemIDExists &&
-		!ownerGroupExists &&
 		!ownerIDExists &&
 		!envIDExists &&
 		!delFlagExists {
 		resp.ResponseNOK(
 			c, message.ErrFieldNotExists,
-			fmt.Sprintf("%s, %s, %s, %s, %s, %s and %s",
+			fmt.Sprintf("%s, %s, %s, %s, %s and %s",
 				clusterNameStruct,
 				middlewareClusterIDStruct,
 				monitorSystemIDStruct,
 				ownerIDStruct,
-				ownerGroupStruct,
 				envIDStruct,
 				delFlagStruct))
 		return

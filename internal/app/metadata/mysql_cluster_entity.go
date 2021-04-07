@@ -31,7 +31,7 @@ func NewMySQLClusterInfo(repo *MySQLClusterRepo,
 	clusterName string,
 	middlewareClusterID int,
 	monitorSystemID int,
-	ownerID int, ownerGroup string,
+	ownerID int,
 	envID int,
 	delFlag int,
 	createTime, lastUpdateTime time.Time) *MySQLClusterInfo {
@@ -55,7 +55,7 @@ func NewMySQLClusterInfoWithGlobal(
 	clusterName string,
 	middlewareClusterID int,
 	monitorSystemID int,
-	ownerID int, ownerGroup string,
+	ownerID int,
 	envID int,
 	delFlag int,
 	createTime, lastUpdateTime time.Time) *MySQLClusterInfo {

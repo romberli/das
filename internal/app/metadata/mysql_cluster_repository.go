@@ -62,7 +62,7 @@ func (mcr *MySQLClusterRepo) Transaction() (middleware.Transaction, error) {
 func (mcr *MySQLClusterRepo) GetAll() ([]metadata.MySQLCluster, error) {
 	sql := `
 		select id, cluster_name, middleware_cluster_id, monitor_system_id, 
-			owner_id, owner_group, env_id, del_flag, create_time, last_update_time
+			owner_id, env_id, del_flag, create_time, last_update_time
 		from t_meta_mysql_cluster_info
 		where del_flag = 0
 		order by id;
@@ -94,8 +94,13 @@ func (mcr *MySQLClusterRepo) GetAll() ([]metadata.MySQLCluster, error) {
 
 // GetByEnv gets mysql clusters of given env id from the middleware
 func (mcr *MySQLClusterRepo) GetByEnv(envID int) ([]metadata.MySQLCluster, error) {
-	// TODO: 重写该语句
-	sql := ``
+	sql := `
+		select id, cluster_name, middleware_cluster_id, monitor_system_id, 
+			owner_id, env_id, del_flag, create_time, last_update_time
+		from t_meta_mysql_cluster_info
+		where del_flag = 0
+		and env_id = ?;
+	`
 	log.Debugf("metadata MySQLServerRepo.GetByEnv() sql: \n%s\nplaceholders: %s", sql, envID)
 
 	result, err := mcr.Execute(sql, envID)
@@ -127,7 +132,7 @@ func (mcr *MySQLClusterRepo) GetByEnv(envID int) ([]metadata.MySQLCluster, error
 func (mcr *MySQLClusterRepo) GetByID(id int) (metadata.MySQLCluster, error) {
 	sql := `
 		select id, cluster_name, middleware_cluster_id, monitor_system_id, 
-			owner_id, owner_group, env_id, del_flag, create_time, last_update_time
+			owner_id, env_id, del_flag, create_time, last_update_time
 		from t_meta_mysql_cluster_info
 		where del_flag = 0
 		and id = ?;
@@ -157,20 +162,31 @@ func (mcr *MySQLClusterRepo) GetByID(id int) (metadata.MySQLCluster, error) {
 
 // GetByName gets a mysql cluster of given cluster name from the middle ware
 func (mcr *MySQLClusterRepo) GetByName(clusterName string) (metadata.MySQLCluster, error) {
-	// TODO: 重写该语句
-	sql := `select id from t_meta_app_info where del_flag = 0 and app_name = ?;`
+	sql := `
+		select id, cluster_name, middleware_cluster_id, monitor_system_id, 
+			owner_id, env_id, del_flag, create_time, last_update_time
+		from t_meta_mysql_cluster_info where del_flag = 0 and cluster_name = ?;
+	`
 	log.Debugf("metadata MySQLClusterRepo.GetByName() select sql: %s", sql)
 	result, err := mcr.Execute(sql, clusterName)
 	if err != nil {
 		return nil, err
 	}
+	switch result.RowNumber() {
+	case 0:
+		return nil, fmt.Errorf("metadata MySQLClusterInfo.GetByID(): data does not exists, clusterName: %s", clusterName)
+	case 1:
+		mysqlClusterInfo := NewEmptyMySQLClusterInfoWithGlobal()
+		// map to struct
+		err = result.MapToStructByRowIndex(mysqlClusterInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+		if err != nil {
+			return nil, err
+		}
 
-	id, err := result.GetInt(constant.ZeroInt, constant.ZeroInt)
-	if err != nil {
-		return nil, err
+		return mysqlClusterInfo, nil
+	default:
+		return nil, fmt.Errorf("metadata MySQLClusterInfo.GetByID(): duplicate key exists, clusterName: %s", clusterName)
 	}
-
-	return mcr.GetByID(id)
 }
 
 // GetID checks identity of given entity from the middleware
@@ -187,15 +203,7 @@ func (mcr *MySQLClusterRepo) GetID(clusterName string) (int, error) {
 
 // GetMySQLServerIDList gets the mysql server id list of given cluster id
 func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) ([]int, error) {
-	// TODO: 重写该语句
-	sql := `
-		select db_id
-		from t_meta_app_info ai
-				 inner join t_meta_app_db_map adm on ai.id = adm.app_id
-		where ai.del_flag = 0
-		  and adm.del_flag = 0
-		  and ai.id = ?;
-	`
+	sql := `select id from t_meta_mysql_server_info where del_flag = 0 and cluster_id = ?;`
 	log.Debugf("metadata MySQLClusterRepo.GetMySQLServerIDList() select sql: %s", sql)
 	result, err := mcr.Execute(sql, clusterID)
 	if err != nil {
@@ -222,8 +230,8 @@ func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) ([]int, error) 
 func (mcr *MySQLClusterRepo) Create(mysqlCluster metadata.MySQLCluster) (metadata.MySQLCluster, error) {
 	sql := `
 		insert into t_meta_mysql_cluster_info(cluster_name,middleware_cluster_id,
-			 monitor_system_id, owner_id, owner_group, env_id) 
-		values(?,?,?,?,?,?);`
+			 monitor_system_id, owner_id, env_id) 
+		values(?,?,?,?,?);`
 	log.Debugf("metadata MySQLClusterRepo.Create() insert sql: %s", sql)
 	// execute
 	_, err := mcr.Execute(sql,
@@ -248,7 +256,7 @@ func (mcr *MySQLClusterRepo) Create(mysqlCluster metadata.MySQLCluster) (metadat
 func (mcr *MySQLClusterRepo) Update(entity metadata.MySQLCluster) error {
 	sql := `
 		update t_meta_mysql_cluster_info set cluster_name = ?, middleware_cluster_id = ?, 
-			monitor_system_id = ?, owner_id = ?, owner_group = ?, 
+			monitor_system_id = ?, owner_id = ?, 
 			env_id = ?, del_flag = ? 
 		where id = ?;`
 	log.Debugf("metadata MySQLClusterRepo.Update() update sql: %s", sql)

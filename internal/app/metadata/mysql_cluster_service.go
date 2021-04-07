@@ -16,7 +16,6 @@ const (
 	middlewareClusterIDStruct = "MiddlewareClusterID"
 	monitorSystemIDStruct     = "MonitorSystemID"
 	ownerIDStruct             = "OwnerID"
-	ownerGroupStruct          = "OwnerGroup"
 	envIDStruct               = "EnvID"
 )
 
