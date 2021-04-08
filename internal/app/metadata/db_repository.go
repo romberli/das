@@ -135,7 +135,7 @@ func (dr *DBRepo) GetByID(id int) (metadata.DB, error) {
 	case 0:
 		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByID(): data does not exists, id: %d", id))
 	case 1:
-		dbInfo := NewEmptyDBInfoWithGlobal()
+		dbInfo := NewEmptyDBInfoWithRepo(dr)
 		// map to struct
 		err = result.MapToStructByRowIndex(dbInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
 		if err != nil {

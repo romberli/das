@@ -88,8 +88,6 @@ func TestDBService_GetByID(t *testing.T) {
 func TestDBService_GetAppIDList(t *testing.T) {
 	asst := assert.New(t)
 
-	t.Log(fmt.Sprintf("%v", dbRepo))
-	t.Log(fmt.Sprintf("%v", dbRepo.Database))
 	s := NewDBService(dbRepo)
 	err := s.GetAppIDList(1)
 	asst.Nil(err, "test GetAppIDList() failed")

@@ -140,8 +140,8 @@ func GetMonitorSystemByID(c *gin.Context) {
 // @Router /api/v1/metadata/monitor-system/host-info [get]
 func GetMonitorSystemByHostInfo(c *gin.Context) {
 	// get param
-	hostIP := c.Param(monitorSystemHostIPJSON)
-	portNumStr := c.Param(monitorSystemPortNumJSON)
+	hostIP := c.Query("hostIp")
+	portNumStr := c.Query("portNum")
 	if hostIP == constant.EmptyString || portNumStr == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", monitorSystemHostIPJSON, monitorSystemPortNumJSON))
 		return
@@ -151,6 +151,7 @@ func GetMonitorSystemByHostInfo(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
 		return
 	}
+
 	// init service
 	s := metadata.NewMonitorSystemServiceWithDefault()
 	// get entity

@@ -65,9 +65,14 @@ func NewDBInfoWithGlobal(id int, dbName string, clusterID, clusterType, ownerID,
 	}
 }
 
+// NewEmptyDBInfoWithRepo return a new DBInfo
+func NewEmptyDBInfoWithRepo(repo *DBRepo) *DBInfo {
+	return &DBInfo{DBRepo: repo}
+}
+
 // NewEmptyDBInfoWithGlobal return a new DBInfo
 func NewEmptyDBInfoWithGlobal() *DBInfo {
-	return &DBInfo{DBRepo: NewDBRepoWithGlobal()}
+	return NewEmptyDBInfoWithRepo(NewDBRepoWithGlobal())
 }
 
 // NewDBInfoWithDefault returns a new *DBInfo with default DBRepo

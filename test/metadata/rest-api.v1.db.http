@@ -2,19 +2,42 @@
 GET http://{{baseURL}}/api/v1/metadata/db
 Accept: application/json
 
+### get all databases by env_id
+GET http://{{baseURL}}/api/v1/metadata/db/env/2
+Accept: application/json
+
 ### get database by id
 GET http://{{baseURL}}/api/v1/metadata/db/1
+Accept: application/json
+
+### get all apps by id
+GET http://{{baseURL}}/api/v1/metadata/db/apps/1
 Accept: application/json
 
 ### add new database
 POST http://{{baseURL}}/api/v1/metadata/db
 Content-Type: application/json
 
-{"db_name": "db100", "cluster_id": 8, "cluster_type": 1, "env_id": 5}
+{"db_name": "db1", "cluster_id": 2, "cluster_type": 2, "env_id": 3}
 
 ### update database by id
-POST http://{{baseURL}}/api/v1/metadata/db/5
+POST http://{{baseURL}}/api/v1/metadata/db/1
 Content-Type: application/json
 
-{"db_name": "db13", "del_flag": 1}
+{"db_name": "db2", "del_flag": 1}
 
+### delete database by id
+POST http://{{baseURL}}/api/v1/metadata/db/delete/2
+Content-Type: application/json
+
+### add new app by id
+POST http://{{baseURL}}/api/v1/metadata/db/add-db/1
+Content-Type: application/json
+
+{"app_id": 3, "db_id": 1}
+
+### delete app by id
+POST http://{{baseURL}}/api/v1/metadata/db/delete-db/1
+Content-Type: application/json
+
+{"app_id": 3, "db_id": 1}
