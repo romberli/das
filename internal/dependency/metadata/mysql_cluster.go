@@ -68,7 +68,7 @@ type MySQLClusterService interface {
 	// GetAll gets all mysql clusters from the middleware
 	GetAll() error
 	// GetByEnv gets mysql clusters of given env id
-	GetByEnv(envID int) ([]MySQLClusterService, error)
+	GetByEnv(envID int) error
 	// GetByID gets a mysql cluster of the given id from the middleware
 	GetByID(id int) error
 	// GetByName gets a mysql cluster of given cluster name

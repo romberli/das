@@ -68,7 +68,7 @@ type MiddlewareServerService interface {
 	// GetByID gets a middleware server of the given id from the middleware
 	GetByID(id int) error
 	// GetByHostInfo gets a middleware server with given host ip and port number
-	GetByHostInfo(hostIP string, portNum int) (MiddlewareServer, error)
+	GetByHostInfo(hostIP string, portNum int) error
 	// Create creates a middleware server in the middleware
 	Create(fields map[string]interface{}) error
 	// Update gets a middleware server of the given id from the middleware,
