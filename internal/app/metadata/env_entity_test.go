@@ -7,6 +7,7 @@ import (
 
 	"github.com/jinzhu/now"
 	"github.com/romberli/go-util/common"
+	"github.com/romberli/go-util/constant"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +34,7 @@ func equal(a, b *EnvInfo) bool {
 
 func TestEnvEntityAll(t *testing.T) {
 	TestEnvInfo_Identity(t)
-	TestEnvInfo_IsDeleted(t)
+	// TestEnvInfo_IsDeleted(t)
 	TestEnvInfo_GetCreateTime(t)
 	TestEnvInfo_GetLastUpdateTime(t)
 	TestEnvInfo_Get(t)
@@ -41,8 +42,24 @@ func TestEnvEntityAll(t *testing.T) {
 	TestEnvInfo_Delete(t)
 	TestEnvInfo_MarshalJSON(t)
 	TestEnvInfo_MarshalJSONWithFields(t)
+	TestEnvInfo_GetEnvName(t)
+	TestEnvInfo_GetDelFlag(t)
+
 }
 
+func TestEnvInfo_GetEnvName(t *testing.T) {
+	asst := assert.New(t)
+
+	envInfo := initNewEnvInfo()
+	asst.Equal(defaultEnvInfoEnvName, envInfo.GetEnvName(), "test GetEnvName failed")
+}
+
+func TestEnvInfo_GetDelFlag(t *testing.T) {
+	asst := assert.New(t)
+
+	envInfo := initNewEnvInfo()
+	asst.Equal(defaultEnvInfoDelFlag, envInfo.GetDelFlag(), "test GetEnvName failed")
+}
 func TestEnvInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
@@ -50,12 +67,12 @@ func TestEnvInfo_Identity(t *testing.T) {
 	asst.Equal(defaultEnvInfoID, envInfo.Identity(), "test Identity() failed")
 }
 
-func TestEnvInfo_IsDeleted(t *testing.T) {
-	asst := assert.New(t)
+// func TestEnvInfo_IsDeleted(t *testing.T) {
+// 	asst := assert.New(t)
 
-	envInfo := initNewEnvInfo()
-	asst.False(envInfo.IsDeleted(), "test IsDeleted() failed")
-}
+// 	envInfo := initNewEnvInfo()
+// 	asst.False(envInfo.IsDeleted(), "test IsDeleted() failed")
+// }
 
 func TestEnvInfo_GetCreateTime(t *testing.T) {
 	asst := assert.New(t)
@@ -95,7 +112,8 @@ func TestEnvInfo_Delete(t *testing.T) {
 
 	envInfo := initNewEnvInfo()
 	envInfo.Delete()
-	asst.True(envInfo.IsDeleted(), "test Delete() failed")
+	DF := envInfo.GetDelFlag()
+	asst.True((DF != constant.ZeroInt), "test Delete() failed")
 }
 
 func TestEnvInfo_MarshalJSON(t *testing.T) {

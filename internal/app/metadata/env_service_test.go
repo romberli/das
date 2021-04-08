@@ -11,7 +11,7 @@ import (
 )
 
 func TestEnvServiceAll(t *testing.T) {
-	TestEnvService_GetEntities(t)
+	TestEnvService_GetEnvs(t)
 	TestEnvService_GetAll(t)
 	TestEnvService_GetByID(t)
 	TestEnvService_Create(t)
@@ -19,16 +19,27 @@ func TestEnvServiceAll(t *testing.T) {
 	TestEnvService_Delete(t)
 	TestEnvService_Marshal(t)
 	TestEnvService_MarshalWithFields(t)
+	TestEnvService_GetEnvByName(t)
 }
 
-func TestEnvService_GetEntities(t *testing.T) {
+func TestEnvService_GetEnvByName(t *testing.T) {
+	asst := assert.New(t)
+
+	s := NewEnvService(envRepo)
+	err := s.GetEnvByName("online")
+	asst.Nil(err, "test GetByID() failed")
+	Name := s.Envs[constant.ZeroInt].GetEnvName()
+	asst.Equal("online", Name, "test GetByID() failed")
+}
+
+func TestEnvService_GetEnvs(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewEnvService(envRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEnvs()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
+	Envs := s.GetEnvs()
+	asst.Greater(len(Envs), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestEnvService_GetAll(t *testing.T) {
@@ -36,9 +47,9 @@ func TestEnvService_GetAll(t *testing.T) {
 
 	s := NewEnvService(envRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEnvs()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
+	asst.Nil(err, "test GetAll() failed")
+	Envs := s.GetEnvs()
+	asst.Greater(len(Envs), constant.ZeroInt, "test GetAll() failed")
 }
 
 func TestEnvService_GetByID(t *testing.T) {
@@ -94,7 +105,7 @@ func TestEnvService_Delete(t *testing.T) {
 }
 
 func TestEnvService_Marshal(t *testing.T) {
-	var entitiesUnmarshal []*EnvInfo
+	var EnvsUnmarshal []*EnvInfo
 
 	asst := assert.New(t)
 
@@ -103,12 +114,12 @@ func TestEnvService_Marshal(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
 	data, err := s.Marshal()
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
-	err = json.Unmarshal(data, &entitiesUnmarshal)
+	err = json.Unmarshal(data, &EnvsUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
-	entities := s.GetEnvs()
-	for i := 0; i < len(entities); i++ {
-		entity := entities[i]
-		entityUnmarshal := entitiesUnmarshal[i]
+	Envs := s.GetEnvs()
+	for i := 0; i < len(Envs); i++ {
+		entity := Envs[i]
+		entityUnmarshal := EnvsUnmarshal[i]
 		asst.True(equal(entity.(*EnvInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }

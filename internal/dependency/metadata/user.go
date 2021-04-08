@@ -66,6 +66,8 @@ type UserRepo interface {
 	Update(db User) error
 	// Delete deletes a user in the middleware
 	Delete(id int) error
+	// GetByEmployeeID gets a user of given employee id from the middleware
+	GetByEmployeeID(employeeID string) (User, error)
 }
 
 type UserService interface {
@@ -98,4 +100,6 @@ type UserService interface {
 	Marshal() ([]byte, error)
 	// MarshalWithFields marshals only specified fields of the UserService to json bytes
 	MarshalWithFields(fields ...string) ([]byte, error)
+	// GetByEmployeeID gets a user of given employee id
+	GetByEmployeeID(employeeID string) error
 }

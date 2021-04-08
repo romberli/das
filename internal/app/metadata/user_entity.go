@@ -104,10 +104,10 @@ func (ui *UserInfo) Identity() int {
 	return ui.ID
 }
 
-// IsDeleted checks if delete flag had been set
-func (ui *UserInfo) IsDeleted() bool {
-	return ui.DelFlag != constant.ZeroInt
-}
+// // IsDeleted checks if delete flag had been set
+// func (ui *UserInfo) IsDeleted() bool {
+// 	return ui.DelFlag != constant.ZeroInt
+// }
 
 // GetCreateTime returns created time of entity
 func (ui *UserInfo) GetCreateTime() time.Time {

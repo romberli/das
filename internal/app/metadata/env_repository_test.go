@@ -19,6 +19,7 @@ const (
 	envDBPass     = "mysql.1234"
 	newEnvName    = "newTest"
 	onlineEnvName = "online"
+	onlineID      = 1
 )
 
 var envRepo = initEnvRepo()
@@ -56,6 +57,9 @@ func TestEnvRepoAll(t *testing.T) {
 	TestEnvRepo_Create(t)
 	TestEnvRepo_Update(t)
 	TestEnvRepo_Delete(t)
+	TestEnvRepo_GetID(t)
+	TestEnvRepo_GetEnvByName(t)
+
 }
 
 func TestEnvRepo_Execute(t *testing.T) {
@@ -156,10 +160,14 @@ func TestEnvRepo_Update(t *testing.T) {
 func TestEnvRepo_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	env, err := createEnv()
+	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
+	ID, err := envRepo.GetID(env.GetEnvName())
+	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
+	err = envRepo.Delete(ID)
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteEnvByID(env.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }
 
@@ -171,4 +179,14 @@ func TestEnvRepo_GetEnvByName(t *testing.T) {
 	envName := entity.GetEnvName()
 	asst.Nil(err, common.CombineMessageWithError("test GetEnvByName() failed", err))
 	asst.Equal(onlineEnvName, envName, "test GetEnvByName() failed")
+}
+
+func TestEnvRepo_GetID(t *testing.T) {
+	asst := assert.New(t)
+
+	env, err := envRepo.GetEnvByName("online")
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	ID, err := envRepo.GetID(env.GetEnvName())
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	asst.Equal(onlineID, ID, "test GetID() failed")
 }

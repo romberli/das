@@ -62,6 +62,70 @@ func TestUserEntityAll(t *testing.T) {
 	TestUserInfo_Delete(t)
 	TestUserInfo_MarshalJSON(t)
 	TestUserInfo_MarshalJSONWithFields(t)
+	TestUserInfo_GetUserName(t)
+	TestUserInfo_GetDepartmentName(t)
+	TestUserInfo_GetEmployeeID(t)
+	TestUserInfo_GetAccountName(t)
+	TestUserInfo_GetEmail(t)
+	TestUserInfo_GetTelephone(t)
+	TestUserInfo_GetMobile(t)
+	TestUserInfo_GetDelFlag(t)
+}
+
+func TestUserInfo_GetUserName(t *testing.T) {
+	asst := assert.New(t)
+
+	userInfo := initNewUserInfo()
+	asst.Equal(defaultUserInfoUserName, userInfo.GetUserName(), "test GetUserName() failed")
+}
+
+func TestUserInfo_GetDepartmentName(t *testing.T) {
+	asst := assert.New(t)
+
+	userInfo := initNewUserInfo()
+	asst.Equal(defaultUserInfoDepartmentName, userInfo.GetDepartmentName(), "test GetDepartmentName() failed")
+}
+
+func TestUserInfo_GetEmployeeID(t *testing.T) {
+	asst := assert.New(t)
+
+	userInfo := initNewUserInfo()
+	asst.Equal(defaultUserInfoEmployeeID, userInfo.GetEmployeeID(), "test GetEmployeeID() failed")
+}
+
+func TestUserInfo_GetAccountName(t *testing.T) {
+	asst := assert.New(t)
+
+	userInfo := initNewUserInfo()
+	asst.Equal(defaultUserInfoAccountName, userInfo.GetAccountName(), "test GetAccountName() failed")
+}
+
+func TestUserInfo_GetEmail(t *testing.T) {
+	asst := assert.New(t)
+
+	userInfo := initNewUserInfo()
+	asst.Equal(defaultUserInfoEmail, userInfo.GetEmail(), "test GetEmail() failed")
+}
+
+func TestUserInfo_GetTelephone(t *testing.T) {
+	asst := assert.New(t)
+
+	userInfo := initNewUserInfo()
+	asst.Equal(defaultUserInfoTelephone, userInfo.GetTelephone(), "test GetTelephone() failed")
+}
+
+func TestUserInfo_GetMobile(t *testing.T) {
+	asst := assert.New(t)
+
+	userInfo := initNewUserInfo()
+	asst.Equal(defaultUserInfoMobile, userInfo.GetMobile(), "test GetMobile() failed")
+}
+
+func TestUserInfo_GetDelFlag(t *testing.T) {
+	asst := assert.New(t)
+
+	userInfo := initNewUserInfo()
+	asst.Equal(defaultUserInfoDelFlag, userInfo.GetDelFlag(), "test GetDelFlag() failed")
 }
 
 func TestUserInfo_Identity(t *testing.T) {
@@ -75,7 +139,7 @@ func TestUserInfo_IsDeleted(t *testing.T) {
 	asst := assert.New(t)
 
 	userInfo := initNewUserInfo()
-	asst.False(userInfo.IsDeleted(), "test IsDeleted() failed")
+	asst.False(userInfo.GetDelFlag() != constant.ZeroInt, "test IsDeleted() failed")
 }
 
 func TestUserInfo_GetCreateTime(t *testing.T) {
@@ -116,7 +180,7 @@ func TestUserInfo_Delete(t *testing.T) {
 
 	userInfo := initNewUserInfo()
 	userInfo.Delete()
-	asst.True(userInfo.IsDeleted(), "test Delete() failed")
+	asst.True(userInfo.GetDelFlag() != constant.ZeroInt, "test Delete() failed")
 }
 
 func TestUserInfo_MarshalJSON(t *testing.T) {

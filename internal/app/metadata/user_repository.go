@@ -286,6 +286,37 @@ func (ur *UserRepo) GetID(accountName string) (int, error) {
 	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
+// GetByEmployeeID get userinfo by employeeID
+func (ur *UserRepo) GetByEmployeeID(employeeID string) (metadata.User, error) {
+	sql := `
+	select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
+	from t_meta_user_info
+	where del_flag = 0
+	and employee_id = ?;
+`
+	log.Debugf("metadata UserRepo.GetByID() sql: \n%s\nplaceholders: %s", sql, employeeID)
+
+	result, err := ur.Execute(sql, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	switch result.RowNumber() {
+	case 0:
+		return nil, errors.New(fmt.Sprintf("metadata UserInfo.GetByEmployeeID(): data does not exists, id: %s", employeeID))
+	case 1:
+		userInfo := NewEmptyUserInfoWithGlobal()
+		// map to struct
+		err = result.MapToStructByRowIndex(userInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+		if err != nil {
+			return nil, err
+		}
+
+		return userInfo, nil
+	default:
+		return nil, errors.New(fmt.Sprintf("metadata UserInfo.GetByEmployeeID(): duplicate key exists, id: %s", employeeID))
+	}
+}
+
 // Create creates data with given user in the middleware
 func (ur *UserRepo) Create(user metadata.User) (metadata.User, error) {
 	sql := `insert into t_meta_user_info(user_name, department_name, employee_id, account_name, email , telephone , mobile, role) values(?,?,?,?,?,?,?,?);`

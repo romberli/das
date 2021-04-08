@@ -77,10 +77,10 @@ func (ei *EnvInfo) Identity() int {
 	return ei.ID
 }
 
-// IsDeleted checks if delete flag had been set
-func (ei *EnvInfo) IsDeleted() bool {
-	return ei.DelFlag != constant.ZeroInt
-}
+// // IsDeleted checks if delete flag had been set
+// func (ei *EnvInfo) IsDeleted() bool {
+// 	return ei.DelFlag != constant.ZeroInt
+// }
 
 // GetCreateTime returns created time of entity
 func (ei *EnvInfo) GetCreateTime() time.Time {
