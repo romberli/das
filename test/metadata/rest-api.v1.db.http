@@ -7,7 +7,7 @@ GET http://{{baseURL}}/api/v1/metadata/db/env/2
 Accept: application/json
 
 ### get database by id
-GET http://{{baseURL}}/api/v1/metadata/db/1
+GET http://{{baseURL}}/api/v1/metadata/db/get/1
 Accept: application/json
 
 ### get all apps by id
@@ -21,7 +21,7 @@ Content-Type: application/json
 {"db_name": "db1", "cluster_id": 2, "cluster_type": 2, "env_id": 3}
 
 ### update database by id
-POST http://{{baseURL}}/api/v1/metadata/db/1
+POST http://{{baseURL}}/api/v1/metadata/db/update/1
 Content-Type: application/json
 
 {"db_name": "db2", "del_flag": 1}

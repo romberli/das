@@ -34,8 +34,7 @@ func initDBRepo() *DBRepo {
 }
 
 func createDB() (metadata.DB, error) {
-	dbInfo := NewDBInfoWithDefault(defaultDBInfoDBName, defaultDBInfoClusterID,
-		defaultDBInfoClusterType, defaultDBInfoEnvID)
+	dbInfo := NewDBInfoWithDefault(defaultDBInfoDBName, defaultDBInfoClusterID, defaultDBInfoEnvID)
 	entity, err := dbRepo.Create(dbInfo)
 	if err != nil {
 		return nil, err

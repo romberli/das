@@ -172,7 +172,6 @@ func (dr *DBRepo) GetAppIDList(dbID int) ([]int, error) {
 	`
 
 	log.Debugf("metadata DBRepo.GetAppIDList() select sql: %s", sql)
-	log.Infof("database %v", dr.Database)
 	result, err := dr.Execute(sql, dbID)
 	if err != nil {
 		return nil, err
@@ -180,7 +179,6 @@ func (dr *DBRepo) GetAppIDList(dbID int) ([]int, error) {
 
 	resultNum := result.RowNumber()
 	appIDList := make([]int, resultNum)
-	fmt.Println(appIDList)
 
 	for row := 0; row < resultNum; row++ {
 		appID, err := result.GetInt(row, constant.ZeroInt)

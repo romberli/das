@@ -100,8 +100,7 @@ func TestDBService_Create(t *testing.T) {
 
 	s := NewDBService(dbRepo)
 	err := s.Create(map[string]interface{}{dbDBNameStruct: defaultDBInfoDBName,
-		dbClusterIDStruct: defaultDBInfoClusterID, dbClusterTypeStruct: defaultDBInfoClusterType,
-		dbEnvIDStruct: defaultDBInfoEnvID})
+		dbClusterIDStruct: defaultDBInfoClusterID, dbEnvIDStruct: defaultDBInfoEnvID})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
 	err = deleteDBByID(s.DBs[0].Identity())

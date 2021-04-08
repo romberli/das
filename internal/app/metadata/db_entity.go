@@ -10,10 +10,9 @@ import (
 )
 
 const (
-	dbDBNameStruct      = "DBName"
-	dbClusterIDStruct   = "ClusterID"
-	dbClusterTypeStruct = "ClusterType"
-	dbEnvIDStruct       = "EnvID"
+	dbDBNameStruct    = "DBName"
+	dbClusterIDStruct = "ClusterID"
+	dbEnvIDStruct     = "EnvID"
 )
 
 var _ metadata.DB = (*DBInfo)(nil)
@@ -76,14 +75,13 @@ func NewEmptyDBInfoWithGlobal() *DBInfo {
 }
 
 // NewDBInfoWithDefault returns a new *DBInfo with default DBRepo
-func NewDBInfoWithDefault(dbName string, clusterID, clusterType, envID int) *DBInfo {
+func NewDBInfoWithDefault(dbName string, clusterID, envID int) *DBInfo {
 	return &DBInfo{
-		DBRepo:      NewDBRepoWithGlobal(),
-		DBName:      dbName,
-		ClusterID:   clusterID,
-		ClusterType: clusterType,
-		OwnerID:     constant.DefaultRandomInt,
-		EnvID:       envID,
+		DBRepo:    NewDBRepoWithGlobal(),
+		DBName:    dbName,
+		ClusterID: clusterID,
+		OwnerID:   constant.DefaultRandomInt,
+		EnvID:     envID,
 	}
 }
 

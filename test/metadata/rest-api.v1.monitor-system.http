@@ -7,7 +7,7 @@ GET http://{{baseURL}}/api/v1/metadata/monitor-system/env/1
 Accept: application/json
 
 ### get monitor system by id
-GET http://{{baseURL}}/api/v1/metadata/monitor-system/1
+GET http://{{baseURL}}/api/v1/metadata/monitor-system/get/1
 Accept: application/json
 
 ### get all monitor systems by host-info
@@ -21,11 +21,11 @@ Content-Type: application/json
 {"system_name": "ms2", "system_type":1, "host_ip": "127.0.0.1", "port_num": 3307, "port_num_slow": 3308, "base_url": "http://127.0.0.1/prometheus/api/v1/", "env_id": 1}
 
 ### update monitor system by id
-POST http://{{baseURL}}/api/v1/metadata/monitor-system/1
+POST http://{{baseURL}}/api/v1/metadata/monitor-system/update/1
 Content-Type: application/json
 
 {"system_name": "ms8", "port_num": 3300, "del_flag": 1}
 
 ### delete monitor system by id
-POST http://{{baseURL}}/api/v1/metadata/monitor-system/1
+POST http://{{baseURL}}/api/v1/metadata/monitor-system/delete/1
 Content-Type: application/json
