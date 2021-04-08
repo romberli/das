@@ -4,8 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/romberli/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap/zapcore"
 
 	_ "github.com/romberli/das/docs"
 )
@@ -20,8 +22,12 @@ type GinRouter struct {
 	Engine *gin.Engine
 }
 
-func NewGinRouter(r *gin.Engine) *GinRouter {
-	return &GinRouter{r}
+func NewGinRouter() *GinRouter {
+	if log.GetLevel() != zapcore.DebugLevel {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	return &GinRouter{gin.Default()}
 }
 
 func (gr *GinRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
