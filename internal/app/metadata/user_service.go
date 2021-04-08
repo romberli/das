@@ -194,17 +194,7 @@ func (us *UserService) GetByMobile(mobile string) error {
 	return err
 }
 
-// GetByEmployeeID gets an userinfo that contains the given employeeID from the middleware
-func (us *UserService) GetByEmployeeID(employeeID string) error {
-	user, err := us.UserRepo.GetByEmployeeID(employeeID)
-	if err != nil {
-		return err
-	}
 
-	us.Users = append(us.Users, user)
-
-	return err
-}
 
 // GetByName gets an userinfo that contains the given userName from the middleware
 func (us *UserService) GetByName(userName string) error {

@@ -79,7 +79,7 @@ func NewUserInfoWithDefault(userName string, departmentName string, employeeID s
 		UserRepo:       NewUserRepoWithGlobal(),
 		UserName:       userName,
 		DepartmentName: departmentName,
-		EmployeeID:     employeeID,
+		EmployeeID:     constant.DefaultRandomString,
 		AccountName:    accountName,
 		Email:          email,
 		Telephone:      constant.DefaultRandomString,

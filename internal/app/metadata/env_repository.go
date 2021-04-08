@@ -99,7 +99,7 @@ func (er *EnvRepo) GetByID(id int) (metadata.Env, error) {
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, errors.New(fmt.Sprintf("metadata EnvInfo.GetByID(): data does not exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata EnvInfo.GetByID(): data does not exists, id: %d", id))
 	case 1:
 		envInfo := NewEmptyEnvInfoWithGlobal()
 		// map to struct
@@ -110,7 +110,7 @@ func (er *EnvRepo) GetByID(id int) (metadata.Env, error) {
 
 		return envInfo, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("metadata EnvInfo.GetByID(): duplicate key exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata EnvInfo.GetByID(): duplicate key exists, id: %d", id))
 	}
 }
 
@@ -171,7 +171,8 @@ func (er *EnvRepo) Delete(id int) error {
 	if err != nil {
 		return err
 	}
-	sql := `delete from t_meta_env_info where where id = ?;`
+	//delete from t_meta_env_info where id =
+	sql := `delete from t_meta_env_info where id = ?;`
 	log.Debugf("metadata EnvRepo.Delete() delete sql(t_meta_app_info): %s", sql)
 	_, err = tx.Execute(sql, id)
 	if err != nil {

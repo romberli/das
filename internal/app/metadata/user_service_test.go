@@ -45,10 +45,10 @@ func TestUserService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewUserService(userRepo)
-	err := s.GetByID(66)
+	err := s.GetByID(2)
 	asst.Nil(err, "test GetByID() failed")
 	id := s.Users[constant.ZeroInt].Identity()
-	asst.Equal(66, id, "test GetByID() failed")
+	asst.Equal(2, id, "test GetByID() failed")
 }
 
 func TestUserService_Create(t *testing.T) {
@@ -56,14 +56,15 @@ func TestUserService_Create(t *testing.T) {
 
 	s := NewUserService(userRepo)
 	err := s.Create(map[string]interface{}{
+
 		userNameStruct:       defaultUserInfoUserName,
 		departmentNameStruct: defaultUserInfoDepartmentName,
 		employeeIDStruct:     defaultUserInfoEmployeeID,
-		//	accountNameStruct:    defaultUserInfoAccountName,
-		emailStruct:     defaultUserInfoEmail,
-		telephoneStruct: defaultUserInfoTelephone,
-		mobileStruct:    defaultUserInfoMobile,
-		roleStruct:      defaultUserInfoRole,
+		accountNameStruct:    defaultUserInfoAccountName,
+		emailStruct:          defaultUserInfoEmail,
+		telephoneStruct:      defaultUserInfoTelephone,
+		mobileStruct:         defaultUserInfoMobile,
+		roleStruct:           defaultUserInfoRole,
 	})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete

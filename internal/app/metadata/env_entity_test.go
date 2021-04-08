@@ -3,7 +3,6 @@ package metadata
 import (
 	"encoding/json"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/jinzhu/now"
@@ -48,7 +47,7 @@ func TestEnvInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
 	envInfo := initNewEnvInfo()
-	asst.Equal(strconv.Itoa(defaultEnvInfoID), envInfo.Identity(), "test Identity() failed")
+	asst.Equal(defaultEnvInfoID, envInfo.Identity(), "test Identity() failed")
 }
 
 func TestEnvInfo_IsDeleted(t *testing.T) {

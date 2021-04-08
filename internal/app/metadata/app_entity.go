@@ -55,6 +55,15 @@ func NewAppInfoWithGlobal(id int, appName string, level int, ownerID int, delFla
 	}
 }
 
+// func NewEmptyAppInfoWithRepo(repo *metadata.AppRepo) *AppInfo{
+// 	return &AppInfo{AppRepo: repo}
+// }
+
+// // NewEmptyAppInfoWithGlobal return a new AppInfo
+// func NewEmptyAppInfoWithGlobal() *AppInfo {
+// 	return NewEmptyAppInfoWithRepo(NewAppRepoWithGlobal())
+// }
+
 // NewEmptyAppInfoWithGlobal return a new AppInfo
 func NewEmptyAppInfoWithGlobal() *AppInfo {
 	return &AppInfo{AppRepo: NewAppRepoWithGlobal()}

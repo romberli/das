@@ -13,12 +13,12 @@ import (
 
 const (
 	// modify these connection information
-	envAddr       = "192.168.137.11:3306"
-	envDBName     = "das"
-	envDBUser     = "root"
-	envDBPass     = "root"
+	envAddr       = "192.168.66.143:3306"
+	envDBName     = "db_test"
+	envDBUser     = "tester"
+	envDBPass     = "mysql.1234"
 	newEnvName    = "newTest"
-	onlineEnvName = "test"
+	onlineEnvName = "online"
 )
 
 var envRepo = initEnvRepo()

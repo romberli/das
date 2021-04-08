@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	onlineUserName = "test"
+	onlineUserName = "online"
 	newUserName    = "nun"
 )
 
@@ -129,7 +129,7 @@ func TestUserRepo_GetAll(t *testing.T) {
 func TestUserRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := userRepo.GetByID(66)
+	entity, err := userRepo.GetByID(2)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	userName := entity.GetUserName()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
@@ -143,7 +143,8 @@ func TestUserRepo_Create(t *testing.T) {
 
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteUserByID(entity.Identity())
+	id := entity.Identity()
+	err = deleteUserByID(id)
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 

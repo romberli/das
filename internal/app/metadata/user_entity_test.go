@@ -3,7 +3,6 @@ package metadata
 import (
 	"encoding/json"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/jinzhu/now"
@@ -17,7 +16,7 @@ const (
 	defaultUserInfoUserName             = "nun"
 	defaultUserInfoDepartmentName       = "dn1"
 	defaultUserInfoEmployeeID           = "11"
-	defaultUserInfoAccountName          = "da1"
+	defaultUserInfoAccountName          = "da"
 	defaultUserInfoEmail                = "e1"
 	defaultUserInfoTelephone            = "t1"
 	defaultUserInfoMobile               = "m1"
@@ -69,7 +68,7 @@ func TestUserInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
 	userInfo := initNewUserInfo()
-	asst.Equal(strconv.Itoa(defaultUserInfoID), userInfo.Identity(), "test Identity() failed")
+	asst.Equal(defaultUserInfoID, userInfo.Identity(), "test Identity() failed")
 }
 
 func TestUserInfo_IsDeleted(t *testing.T) {

@@ -197,7 +197,7 @@ func (ur *UserRepo) GetByID(id int) (metadata.User, error) {
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, errors.New(fmt.Sprintf("metadata UserInfo.GetByID(): data does not exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata UserInfo.GetByID(): data does not exists, id: %d", id))
 	case 1:
 		userInfo := NewEmptyUserInfoWithGlobal()
 		// map to struct
@@ -208,7 +208,7 @@ func (ur *UserRepo) GetByID(id int) (metadata.User, error) {
 
 		return userInfo, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("metadata UserInfo.GetByID(): duplicate key exists, id: %s", id))
+		return nil, errors.New(fmt.Sprintf("metadata UserInfo.GetByID(): duplicate key exists, id: %d", id))
 	}
 }
 
@@ -243,37 +243,6 @@ func (ur *UserRepo) GetByAccountName(accountName string) (metadata.User, error) 
 	}
 }
 
-// GetByEmployeeID get userinfo by employeeID
-func (ur *UserRepo) GetByEmployeeID(employeeID string) (metadata.User, error) {
-	sql := `
-	select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
-	from t_meta_user_info
-	where del_flag = 0
-	and employee_id = ?;
-`
-	log.Debugf("metadata UserRepo.GetByID() sql: \n%s\nplaceholders: %s", sql, employeeID)
-
-	result, err := ur.Execute(sql, employeeID)
-	if err != nil {
-		return nil, err
-	}
-	switch result.RowNumber() {
-	case 0:
-		return nil, errors.New(fmt.Sprintf("metadata UserInfo.GetByEmployeeID(): data does not exists, id: %s", employeeID))
-	case 1:
-		userInfo := NewEmptyUserInfoWithGlobal()
-		// map to struct
-		err = result.MapToStructByRowIndex(userInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
-		if err != nil {
-			return nil, err
-		}
-
-		return userInfo, nil
-	default:
-		return nil, errors.New(fmt.Sprintf("metadata UserInfo.GetByEmployeeID(): duplicate key exists, id: %s", employeeID))
-	}
-}
-
 // GetByEmail get userinfo by email
 func (ur *UserRepo) GetByEmail(email string) (metadata.User, error) {
 	sql := `
@@ -305,11 +274,11 @@ func (ur *UserRepo) GetByEmail(email string) (metadata.User, error) {
 	}
 }
 
-// GetID checks iduser of given user from the middleware
-func (ur *UserRepo) GetID(employeeID string) (int, error) {
-	sql := `select id from t_meta_user_info where del_flag = 0 and employee_id = ?;`
+// GetID checks iduser of given accountName from the middleware
+func (ur *UserRepo) GetID(accountName string) (int, error) {
+	sql := `select id from t_meta_user_info where del_flag = 0 and account_name = ?;`
 	log.Debugf("metadata UserRepo.GetID() select sql: %s", sql)
-	result, err := ur.Execute(sql, employeeID)
+	result, err := ur.Execute(sql, accountName)
 	if err != nil {
 		return constant.ZeroInt, err
 	}
@@ -328,7 +297,7 @@ func (ur *UserRepo) Create(user metadata.User) (metadata.User, error) {
 		return nil, err
 	}
 	// get id
-	id, err := ur.GetID(user.GetEmployeeID())
+	id, err := ur.GetID(user.GetAccountName())
 	if err != nil {
 		return nil, err
 	}

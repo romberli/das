@@ -5,20 +5,13 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-<<<<<<< HEAD
 	"github.com/romberli/das/internal/app/metadata"
 	"github.com/romberli/das/pkg/message"
 	msgmeta "github.com/romberli/das/pkg/message/metadata"
 	"github.com/romberli/das/pkg/resp"
-=======
->>>>>>> 1184234f14f18beb03a93e8254c258010ac2393a
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/log"
-
-	"github.com/romberli/das/internal/app/metadata"
-	"github.com/romberli/das/pkg/message"
-	"github.com/romberli/das/pkg/resp"
 )
 
 const (
@@ -53,7 +46,7 @@ func GetUser(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
-	// response
+	// responseF
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetUserAll, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetUserAll)
@@ -117,33 +110,6 @@ func GetUserByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetUserByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetUserByID, id)
-}
-
-func GetUserByEmployeeID(c *gin.Context) {
-	// get param
-	employeeID := c.Param(employeeIDStruct)
-	if employeeID == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, employeeIDStruct)
-		return
-	}
-	// init service
-	s := metadata.NewUserServiceWithDefault()
-	// get UserRepo
-	err := s.GetByEmployeeID(employeeID)
-	if err != nil {
-		resp.ResponseNOK(c, msgmeta.ErrMetadataGetEmployeeID, employeeID, err.Error())
-		return
-	}
-	// marshal service
-	jsonBytes, err := s.Marshal()
-	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
-		return
-	}
-	// response
-	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetEmployeeID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetEmployeeID, employeeID)
 }
 
 func GetUserByAccountName(c *gin.Context) {
