@@ -11,7 +11,7 @@ import (
 )
 
 func TestUserServiceAll(t *testing.T) {
-	TestUserService_GetEntities(t)
+	TestUserService_GetUsers(t)
 	TestUserService_GetAll(t)
 	TestUserService_GetByID(t)
 	TestUserService_Create(t)
@@ -21,14 +21,14 @@ func TestUserServiceAll(t *testing.T) {
 	TestUserService_MarshalWithFields(t)
 }
 
-func TestUserService_GetEntities(t *testing.T) {
+func TestUserService_GetUsers(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewUserService(userRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
+	Users := s.GetUsers()
+	asst.Greater(len(Users), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestUserService_GetAll(t *testing.T) {
@@ -37,18 +37,18 @@ func TestUserService_GetAll(t *testing.T) {
 	s := NewUserService(userRepo)
 	err := s.GetAll()
 	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
+	Users := s.GetUsers()
+	asst.Greater(len(Users), constant.ZeroInt, "test GetEnvs() failed")
 }
 
 func TestUserService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewUserService(userRepo)
-	err := s.GetByID("66")
+	err := s.GetByID(66)
 	asst.Nil(err, "test GetByID() failed")
-	id := s.Entities[constant.ZeroInt].Identity()
-	asst.Equal("66", id, "test GetByID() failed")
+	id := s.Users[constant.ZeroInt].Identity()
+	asst.Equal(66, id, "test GetByID() failed")
 }
 
 func TestUserService_Create(t *testing.T) {
@@ -67,7 +67,7 @@ func TestUserService_Create(t *testing.T) {
 	})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteUserByID(s.Entities[0].Identity())
+	err = deleteUserByID(s.Users[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
@@ -81,11 +81,11 @@ func TestUserService_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	userName, err := s.GetEntities()[constant.ZeroInt].Get(userNameStruct)
+	userName := s.GetUsers()[constant.ZeroInt].GetUserName()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(newUserName, userName)
 	// delete
-	err = deleteUserByID(s.Entities[0].Identity())
+	err = deleteUserByID(s.Users[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
@@ -103,7 +103,7 @@ func TestUserService_Delete(t *testing.T) {
 }
 
 func TestUserService_Marshal(t *testing.T) {
-	var entitiesUnmarshal []*UserInfo
+	var UsersUnmarshal []*UserInfo
 
 	asst := assert.New(t)
 
@@ -112,12 +112,12 @@ func TestUserService_Marshal(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
 	data, err := s.Marshal()
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
-	err = json.Unmarshal(data, &entitiesUnmarshal)
+	err = json.Unmarshal(data, &UsersUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
-	entities := s.GetEntities()
-	for i := 0; i < len(entities); i++ {
-		entity := entities[i]
-		entityUnmarshal := entitiesUnmarshal[i]
+	Users := s.GetUsers()
+	for i := 0; i < len(Users); i++ {
+		entity := Users[i]
+		entityUnmarshal := UsersUnmarshal[i]
 		asst.True(userStructEqual(entity.(*UserInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }

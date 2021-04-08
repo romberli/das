@@ -29,16 +29,10 @@ type User interface {
 	GetCreateTime() time.Time
 	// GetLastUpdateTime returns the last update time
 	GetLastUpdateTime() time.Time
-	// GetAppIDList gets app identity list that uses this db
-	GetAppIDList() ([]int, error)
 	// Set sets User with given fields, key is the field name and value is the relevant value of the key
 	Set(fields map[string]interface{}) error
 	// Delete sets DelFlag to 1
 	Delete()
-	// AddUser adds a new map of the app and database in the middleware
-	AddApp(appID int) error
-	// DeleteApp deletes a new map of the app and database in the middleware
-	DeleteApp(appID int) error
 	// MarshalJSON marshals User to json string
 	MarshalJSON() ([]byte, error)
 	// MarshalJSONWithFields marshals only specified field of the User to json string

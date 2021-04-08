@@ -16,7 +16,7 @@ const (
 	defaultUserInfoID                   = 22
 	defaultUserInfoUserName             = "nun"
 	defaultUserInfoDepartmentName       = "dn1"
-	defaultUserInfoEmployeeID           = 11
+	defaultUserInfoEmployeeID           = "11"
 	defaultUserInfoAccountName          = "da1"
 	defaultUserInfoEmail                = "e1"
 	defaultUserInfoTelephone            = "t1"

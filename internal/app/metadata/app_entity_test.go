@@ -45,8 +45,9 @@ func appSystemStructEqual(a, b *AppInfo) bool {
 
 func TestAppEntityAll(t *testing.T) {
 	TestAppInfo_Identity(t)
-	TestAppInfo_GetSystemName(t)
+	TestAppInfo_GetAppName(t)
 	TestAppInfo_GetLevel(t)
+	TestAppInfo_GetOwnerID(t)
 	TestAppInfo_GetDelFlag(t)
 	TestAppInfo_GetCreateTime(t)
 	TestAppInfo_GetLastUpdateTime(t)
@@ -66,7 +67,7 @@ func TestAppInfo_Identity(t *testing.T) {
 	asst.Equal(defaultAppInfoID, appSystemInfo.Identity(), "test Identity() failed")
 }
 
-func TestAppInfo_GetSystemName(t *testing.T) {
+func TestAppInfo_GetAppName(t *testing.T) {
 	asst := assert.New(t)
 
 	appSystemInfo := initNewAppInfo()
@@ -84,8 +85,9 @@ func TestAppInfo_GetOwnerID(t *testing.T) {
 	asst := assert.New(t)
 
 	appSystemInfo := initNewAppInfo()
-	asst.Equal(defaultAppInfoOwnerID, appSystemInfo.GetOwnerID(), "test GetOwnerID() failed")
+	asst.Equal(defaultAppInfoOwnerID, appSystemInfo.GetOwnerID(), "test GetLevel() failed")
 }
+
 
 func TestAppInfo_GetDelFlag(t *testing.T) {
 	asst := assert.New(t)

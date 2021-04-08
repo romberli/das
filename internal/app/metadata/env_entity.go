@@ -1,19 +1,22 @@
 package metadata
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-var _ dependency.Entity = (*EnvInfo)(nil)
+const (
+//envNameStruct = "EnvName"
+)
+
+var _ metadata.Env = (*EnvInfo)(nil)
 
 type EnvInfo struct {
-	dependency.Repository
+	metadata.EnvRepo
 	ID             int       `middleware:"id" json:"id"`
 	EnvName        string    `middleware:"env_name" json:"env_name"`
 	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
@@ -22,7 +25,7 @@ type EnvInfo struct {
 }
 
 // NewEnvInfo returns a new *EnvInfo
-func NewEnvInfo(repo *EnvRepo, id int, envName string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *EnvInfo {
+func NewEnvInfo(repo metadata.EnvRepo, id int, envName string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *EnvInfo {
 	return &EnvInfo{
 		repo,
 		id,
@@ -33,7 +36,7 @@ func NewEnvInfo(repo *EnvRepo, id int, envName string, delFlag int, createTime t
 	}
 }
 
-// NewEnvInfo returns a new *EnvInfo with default EnvRepo
+// NewEnvInfoWithGlobal returns a new *EnvInfo with default EnvRepo
 func NewEnvInfoWithGlobal(id int, envName string, delFlag int, createTime time.Time, lastUpdateTime time.Time) *EnvInfo {
 	return &EnvInfo{
 		NewEnvRepoWithGlobal(),
@@ -47,14 +50,14 @@ func NewEnvInfoWithGlobal(id int, envName string, delFlag int, createTime time.T
 
 // NewEmptyEnvInfoWithGlobal returns a new *EnvInfo with global repository
 func NewEmptyEnvInfoWithGlobal() *EnvInfo {
-	return &EnvInfo{Repository: NewEnvRepoWithGlobal()}
+	return &EnvInfo{EnvRepo: NewEnvRepoWithGlobal()}
 }
 
 // NewEnvInfoWithDefault returns a new *EnvInfo with default EnvRepo
 func NewEnvInfoWithDefault(envName string) *EnvInfo {
 	return &EnvInfo{
-		Repository: NewEnvRepoWithGlobal(),
-		EnvName:    envName,
+		EnvRepo: NewEnvRepoWithGlobal(),
+		EnvName: envName,
 	}
 }
 
@@ -70,8 +73,8 @@ func NewEnvInfoWithMapAndRandom(fields map[string]interface{}) (*EnvInfo, error)
 }
 
 // Identity returns ID of entity
-func (ei *EnvInfo) Identity() string {
-	return strconv.Itoa(ei.ID)
+func (ei *EnvInfo) Identity() int {
+	return ei.ID
 }
 
 // IsDeleted checks if delete flag had been set
@@ -92,6 +95,16 @@ func (ei *EnvInfo) GetLastUpdateTime() time.Time {
 // Get returns value of given field
 func (ei *EnvInfo) Get(field string) (interface{}, error) {
 	return common.GetValueOfStruct(ei, field)
+}
+
+// GetDelFlag returns the delete flag
+func (ei *EnvInfo) GetDelFlag() int {
+	return ei.DelFlag
+}
+
+// GetEnvName returns the env name
+func (ei *EnvInfo) GetEnvName() string {
+	return ei.EnvName
 }
 
 // Set sets entity with given fields, key is the field name and value is the relevant value of the key

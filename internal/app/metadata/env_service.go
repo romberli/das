@@ -6,71 +6,65 @@ import (
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 	"github.com/romberli/das/pkg/message"
 )
 
 const envNameStruct = "EnvName"
 
-var _ dependency.Service = (*EnvService)(nil)
+var _ metadata.EnvService = (*EnvService)(nil)
 
-// EnvService implements Service interface
 type EnvService struct {
-	dependency.Repository
-	Envs []dependency.Entity
+	metadata.EnvRepo
+	Envs []metadata.Env
 }
 
 // NewEnvService returns a new *EnvService
-func NewEnvService(repo dependency.Repository) *EnvService {
-	return &EnvService{repo, []dependency.Entity{}}
+func NewEnvService(repo metadata.EnvRepo) *EnvService {
+	return &EnvService{repo, []metadata.Env{}}
 }
 
-// NewEnvServiceWithDefault returns a new *EnvService with default repository
+// NewEnvServiceWithDefault returns a new *EnvService with default EnvRepo
 func NewEnvServiceWithDefault() *EnvService {
 	return NewEnvService(NewEnvRepoWithGlobal())
 }
 
-// GetEntities returns entities of the service
-func (es *EnvService) GetEntities() []dependency.Entity {
-	envList := make([]dependency.Entity, len(es.Envs))
-	for i := range envList {
-		envList[i] = es.Envs[i]
-	}
-
-	return envList
+// GetEnvs returns envs of the service
+func (es *EnvService) GetEnvs() []metadata.Env {
+	return es.Envs
 }
 
 // GetAll gets all environment entities from the middleware
 func (es *EnvService) GetAll() error {
 	var err error
-	es.Envs, err = es.Repository.GetAll()
+	es.Envs, err = es.EnvRepo.GetAll()
 
 	return err
 }
 
 // GetID gets identity of an entity with given fields
-func (es *EnvService) GetID(fields map[string]interface{}) (string, error) {
+func (es *EnvService) GetID(fields map[string]interface{}) (int, error) {
 	_, ok := fields[envNameStruct]
 	if !ok {
-		return constant.EmptyString, message.NewMessage(message.ErrFieldNotExists, envNameStruct)
+		return constant.ZeroInt, message.NewMessage(message.ErrFieldNotExists, envNameStruct)
 	}
 	// create a new entity
 	envInfo, err := NewEnvInfoWithMapAndRandom(fields)
 	if err != nil {
-		return constant.EmptyString, err
+		return constant.ZeroInt, err
 	}
 	// get identity from the middleware
-	id, err := es.Repository.GetID(envInfo)
+	id, err := es.EnvRepo.GetID(envInfo.EnvName)
 	if err != nil {
-		return constant.EmptyString, err
+		return constant.ZeroInt, err
 	}
 
 	return id, nil
 }
 
 // GetByID gets an environment entity that contains the given id from the middleware
-func (es *EnvService) GetByID(id string) error {
-	entity, err := es.Repository.GetByID(id)
+func (es *EnvService) GetByID(id int) error {
+	entity, err := es.EnvRepo.GetByID(id)
 	if err != nil {
 		return err
 	}
@@ -78,6 +72,18 @@ func (es *EnvService) GetByID(id string) error {
 	es.Envs = append(es.Envs, entity)
 
 	return err
+}
+
+// GetEnvByName gets Env from the middleware by name
+func (es *EnvService) GetEnvByName(envName string) error {
+	env, err := es.EnvRepo.GetEnvByName(envName)
+	if err != nil {
+		return err
+	}
+
+	es.Envs = append(es.Envs, env)
+
+	return nil
 }
 
 // Create creates a new environment entity and insert it into the middleware
@@ -93,7 +99,7 @@ func (es *EnvService) Create(fields map[string]interface{}) error {
 		return err
 	}
 	// insert into middleware
-	env, err := es.Repository.Create(envInfo)
+	env, err := es.EnvRepo.Create(envInfo)
 	if err != nil {
 		return err
 	}
@@ -107,7 +113,7 @@ func (es *EnvService) Create(fields map[string]interface{}) error {
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (es *EnvService) Update(id string, fields map[string]interface{}) error {
+func (es *EnvService) Update(id int, fields map[string]interface{}) error {
 	err := es.GetByID(id)
 	if err != nil {
 		return err
@@ -117,12 +123,12 @@ func (es *EnvService) Update(id string, fields map[string]interface{}) error {
 		return err
 	}
 
-	return es.Repository.Update(es.Envs[constant.ZeroInt])
+	return es.EnvRepo.Update(es.Envs[constant.ZeroInt])
 }
 
 // Delete deletes the environment entity that contains the given id in the middleware
-func (es *EnvService) Delete(id string) error {
-	return es.Repository.Delete(id)
+func (es *EnvService) Delete(id int) error {
+	return es.EnvRepo.Delete(id)
 }
 
 // Marshal marshals service.Envs

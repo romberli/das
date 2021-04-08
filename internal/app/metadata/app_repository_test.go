@@ -55,9 +55,14 @@ func TestAppRepoAll(t *testing.T) {
 	TestAppRepo_Execute(t)
 	TestAppRepo_GetAll(t)
 	TestAppRepo_GetByID(t)
+	TestAppRepo_GetAppByName(t)
+	TestAppRepo_GetDBIDList(t)
 	TestAppRepo_Create(t)
 	TestAppRepo_Update(t)
 	TestAppRepo_Delete(t)
+	TestAppRepo_AddAppDB(t)
+	TestAppRepo_DeleteAppDB(t)
+
 }
 
 func TestAppRepo_Execute(t *testing.T) {

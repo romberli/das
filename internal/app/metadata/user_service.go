@@ -8,8 +8,10 @@ import (
 
 	"github.com/romberli/das/pkg/message"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
+
+var _ metadata.UserService = (*UserService)(nil)
 
 const (
 	userNameStruct       = "UserName"
@@ -22,17 +24,15 @@ const (
 	roleStruct           = "Role"
 )
 
-var _ dependency.Service = (*UserService)(nil)
-
 // UserService struct
 type UserService struct {
-	dependency.Repository
-	Entities []dependency.Entity
+	metadata.UserRepo
+	Users []metadata.User
 }
 
 // NewUserService returns a new *UserService
-func NewUserService(repo dependency.Repository) *UserService {
-	return &UserService{repo, []dependency.Entity{}}
+func NewUserService(repo metadata.UserRepo) *UserService {
+	return &UserService{repo, []metadata.User{}}
 }
 
 // NewUserServiceWithDefault returns a new *UserService with default repository
@@ -40,37 +40,27 @@ func NewUserServiceWithDefault() *UserService {
 	return NewUserService(NewUserRepoWithGlobal())
 }
 
-// GetEntities returns entities of the service
-func (us *UserService) GetEntities() []dependency.Entity {
-	entityList := make([]dependency.Entity, len(us.Entities))
-	for i := range entityList {
-		entityList[i] = us.Entities[i]
-	}
-
-	return entityList
-}
-
 // GetAll gets all user entities from the middleware
 func (us *UserService) GetAll() error {
 	var err error
-	us.Entities, err = us.Repository.GetAll()
+	us.Users, err = us.UserRepo.GetAll()
 
 	return err
 }
 
-// GetByID gets an user entity that contains the given id from the middleware
-func (us *UserService) GetByID(id string) error {
-	entity, err := us.Repository.GetByID(id)
+// GetByID gets an user user that contains the given id from the middleware
+func (us *UserService) GetByID(id int) error {
+	user, err := us.UserRepo.GetByID(id)
 	if err != nil {
 		return err
 	}
 
-	us.Entities = append(us.Entities, entity)
+	us.Users = append(us.Users, user)
 
 	return err
 }
 
-// Create creates a new user entity and insert it into the middleware
+// Create creates a new user user and insert it into the middleware
 func (us *UserService) Create(fields map[string]interface{}) error {
 	// generate new map
 	_, ok := fields[userNameStruct]
@@ -99,59 +89,132 @@ func (us *UserService) Create(fields map[string]interface{}) error {
 		return message.NewMessage(message.ErrFieldNotExists, roleStruct)
 	}
 
-	// create a new entity
+	// create a new user
 	userInfo, err := NewUserInfoWithMapAndRandom(fields)
 	if err != nil {
 		return err
 	}
 
 	// insert into middleware
-	entity, err := us.Repository.Create(userInfo)
+	user, err := us.UserRepo.Create(userInfo)
 	if err != nil {
 		return err
 	}
 
-	us.Entities = append(us.Entities, entity)
+	us.Users = append(us.Users, user)
 	return nil
 }
 
-// Update gets an user entity that contains the given id from the middleware,
+// Update gets an user user that contains the given id from the middleware,
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (us *UserService) Update(id string, fields map[string]interface{}) error {
+func (us *UserService) Update(id int, fields map[string]interface{}) error {
 	err := us.GetByID(id)
 	if err != nil {
 		return err
 	}
-	err = us.Entities[constant.ZeroInt].Set(fields)
+	err = us.Users[constant.ZeroInt].Set(fields)
 	if err != nil {
 		return err
 	}
 
-	return us.Repository.Update(us.Entities[constant.ZeroInt])
+	return us.UserRepo.Update(us.Users[constant.ZeroInt])
 }
 
-// Delete deletes the user entity that contains the given id in the middleware
-func (us *UserService) Delete(id string) error {
-	return us.Repository.Delete(id)
+// Delete deletes the user user that contains the given id in the middleware
+func (us *UserService) Delete(id int) error {
+	return us.UserRepo.Delete(id)
 }
 
-// Marshal marshals service.Entities
+// Marshal marshals service.Users
 func (us *UserService) Marshal() ([]byte, error) {
-	return json.Marshal(us.Entities)
+	return json.Marshal(us.Users)
 }
 
-// MarshalWithFields marshals service.Entities with given fields
+// MarshalWithFields marshals service.Users with given fields
 func (us *UserService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(us.Entities))
+	interfaceList := make([]interface{}, len(us.Users))
 	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(us.Entities[i], fields...)
+		user, err := common.CopyStructWithFields(us.Users[i], fields...)
 		if err != nil {
 			return nil, err
 		}
-		interfaceList[i] = entity
+		interfaceList[i] = user
 	}
 
 	return json.Marshal(interfaceList)
+}
+
+// GetByAccountName gets an userinfo that contains the given accountname from the middleware
+func (us *UserService) GetByAccountName(accountName string) error {
+	user, err := us.UserRepo.GetByAccountName(accountName)
+	if err != nil {
+		return err
+	}
+
+	us.Users = append(us.Users, user)
+
+	return err
+}
+
+// GetByEmail gets an userinfo that contains the given email from the middleware
+func (us *UserService) GetByEmail(email string) error {
+	user, err := us.UserRepo.GetByEmail(email)
+	if err != nil {
+		return err
+	}
+
+	us.Users = append(us.Users, user)
+
+	return err
+}
+
+// GetByTelephone gets an userinfo that contains the given telephone from the middleware
+func (us *UserService) GetByTelephone(telephone string) error {
+	user, err := us.UserRepo.GetByTelephone(telephone)
+	if err != nil {
+		return err
+	}
+
+	us.Users = append(us.Users, user)
+
+	return err
+}
+
+// GetByMobile gets an userinfo that contains the given mobile from the middleware
+func (us *UserService) GetByMobile(mobile string) error {
+	user, err := us.UserRepo.GetByMobile(mobile)
+	if err != nil {
+		return err
+	}
+
+	us.Users = append(us.Users, user)
+
+	return err
+}
+
+// GetByEmployeeID gets an userinfo that contains the given employeeID from the middleware
+func (us *UserService) GetByEmployeeID(employeeID string) error {
+	user, err := us.UserRepo.GetByEmployeeID(employeeID)
+	if err != nil {
+		return err
+	}
+
+	us.Users = append(us.Users, user)
+
+	return err
+}
+
+// GetByName gets an userinfo that contains the given userName from the middleware
+func (us *UserService) GetByName(userName string) error {
+	var err error
+	us.Users, err = us.UserRepo.GetByName(userName)
+
+	return err
+}
+
+// GetUsers() return users of the service
+func (us *UserService) GetUsers() []metadata.User {
+	return us.Users
 }

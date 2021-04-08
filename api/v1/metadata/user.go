@@ -2,10 +2,12 @@ package metadata
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/romberli/das/internal/app/metadata"
 	"github.com/romberli/das/pkg/message"
+	msgmeta "github.com/romberli/das/pkg/message/metadata"
 	"github.com/romberli/das/pkg/resp"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
@@ -20,6 +22,7 @@ const (
 	emailStruct          = "Email"
 	telephoneStruct      = "Telephone"
 	roleStruct           = "Role"
+	mobileStruct         = "Mobile"
 )
 
 // @Tags user
@@ -34,7 +37,7 @@ func GetUser(c *gin.Context) {
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetUserAll, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetUserAll, err.Error())
 		return
 	}
 	// marshal service
@@ -45,12 +48,35 @@ func GetUser(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetUserAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetUserAll)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetUserAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetUserAll)
 }
 
 func GetUserByName(c *gin.Context) {
-
+	// get param
+	userName := c.Param(userNameStruct)
+	if userName == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, userNameStruct)
+		return
+	}
+	// init service
+	s := metadata.NewUserServiceWithDefault()
+	// get UserRepo
+	err := s.GetByName(userName)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetUserByName, userName, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetUserByName, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetUserByName, userName)
 }
 
 // @Tags user
@@ -60,17 +86,18 @@ func GetUserByName(c *gin.Context) {
 // @Router /api/v1/metadata/user/:id [get]
 func GetUserByID(c *gin.Context) {
 	// get param
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
+	idStr := c.Param(idJSON)
+	if idStr == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
 		return
 	}
+	id, err := strconv.Atoi(idStr)
 	// init service
 	s := metadata.NewUserServiceWithDefault()
-	// get entity
-	err := s.GetByID(id)
+	// get UserRepo
+	err = s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetUserByID, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetUserByID, id, err.Error())
 		return
 	}
 	// marshal service
@@ -81,28 +108,143 @@ func GetUserByID(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetUserByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetUserByID, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetUserByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetUserByID, id)
 }
 
 func GetUserByEmployeeID(c *gin.Context) {
-
+	// get param
+	employeeID := c.Param(employeeIDStruct)
+	if employeeID == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, employeeIDStruct)
+		return
+	}
+	// init service
+	s := metadata.NewUserServiceWithDefault()
+	// get UserRepo
+	err := s.GetByEmployeeID(employeeID)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetEmployeeID, employeeID, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetEmployeeID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetEmployeeID, employeeID)
 }
 
 func GetUserByAccountName(c *gin.Context) {
-
+	// get param
+	accountName := c.Param(accountNameStruct)
+	if accountName == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, accountNameStruct)
+		return
+	}
+	// init service
+	s := metadata.NewUserServiceWithDefault()
+	// get UserRepo
+	err := s.GetByAccountName(accountName)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetAccountName, accountName, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetAccountName, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetAccountName, accountName)
 }
 
 func GetUserByEmail(c *gin.Context) {
-
+	// get param
+	email := c.Param(emailStruct)
+	if email == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, emailStruct)
+		return
+	}
+	// init service
+	s := metadata.NewUserServiceWithDefault()
+	// get UserRepo
+	err := s.GetByEmail(email)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetEmail, email, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetEmail, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetEmail, email)
 }
 
 func GetUserByTelephone(c *gin.Context) {
-
+	// get param
+	telephone := c.Param(telephoneStruct)
+	if telephone == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, telephoneStruct)
+		return
+	}
+	// init service
+	s := metadata.NewUserServiceWithDefault()
+	// get UserRepo
+	err := s.GetByTelephone(telephone)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetTelephone, telephone, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetTelephone, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetTelephone, telephone)
 }
 
 func GetUserByMobile(c *gin.Context) {
-
+	// get param
+	mobile := c.Param(mobileStruct)
+	if mobile == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mobileStruct)
+		return
+	}
+	// init service
+	s := metadata.NewUserServiceWithDefault()
+	// get UserRepo
+	err := s.GetByMobile(mobile)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMobile, mobile, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMobile, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMobile, mobile)
 }
 
 // @Tags user
@@ -155,7 +297,7 @@ func AddUser(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddUser, fields[userNameStruct], err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataAddUser, fields[userNameStruct], err.Error())
 		return
 	}
 	// marshal service
@@ -166,8 +308,8 @@ func AddUser(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddUser, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddUser, fields[userNameStruct])
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataAddUser, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataAddUser, fields[userNameStruct])
 }
 
 // @Tags user
@@ -179,10 +321,11 @@ func UpdateUserByID(c *gin.Context) {
 	var fields map[string]interface{}
 
 	// get params
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
+	idStr := c.Param(idJSON)
+	if idStr == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
 	}
+	id, err := strconv.Atoi(idStr)
 	data, err := c.GetRawData()
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrGetRawData, err.Error())
@@ -208,10 +351,10 @@ func UpdateUserByID(c *gin.Context) {
 	}
 	// init service
 	s := metadata.NewUserServiceWithDefault()
-	// update entity
+	// update UserRepo
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateUser, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataUpdateUser, err.Error())
 		return
 	}
 	// marshal service
@@ -222,10 +365,40 @@ func UpdateUserByID(c *gin.Context) {
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateUser, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateUser, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataUpdateUser, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.DebugMetadataUpdateUser, id)
 }
 
 func DeleteUserByID(c *gin.Context) {
+	var fields map[string]interface{}
 
+	// get params
+	idStr := c.Param(idJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	// init service
+	s := metadata.NewUserServiceWithDefault()
+	// update entities
+	err = s.Delete(id)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDeleteUserByID, id, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataDeleteUserByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataDeleteUserByID, fields[userNameStruct])
 }
