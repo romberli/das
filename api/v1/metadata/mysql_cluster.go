@@ -10,6 +10,7 @@ import (
 
 	"github.com/romberli/das/internal/app/metadata"
 	"github.com/romberli/das/pkg/message"
+	msgmeta "github.com/romberli/das/pkg/message/metadata"
 	"github.com/romberli/das/pkg/resp"
 )
 
@@ -32,7 +33,7 @@ func GetMySQLCluster(c *gin.Context) {
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMySQLClusterAll, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLClusterAll, err.Error())
 		return
 	}
 	// marshal service
@@ -45,9 +46,9 @@ func GetMySQLCluster(c *gin.Context) {
 	// response
 
 	jsonStr := string(jsonBytes)
-	fmt.Println(message.DebugMetadataGetMySQLClusterAll, jsonStr)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLClusterAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLClusterAll)
+	fmt.Println(msgmeta.DebugMetadataGetMySQLClusterAll, jsonStr)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLClusterAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLClusterAll)
 }
 
 func GetMySQLClusterByEnv(c *gin.Context) {
@@ -71,7 +72,7 @@ func GetMySQLClusterByID(c *gin.Context) {
 	// get entity
 	err := s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMySQLClusterByID, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLClusterByID, id, err.Error())
 		return
 	}
 	// marshal service
@@ -82,8 +83,8 @@ func GetMySQLClusterByID(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLClusterByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLClusterByID, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLClusterByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLClusterByID, id)
 }
 
 func GetMySQLClusterByName(c *gin.Context) {
@@ -137,7 +138,7 @@ func AddMySQLCluster(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMySQLCluster, clusterNameStruct, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataAddMySQLCluster, clusterNameStruct, err.Error())
 		return
 	}
 	// marshal service
@@ -148,8 +149,8 @@ func AddMySQLCluster(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddMySQLCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMySQLCluster, clusterNameStruct)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataAddMySQLCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataAddMySQLCluster, clusterNameStruct)
 }
 
 // @Tags mysql cluster
@@ -204,7 +205,7 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMySQLCluster, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataUpdateMySQLCluster, id, err.Error())
 		return
 	}
 	// marshal service
@@ -215,8 +216,8 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateMySQLCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMySQLCluster, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataUpdateMySQLCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.DebugMetadataUpdateMySQLCluster, id)
 }
 
 func DeleteMySQLClusterByID(c *gin.Context) {

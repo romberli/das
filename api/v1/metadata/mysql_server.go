@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/romberli/go-util/common"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/romberli/das/internal/app/metadata"
 	"github.com/romberli/das/pkg/message"
+	msgmeta "github.com/romberli/das/pkg/message/metadata"
 	"github.com/romberli/das/pkg/resp"
 )
 
@@ -33,7 +35,7 @@ func GetMySQLServer(c *gin.Context) {
 	// get entities
 	err := s.GetAll()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMySQLServerAll, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLServerAll, err.Error())
 		return
 	}
 	// marshal service
@@ -44,8 +46,8 @@ func GetMySQLServer(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLServerAll, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerAll)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLServerAll, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLServerAll)
 }
 
 // TODO: Modify Swagger commment
@@ -56,13 +58,35 @@ func GetMySQLServer(c *gin.Context) {
 // @Router /api/v1/metadata/mysql-server/:id [get]
 func GetMySQLServerByClusterID(c *gin.Context) {
 	// get param
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
+	clusterIDStr := c.Param(idJSON)
+	if clusterIDStr == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
 		return
 	}
+	clusterID, err := strconv.Atoi(clusterIDStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+
+	}
 	// init service
 	s := metadata.NewMySQLServerServiceWithDefault()
+	// get entity
+	err = s.GetByClusterID(clusterID)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLServerByClusterID, clusterID, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLServerByClusterID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLServerByClusterID, clusterID)
 }
 
 // @Tags mysql server
@@ -82,7 +106,7 @@ func GetMySQLServerByID(c *gin.Context) {
 	// get entity
 	err := s.GetByID(id)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataGetMySQLServerByID, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLServerByID, id, err.Error())
 		return
 	}
 	// marshal service
@@ -93,12 +117,46 @@ func GetMySQLServerByID(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataGetMySQLServerByID, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataGetMySQLServerByID, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLServerByID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLServerByID, id)
 }
 
 func GetMySQLServerByHostInfo(c *gin.Context) {
+	// get param
+	hostIP := c.Param(hostIPJSON)
+	if hostIP == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, hostIPJSON)
+		return
+	}
+	portNumStr := c.Param(portNumJSON)
+	if portNumStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, portNumJSON)
+		return
+	}
+	clusterID, err := strconv.Atoi(portNumStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
 
+	}
+	// init service
+	s := metadata.NewMySQLServerServiceWithDefault()
+	// get entity
+	err = s.GetByClusterID(clusterID)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLServerByClusterID, clusterID, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLServerByClusterID, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLServerByClusterID, clusterID)
 }
 
 // @Tags mysql server
@@ -149,7 +207,7 @@ func AddMySQLServer(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMySQLServer,
+		resp.ResponseNOK(c, msgmeta.ErrMetadataAddMySQLServer,
 			clusterIDStruct, serverNameStruct, hostIPStruct, portNumStruct,
 			deploymentTypeStruct, versionStruct, err.Error())
 		return
@@ -162,8 +220,8 @@ func AddMySQLServer(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddMySQLServer, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMySQLServer, hostIPStruct, portNumStruct)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataAddMySQLServer, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataAddMySQLServer, hostIPStruct, portNumStruct)
 }
 
 // @Tags mysql server
@@ -221,7 +279,7 @@ func UpdateMySQLServerByID(c *gin.Context) {
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMySQLServer, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataUpdateMySQLServer, id, err.Error())
 		return
 	}
 	// marshal service
@@ -232,8 +290,8 @@ func UpdateMySQLServerByID(c *gin.Context) {
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateMySQLServer, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.DebugMetadataUpdateMySQLServer, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataUpdateMySQLServer, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.DebugMetadataUpdateMySQLServer, id)
 }
 
 func DeleteMySQLServerByID(c *gin.Context) {
