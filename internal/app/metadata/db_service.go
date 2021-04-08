@@ -81,9 +81,11 @@ func (ds *DBService) Create(fields map[string]interface{}) error {
 	// generate new map
 	_, dbNameExists := fields[dbDBNameStruct]
 	_, clusterIDExists := fields[dbClusterIDStruct]
+	_, clusterTypeExists := fields[dbClusterTypeStruct]
 	_, envIDExists := fields[dbEnvIDStruct]
-	if !dbNameExists || !clusterIDExists || !envIDExists {
-		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s", dbDBNameStruct, dbClusterIDStruct, dbEnvIDStruct))
+	if !dbNameExists || !clusterIDExists || !clusterTypeExists || !envIDExists {
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s",
+			dbDBNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
 	}
 	// create a new entity
 	dbInfo, err := NewDBInfoWithMapAndRandom(fields)

@@ -100,7 +100,7 @@ func GetMonitorSystemByEnv(c *gin.Context) {
 // @Summary get monitor system by id
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "system_type": 1, "host_ip": "127.0.0.1", "port_num": 3306, "port_num_slow": 3307, "base_url": "http://127.0.0.1/prometheus/api/v1/", "env_id": 1, "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
-// @Router /api/v1/metadata/monitor-system/:id [get]
+// @Router /api/v1/metadata/monitor-system/get/:id [get]
 func GetMonitorSystemByID(c *gin.Context) {
 	// get param
 	idStr := c.Param(monitorSystemIDJSON)
@@ -234,7 +234,7 @@ func AddMonitorSystem(c *gin.Context) {
 // @Summary update monitor system by id
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "system_type": 1, "host_ip": "127.0.0.1", "port_num": 3306, "port_num_slow": 3307, "base_url": "http://127.0.0.1/prometheus/api/v1/", "env_id": 1, "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
-// @Router /api/v1/metadata/monitor-system/:id [post]
+// @Router /api/v1/metadata/monitor-system/update/:id [post]
 func UpdateMonitorSystemByID(c *gin.Context) {
 	var fields map[string]interface{}
 
@@ -268,7 +268,7 @@ func UpdateMonitorSystemByID(c *gin.Context) {
 	_, baseUrlExists := fields[monitorSystemBaseUrlStruct]
 	_, envIdExists := fields[monitorSystemEnvIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !systemNameExists || !systemTypeExists || !hostIpExists || !portNumExists || !portNumSlowExists || !baseUrlExists || !envIdExists || !delFlagExists {
+	if !systemNameExists && !systemTypeExists && !hostIpExists && !portNumExists && !portNumSlowExists && !baseUrlExists && !envIdExists && !delFlagExists {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s and %s and %s and %s and %s",
 			monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIPStruct, monitorSystemPortNumStruct,
 			monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct, monitorSystemEnvIDStruct, delFlagStruct))
@@ -294,6 +294,11 @@ func UpdateMonitorSystemByID(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataUpdateMonitorSystem, id)
 }
 
+// @Tags monitor system
+// @Summary delete monitor system by id
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "system_name": "pmm", "system_type": 1, "host_ip": "127.0.0.1", "port_num": 3306, "port_num_slow": 3307, "base_url": "http://127.0.0.1/prometheus/api/v1/", "env_id": 1, "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Router /api/v1/metadata/monitor-system/delete/:id [post]
 func DeleteMonitorSystemByID(c *gin.Context) {
 	// get params
 	idStr := c.Param(monitorSystemIDJSON)

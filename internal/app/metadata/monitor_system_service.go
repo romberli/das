@@ -100,6 +100,7 @@ func (mss *MonitorSystemService) Create(fields map[string]interface{}) error {
 			monitorSystemNameStruct, monitorSystemTypeStruct, monitorSystemHostIPStruct, monitorSystemPortNumStruct,
 			monitorSystemPortNumSlowStruct, monitorSystemBaseUrlStruct, monitorSystemEnvIDStruct))
 	}
+
 	// create a new entity
 	monitorSystemInfo, err := NewMonitorSystemInfoWithMapAndRandom(fields)
 	if err != nil {

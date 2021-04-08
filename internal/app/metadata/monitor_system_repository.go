@@ -148,7 +148,7 @@ func (msr *MonitorSystemRepo) GetByID(id int) (metadata.MonitorSystem, error) {
 	}
 }
 
-// GetByID gets a monitor system by the identity from the middleware
+// GetByHostInfo gets a monitor system by the hostInfo from the middleware
 func (msr *MonitorSystemRepo) GetByHostInfo(hostIP string, portNum int) (metadata.MonitorSystem, error) {
 	sql := `select id from t_meta_monitor_system_info where del_flag = 0 and host_ip = ? and port_num = ?;`
 	log.Debugf("metadata MonitorSystemRepo.GetByHostInfo() sql: \n%s\nplaceholders: %s", sql)

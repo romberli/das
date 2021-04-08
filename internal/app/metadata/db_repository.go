@@ -170,8 +170,8 @@ func (dr *DBRepo) GetAppIDList(dbID int) ([]int, error) {
 		and adm.del_flag = 0
 		and di.id = ?;
 	`
-
 	log.Debugf("metadata DBRepo.GetAppIDList() select sql: %s", sql)
+
 	result, err := dr.Execute(sql, dbID)
 	if err != nil {
 		return nil, err
@@ -196,6 +196,7 @@ func (dr *DBRepo) GetAppIDList(dbID int) ([]int, error) {
 func (dr *DBRepo) Create(db metadata.DB) (metadata.DB, error) {
 	sql := `insert into t_meta_db_info(db_name, cluster_id, cluster_type, owner_id, env_id) values(?, ?, ?, ?, ?);`
 	log.Debugf("metadata DBRepo.Create() insert sql: %s", sql)
+
 	// execute
 	_, err := dr.Execute(sql, db.GetDBName(), db.GetClusterID(), db.GetClusterType(), db.GetOwnerID(), db.GetEnvID())
 	if err != nil {

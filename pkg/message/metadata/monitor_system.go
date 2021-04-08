@@ -61,9 +61,9 @@ func initInfoMonitorSystemMessage() {
 
 func initErrorMonitorSystemMessage() {
 	message.Messages[ErrMetadataGetMonitorSystemAll] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetMonitorSystemAll, "metadata: get all monitor systems failed.\n%s")
-	message.Messages[ErrMetadataGetMonitorSystemByEnv] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetMonitorSystemByEnv, "metadata: get monitor systems by environment failed.\n%s")
+	message.Messages[ErrMetadataGetMonitorSystemByEnv] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetMonitorSystemByEnv, "metadata: get monitor systems by environment failed. env_id: %d\n%s")
 	message.Messages[ErrMetadataGetMonitorSystemByID] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetMonitorSystemByID, "metadata: get monitor system by id failed. id: %d\n%s")
-	message.Messages[ErrMetadataGetMonitorSystemByHostInfo] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetMonitorSystemByHostInfo, "metadata: get monitor system by host info failed.\n%s")
+	message.Messages[ErrMetadataGetMonitorSystemByHostInfo] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetMonitorSystemByHostInfo, "metadata: get monitor system by host info failed. host_ip: %s, port_num: %d\n%s")
 	message.Messages[ErrMetadataAddMonitorSystem] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataAddMonitorSystem, "metadata: add new monitor system failed. system_name: %s, system_type: %d, host_ip: %s, port_num: %d, port_num_slow: %d, base_url: %s, env_id: %d\n%s")
 	message.Messages[ErrMetadataUpdateMonitorSystem] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataUpdateMonitorSystem, "metadata: update monitor system failed. id: %d\n%s")
 	message.Messages[ErrMetadataDeleteMonitorSystem] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataDeleteMonitorSystem, "metadata: delete monitor system failed. id: %d\n%s")
