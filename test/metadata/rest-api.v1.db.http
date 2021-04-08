@@ -18,7 +18,7 @@ Accept: application/json
 POST http://{{baseURL}}/api/v1/metadata/db
 Content-Type: application/json
 
-{"db_name": "db1", "cluster_id": 2, "cluster_type": 2, "env_id": 3}
+{"db_name": "db1", "cluster_id": 2, "cluster_type": 1, "env_id": 3}
 
 ### update database by id
 POST http://{{baseURL}}/api/v1/metadata/db/update/1
