@@ -3,7 +3,6 @@ package metadata
 import (
 	"encoding/json"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/jinzhu/now"
@@ -70,7 +69,7 @@ func TestMySQLServerInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
 	mysqlServerInfo := initNewMySQLServerInfo()
-	asst.Equal(strconv.Itoa(defaultMySQLServerInfoID), mysqlServerInfo.Identity(), "test Identity() failed")
+	asst.Equal(defaultMySQLServerInfoID, mysqlServerInfo.Identity(), "test Identity() failed")
 }
 
 func TestMySQLServerInfo_Get(t *testing.T) {

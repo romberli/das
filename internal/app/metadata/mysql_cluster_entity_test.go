@@ -3,7 +3,6 @@ package metadata
 import (
 	"encoding/json"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/jinzhu/now"
@@ -67,7 +66,7 @@ func TestMySQLClusterInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
 	mysqlClusterInfo := initNewMySQLClusterInfo()
-	asst.Equal(strconv.Itoa(defaultMySQLClusterInfoID), mysqlClusterInfo.Identity(), "test Identity() failed")
+	asst.Equal(defaultMySQLClusterInfoID, mysqlClusterInfo.Identity(), "test Identity() failed")
 }
 
 func TestMySQLClusterInfo_Get(t *testing.T) {

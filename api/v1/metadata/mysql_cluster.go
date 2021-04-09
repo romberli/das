@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/romberli/go-util/common"
@@ -15,11 +16,18 @@ import (
 )
 
 const (
-	clusterNameStruct         = "ClusterName"
-	middlewareClusterIDStruct = "MiddlewareClusterID"
-	monitorSystemIDStruct     = "MonitorSystemID"
-	ownerIDStruct             = "OwnerID"
-	envIDStruct               = "EnvID"
+	mcIDJSON          = "id"
+	mcEnvIDJSON       = "env_id"
+	mcClusterNameJSON = "cluster_name"
+)
+
+const (
+	mcIDStruct                  = "ID"
+	mcClusterNameStruct         = "ClusterName"
+	mcMiddlewareClusterIDStruct = "MiddlewareClusterID"
+	mcMonitorSystemIDStruct     = "MonitorSystemID"
+	mcOwnerIDStruct             = "OwnerID"
+	mcEnvIDStruct               = "EnvID"
 )
 
 // @Tags mysql cluster
@@ -52,7 +60,36 @@ func GetMySQLCluster(c *gin.Context) {
 }
 
 func GetMySQLClusterByEnv(c *gin.Context) {
+	// get param
+	envIDStr := c.Param(mcEnvIDJSON)
+	if envIDStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcEnvIDJSON)
+		return
+	}
+	envID, err := strconv.Atoi(envIDStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
 
+	}
+	// init service
+	s := metadata.NewMySQLClusterServiceWithDefault()
+	// get entity
+	err = s.GetByEnv(envID)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLClusterByEnv, envID, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLClusterByEnv, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLClusterByEnv, envID)
 }
 
 // @Tags mysql cluster
@@ -62,15 +99,21 @@ func GetMySQLClusterByEnv(c *gin.Context) {
 // @Router /api/v1/metadata/mysql-cluster/:id [get]
 func GetMySQLClusterByID(c *gin.Context) {
 	// get param
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+	idStr := c.Param(mcIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcIDJSON)
 		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+
 	}
 	// init service
 	s := metadata.NewMySQLClusterServiceWithDefault()
 	// get entity
-	err := s.GetByID(id)
+	err = s.GetByID(id)
 	if err != nil {
 		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLClusterByID, id, err.Error())
 		return
@@ -88,11 +131,61 @@ func GetMySQLClusterByID(c *gin.Context) {
 }
 
 func GetMySQLClusterByName(c *gin.Context) {
-
+	// get param
+	clusterName := c.Param(mcIDJSON)
+	if clusterName == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcIDJSON)
+		return
+	}
+	// init service
+	s := metadata.NewMySQLClusterServiceWithDefault()
+	// get entity
+	err := s.GetByName(clusterName)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLClusterByName, clusterName, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLClusterByName, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLClusterByName, clusterName)
 }
 
 func GetMySQLServerIDList(c *gin.Context) {
-
+	// get params
+	idStr := c.Param(mcIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcIDJSON)
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	// init service
+	s := metadata.NewMySQLClusterServiceWithDefault()
+	// get entity
+	err = s.GetMySQLServerIDList(id)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMySQLServerIDList, id, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.MarshalWithFields(appDBIDListStruct)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLServerIDList, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLServerIDList, id)
 }
 
 // @Tags mysql cluster
@@ -115,21 +208,12 @@ func AddMySQLCluster(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	if _, ok := fields[clusterNameStruct]; !ok {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, clusterNameStruct)
+	if _, ok := fields[mcClusterNameStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcClusterNameStruct)
 		return
 	}
-	if _, ok := fields[middlewareClusterIDStruct]; !ok {
-		fields[middlewareClusterIDStruct] = constant.DefaultRandomInt
-	}
-	if _, ok := fields[monitorSystemIDStruct]; !ok {
-		fields[monitorSystemIDStruct] = constant.DefaultRandomInt
-	}
-	if _, ok := fields[ownerIDStruct]; !ok {
-		fields[ownerIDStruct] = constant.DefaultRandomInt
-	}
-	if _, ok := fields[envIDStruct]; !ok {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, envIDStruct)
+	if _, ok := fields[mcEnvIDStruct]; !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcEnvIDStruct)
 		return
 	}
 
@@ -138,7 +222,10 @@ func AddMySQLCluster(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, msgmeta.ErrMetadataAddMySQLCluster, clusterNameStruct, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataAddMySQLCluster,
+			fields[mcClusterNameStruct],
+			fields[mcEnvIDStruct],
+			err.Error())
 		return
 	}
 	// marshal service
@@ -150,7 +237,10 @@ func AddMySQLCluster(c *gin.Context) {
 	// response
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(msgmeta.DebugMetadataAddMySQLCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataAddMySQLCluster, clusterNameStruct)
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataAddMySQLCluster,
+		fields[mcClusterNameStruct],
+		fields[mcEnvIDStruct],
+	)
 }
 
 // @Tags mysql cluster
@@ -162,9 +252,16 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	var fields map[string]interface{}
 
 	// get params
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+	idStr := c.Param(mcIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+
 	}
 	data, err := c.GetRawData()
 	if err != nil {
@@ -177,11 +274,11 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	_, clusterNameExists := fields[clusterNameStruct]
-	_, middlewareClusterIDExists := fields[middlewareClusterIDStruct]
-	_, monitorSystemIDExists := fields[monitorSystemIDStruct]
-	_, ownerIDExists := fields[ownerIDStruct]
-	_, envIDExists := fields[envIDStruct]
+	_, clusterNameExists := fields[mcClusterNameStruct]
+	_, middlewareClusterIDExists := fields[mcMiddlewareClusterIDStruct]
+	_, monitorSystemIDExists := fields[mcMonitorSystemIDStruct]
+	_, ownerIDExists := fields[mcOwnerIDStruct]
+	_, envIDExists := fields[mcEnvIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
 	if !clusterNameExists &&
 		!middlewareClusterIDExists &&
@@ -192,11 +289,11 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 		resp.ResponseNOK(
 			c, message.ErrFieldNotExists,
 			fmt.Sprintf("%s, %s, %s, %s, %s and %s",
-				clusterNameStruct,
-				middlewareClusterIDStruct,
-				monitorSystemIDStruct,
-				ownerIDStruct,
-				envIDStruct,
+				mcClusterNameStruct,
+				mcMiddlewareClusterIDStruct,
+				mcMonitorSystemIDStruct,
+				mcOwnerIDStruct,
+				mcEnvIDStruct,
 				delFlagStruct))
 		return
 	}
@@ -217,9 +314,41 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	// resp
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(msgmeta.DebugMetadataUpdateMySQLCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, msgmeta.DebugMetadataUpdateMySQLCluster, id)
+	resp.ResponseOK(c, jsonStr, msgmeta.DebugMetadataUpdateMySQLCluster, fields[mcClusterNameStruct])
 }
 
 func DeleteMySQLClusterByID(c *gin.Context) {
+	var fields map[string]interface{}
 
+	// get param
+	idStr := c.Param(mcIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+
+	}
+	// init service
+	s := metadata.NewMySQLClusterServiceWithDefault()
+	// insert into middleware
+	err = s.Delete(id)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDeleteMySQLCluster,
+			id, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataDeleteMySQLCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataDeleteMySQLCluster, fields[mcClusterNameStruct])
 }

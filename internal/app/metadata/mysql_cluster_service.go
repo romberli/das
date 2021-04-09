@@ -108,7 +108,7 @@ func (mcs *MySQLClusterService) Create(fields map[string]interface{}) error {
 	_, envIDExists := fields[envIDStruct]
 
 	if !clusterNameExists || !middlewareClusterIDExists || !monitorSystemIDExists ||
-		!ownerIDExists || envIDExists {
+		!ownerIDExists || !envIDExists {
 		return message.NewMessage(
 			message.ErrFieldNotExists,
 			fmt.Sprintf(

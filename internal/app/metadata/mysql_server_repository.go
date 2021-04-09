@@ -115,7 +115,7 @@ func (msr *MySQLServerRepo) GetByClusterID(clusterID int) ([]metadata.MySQLServe
 			return nil, err
 		}
 
-		mysqlServerList = append(mysqlServerList, mysqlServer)
+		mysqlServerList[row] = mysqlServer
 	}
 
 	return mysqlServerList, nil
@@ -206,12 +206,12 @@ func (msr *MySQLServerRepo) Create(mysqlServer metadata.MySQLServer) (metadata.M
 	log.Debugf("metadata MySQLServerRepo.Create() insert sql: %s", sql)
 	// execute
 	_, err := msr.Execute(sql,
-		mysqlServer.(*MySQLServerInfo).ClusterID,
-		mysqlServer.(*MySQLServerInfo).ServerName,
-		mysqlServer.(*MySQLServerInfo).HostIP,
-		mysqlServer.(*MySQLServerInfo).PortNum,
-		mysqlServer.(*MySQLServerInfo).DeploymentType,
-		mysqlServer.(*MySQLServerInfo).Version,
+		mysqlServer.GetClusterID(),
+		mysqlServer.GetServerName(),
+		mysqlServer.GetHostIP(),
+		mysqlServer.GetPortNum(),
+		mysqlServer.GetDeploymentType(),
+		mysqlServer.GetVersion(),
 	)
 	if err != nil {
 		return nil, err
@@ -250,7 +250,7 @@ func (msr *MySQLServerRepo) Update(mysqlServer metadata.MySQLServer) error {
 // Delete deletes data in the middleware, it is recommended to use soft deletion,
 // therefore use update instead of delete
 func (msr *MySQLServerRepo) Delete(id int) error {
-	sql := `delete from t_meta_mysql_server_info where where id = ?;`
+	sql := `delete from t_meta_mysql_server_info where id = ?;`
 	log.Debugf("metadata MySQLServerRepo.Delete() delete sql(t_meta_mysql_server_info): %s", sql)
 	_, err := msr.Execute(sql, id)
 	return err

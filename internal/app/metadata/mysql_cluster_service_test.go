@@ -48,7 +48,7 @@ func TestMySQLClusterService_GetByID(t *testing.T) {
 	err := s.GetByID(1)
 	asst.Nil(err, "test GetByID() failed")
 	id := s.MySQLClusters[constant.ZeroInt].Identity()
-	asst.Equal("1", id, "test GetByID() failed")
+	asst.Equal(1, id, "test GetByID() failed")
 }
 
 func TestMySQLClusterService_Create(t *testing.T) {

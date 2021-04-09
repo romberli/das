@@ -52,6 +52,7 @@ func deleteMySQLClusterByID(id int) error {
 
 func TestMySQLClusterRepoAll(t *testing.T) {
 	TestMySQLClusterRepo_Execute(t)
+	TestMySQLClusterRepo_Transaction(t)
 	TestMySQLClusterRepo_Create(t)
 	TestMySQLClusterRepo_GetAll(t)
 	TestMySQLClusterRepo_GetByEnv(t)
@@ -147,9 +148,9 @@ func TestMySQLClusterRepo_GetByEnv(t *testing.T) {
 	asst := assert.New(t)
 
 	entitys, err := mysqlClusterRepo.GetByEnv(testInitClusterID)
+	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
 
 	for _, entity := range entitys {
-		asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
 		clusterName := entity.GetClusterName()
 		asst.Equal(testInitClusterName, clusterName, "test GetByEnv() failed")
 	}
@@ -158,7 +159,7 @@ func TestMySQLClusterRepo_GetByEnv(t *testing.T) {
 func TestMySQLClusterRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := mysqlClusterRepo.GetByID(1)
+	entity, err := mysqlClusterRepo.GetByID(testInitClusterID)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	mysqlClusterName := entity.GetClusterName()
 	asst.Equal(testInitClusterName, mysqlClusterName, "test GetByID() failed")
@@ -186,7 +187,7 @@ func TestMySQLClusterRepo_GetMySQLServerIDList(t *testing.T) {
 
 	mysqlServerIDList, err := mysqlClusterRepo.GetMySQLServerIDList(testInitClusterID)
 	asst.Nil(err, common.CombineMessageWithError("test GetMySQLServerIDList() failed", err))
-	for mysqlServerID := range mysqlServerIDList {
+	for _, mysqlServerID := range mysqlServerIDList {
 		mysqlServer, err := mysqlServerRepo.GetByID(mysqlServerID)
 		asst.Nil(err, common.CombineMessageWithError("test GetMySQLServerIDList() failed", err))
 		asst.Equal(mysqlServer.GetClusterID(), testInitClusterID, "test GetMySQLServerIDList() failed", err)

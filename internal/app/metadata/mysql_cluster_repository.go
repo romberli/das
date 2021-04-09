@@ -122,7 +122,7 @@ func (mcr *MySQLClusterRepo) GetByEnv(envID int) ([]metadata.MySQLCluster, error
 			return nil, err
 		}
 
-		mysqlClusterList = append(mysqlClusterList, mysqlCluster)
+		mysqlClusterList[row] = mysqlCluster
 	}
 
 	return mysqlClusterList, nil
@@ -219,7 +219,7 @@ func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) ([]int, error) 
 			return nil, err
 		}
 
-		mysqlServerIDList = append(mysqlServerIDList, mysqlServerID)
+		mysqlServerIDList[row] = mysqlServerID
 	}
 
 	return mysqlServerIDList, nil
@@ -235,11 +235,11 @@ func (mcr *MySQLClusterRepo) Create(mysqlCluster metadata.MySQLCluster) (metadat
 	log.Debugf("metadata MySQLClusterRepo.Create() insert sql: %s", sql)
 	// execute
 	_, err := mcr.Execute(sql,
-		mysqlCluster.GetClusterName,
-		mysqlCluster.GetMiddlewareClusterID,
-		mysqlCluster.GetMonitorSystemID,
-		mysqlCluster.GetOwnerID,
-		mysqlCluster.GetEnvID)
+		mysqlCluster.GetClusterName(),
+		mysqlCluster.GetMiddlewareClusterID(),
+		mysqlCluster.GetMonitorSystemID(),
+		mysqlCluster.GetOwnerID(),
+		mysqlCluster.GetEnvID())
 	if err != nil {
 		return nil, err
 	}
