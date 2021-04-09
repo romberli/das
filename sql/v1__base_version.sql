@@ -145,6 +145,8 @@ CREATE TABLE `t_meta_user_info` (
   UNIQUE KEY `idx01_employee_id` (`employee_id`),
   UNIQUE KEY `idx02_account_name` (`account_name`),
   UNIQUE KEY `idx03_user_name` (`email`),
+  UNIQUE KEY `idx03_user_name` (`telephone`),
+  UNIQUE KEY `idx03_user_name` (`mobile`),
   KEY `idx04_user_name` (`user_name`),
   KEY `idx05_user_name` (`mobile`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
