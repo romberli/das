@@ -64,7 +64,7 @@ func GetUser(c *gin.Context) {
 // @Summary get user by Name
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:Name [get]
+// @Router /api/v1/metadata/user/user-name/:user_name [get]
 func GetUserByName(c *gin.Context) {
 	// get param
 	userName := c.Param(userNameJSON)
@@ -96,7 +96,7 @@ func GetUserByName(c *gin.Context) {
 // @Summary get user by id
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:id [get]
+// @Router /api/v1/metadata/user/get/:id [get]
 func GetUserByID(c *gin.Context) {
 	// get param
 	idStr := c.Param(idJSON)
@@ -129,7 +129,7 @@ func GetUserByID(c *gin.Context) {
 // @Summary get user by EmployeeID
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:EmployeeID [get]
+// @Router /api/v1/metadata/user/employee-id/:employee_id [get]
 func GetUserByEmployeeID(c *gin.Context) {
 	// get param
 	employeeID := c.Param(employeeIDJSON)
@@ -161,7 +161,7 @@ func GetUserByEmployeeID(c *gin.Context) {
 // @Summary get user by AccountName
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:AccountName [get]
+// @Router /api/v1/metadata/user/account-name/:account_name [get]
 func GetUserByAccountName(c *gin.Context) {
 	// get param
 	accountName := c.Param(accountNameJSON)
@@ -193,7 +193,7 @@ func GetUserByAccountName(c *gin.Context) {
 // @Summary get user by Email
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:Email [get]
+// @Router /api/v1/metadata"/user/email/:email [get]
 func GetUserByEmail(c *gin.Context) {
 	// get param
 	email := c.Param(emailJSON)
@@ -225,7 +225,7 @@ func GetUserByEmail(c *gin.Context) {
 // @Summary get user by Telephone
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:Telephone [get]
+// @Router /api/v1/metadata/user/telephone/:telephone [get]
 func GetUserByTelephone(c *gin.Context) {
 	// get param
 	telephone := c.Param(telephoneJSON)
@@ -257,7 +257,7 @@ func GetUserByTelephone(c *gin.Context) {
 // @Summary get user by Mobile
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:Mobile [get]
+// @Router /api/v1/metadata/user/mobile/:mobile [get]
 func GetUserByMobile(c *gin.Context) {
 	// get param
 	mobile := c.Param(mobileJSON)
@@ -354,7 +354,7 @@ func AddUser(c *gin.Context) {
 // @Summary update user by id
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:id [post]
+// @Router /api/v1/metadata/user/update/:id [post]
 func UpdateUserByID(c *gin.Context) {
 	var fields map[string]interface{}
 
@@ -410,8 +410,8 @@ func UpdateUserByID(c *gin.Context) {
 // @Tags user
 // @Summary delete user by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"department_name": "dn","accountNameStruct = "AccountName"": "da", "mobile": "m", "del_flag": 0,"last_update_time": "2021-01-21T13:00:00+08:00","user_name": "un","create_time": "2021-01-21T13:00:00+08:00","employee_id": 1,"email": "e","telephone": "t","role": 1, "id": 1}]}"
-// @Router /api/v1/metadata/user/:id [get]
+// @Success 200 {string} string "{"code": 200, "data": []}"
+// @Router /api/v1/metadata/user/delete/:id [get]
 func DeleteUserByID(c *gin.Context) {
 	var fields map[string]interface{}
 

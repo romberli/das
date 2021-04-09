@@ -89,6 +89,11 @@ func GetEnvByID(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetEnvByID, id)
 }
 
+// @Tags environment
+// @Summary get environment by Name
+// @Produce  environment/json
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Router /api/v1/metadata/env/env-name/:env_name [get]
 func GetEnvByName(c *gin.Context) {
 	// get params
 	envName := c.Param(envNameJSON)
@@ -169,7 +174,7 @@ func AddEnv(c *gin.Context) {
 // @Produce envlication/json
 // @Param	id path int true "environment id"
 // @Success	200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
-// @Router	/api/v1/metadata/env/:id [post]
+// @Router	/api/v1/metadata/env/update/:id [post]
 func UpdateEnvByID(c *gin.Context) {
 	var fields map[string]interface{}
 
@@ -224,7 +229,7 @@ func UpdateEnvByID(c *gin.Context) {
 // @Tags environment
 // @Summary delete environment by id
 // @Produce  environment/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": []}"
 // @Router /api/v1/metadata/env/delete/:id [post]
 func DeleteEnvByID(c *gin.Context) {
 	var fields map[string]interface{}
