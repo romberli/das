@@ -12,16 +12,16 @@ import (
 )
 
 const (
-	testInitServerID = 1
-	testInitHostIP         = "host_ip_init"
-	testInitPortNum        = 3306
+	testInitServerID        = 1
+	testInitHostIP          = "host_ip_init"
+	testInitPortNum         = 3306
 	testTransactionServerID = 2
-	testTransactionHostIP  = "host_ip_need_rollback"
-	testTransactionPortNum = 3308
-	testInsertHostIP       = "host_ip_insert"
-	testInsertPortNum      = 3307
-	testUpdateHostIP       = "host_ip_update"
-	testUpdatePortNum      = 3309
+	testTransactionHostIP   = "host_ip_need_rollback"
+	testTransactionPortNum  = 3308
+	testInsertHostIP        = "host_ip_insert"
+	testInsertPortNum       = 3307
+	testUpdateHostIP        = "host_ip_update"
+	testUpdatePortNum       = 3309
 )
 
 var mysqlServerRepo = initMySQLServerRepo()

@@ -88,7 +88,6 @@ func TestAppInfo_GetOwnerID(t *testing.T) {
 	asst.Equal(defaultAppInfoOwnerID, appSystemInfo.GetOwnerID(), "test GetLevel() failed")
 }
 
-
 func TestAppInfo_GetDelFlag(t *testing.T) {
 	asst := assert.New(t)
 
