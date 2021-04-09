@@ -100,20 +100,18 @@ func (mss *MySQLServerService) Create(fields map[string]interface{}) error {
 	_, hostIPExists := fields[hostIPStruct]
 	_, portNumExists := fields[portNumStruct]
 	_, deploymentTypeExists := fields[deploymentTypeStruct]
-	_, versionExists := fields[versionStruct]
 
 	if !clusterIDExists || !serverNameExists || !hostIPExists || !portNumExists ||
-		!deploymentTypeExists || !versionExists {
+		!deploymentTypeExists {
 		return message.NewMessage(
 			message.ErrFieldNotExists,
 			fmt.Sprintf(
-				"%s and %s and %s and %s and %s and %s",
+				"%s and %s and %s and %s and %s",
 				clusterIDStruct,
 				serverNameStruct,
 				hostIPStruct,
 				portNumStruct,
-				deploymentTypeStruct,
-				versionStruct))
+				deploymentTypeStruct))
 	}
 
 	// create a new entity

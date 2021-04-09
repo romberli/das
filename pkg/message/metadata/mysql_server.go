@@ -94,7 +94,7 @@ func initInfoMySQLServerMessage() {
 	message.Messages[InfoMetadataAddMySQLServer] = config.NewErrMessage(
 		message.DefaultMessageHeader,
 		InfoMetadataAddMySQLServer,
-		"metadata: add new mysql server completed. server_name: %s, cluster_id: %s, host_ip: %s, port_num: %s, deployment_type: %s")
+		"metadata: add new mysql server completed. server_name: %s, cluster_id: %d, host_ip: %s, port_num: %d, deployment_type: %d")
 	message.Messages[InfoMetadataUpdateMySQLServer] = config.NewErrMessage(
 		message.DefaultMessageHeader,
 		InfoMetadataUpdateMySQLServer,
@@ -125,11 +125,11 @@ func initErrorMySQLServerMessage() {
 	message.Messages[ErrMetadataAddMySQLServer] = config.NewErrMessage(
 		message.DefaultMessageHeader,
 		ErrMetadataAddMySQLServer,
-		"metadata: add new mysql server failed. server_name: %s\n%s")
+		"metadata: add new mysql server failed. server_name: server_name: %s, cluster_id: %d, host_ip: %s, port_num: %d, deployment_type: %d\n%s")
 	message.Messages[ErrMetadataUpdateMySQLServer] = config.NewErrMessage(
 		message.DefaultMessageHeader,
 		ErrMetadataUpdateMySQLServer,
-		"metadata: update mysql server failed. server_name: %s, cluster_id: %s, host_ip: %s, port_num: %s, deployment_type: %s\n%s")
+		"metadata: update mysql server failed. server_name: %s\n%s")
 	message.Messages[ErrMetadataDeleteMySQLServer] = config.NewErrMessage(
 		message.DefaultMessageHeader,
 		ErrMetadataDeleteMySQLServer,

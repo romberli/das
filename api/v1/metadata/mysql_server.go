@@ -204,10 +204,11 @@ func AddMySQLServer(c *gin.Context) {
 	_, portNumExists := fields[msPortNumStruct]
 	_, deploymentTypeExists := fields[msDeploymentTypeStruct]
 	if !clusterIDExists || !serverNameExists || !hostIPExists || !portNumExists || !deploymentTypeExists {
+		fmt.Println("wtf")
 		resp.ResponseNOK(
 			c, message.ErrFieldNotExists,
 			fmt.Sprintf(
-				"%s and %s and %s and %s and %s and %s",
+				"%s and %s and %s and %s and %s",
 				msClusterIDStruct,
 				msServerNameStruct,
 				msHostIPStruct,

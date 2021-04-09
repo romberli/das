@@ -59,6 +59,10 @@ func initDebugMySQLCLusterMessage() {
 		message.DefaultMessageHeader,
 		DebugMetadataGetMySQLClusterByName,
 		"metadata: get mysql cluster by name message: %s")
+	message.Messages[DebugMetadataGetMySQLServerIDList] = config.NewErrMessage(
+		message.DefaultMessageHeader,
+		DebugMetadataGetMySQLServerIDList,
+		"metadata: get mysql server id from mysql cluster message: %s")
 	message.Messages[DebugMetadataAddMySQLCluster] = config.NewErrMessage(
 		message.DefaultMessageHeader,
 		DebugMetadataAddMySQLCluster,
@@ -67,6 +71,10 @@ func initDebugMySQLCLusterMessage() {
 		message.DefaultMessageHeader,
 		DebugMetadataUpdateMySQLCluster,
 		"metadata: update mysql cluster message: %s")
+	message.Messages[DebugMetadataDeleteMySQLCluster] = config.NewErrMessage(
+		message.DefaultMessageHeader,
+		DebugMetadataDeleteMySQLCluster,
+		"metadata: delete mysql cluster message: %s")
 }
 
 func initInfoMySQLCLusterMessage() {
@@ -86,6 +94,10 @@ func initInfoMySQLCLusterMessage() {
 		message.DefaultMessageHeader,
 		InfoMetadataGetMySQLClusterByName,
 		"metadata: get mysql cluster by name completed. cluster_name: %s")
+	message.Messages[InfoMetadataGetMySQLServerIDList] = config.NewErrMessage(
+		message.DefaultMessageHeader,
+		InfoMetadataGetMySQLServerIDList,
+		"metadata: get mysql server id from mysql cluster completed. id: %d")
 	message.Messages[InfoMetadataAddMySQLCluster] = config.NewErrMessage(
 		message.DefaultMessageHeader,
 		InfoMetadataAddMySQLCluster,
@@ -94,6 +106,10 @@ func initInfoMySQLCLusterMessage() {
 		message.DefaultMessageHeader,
 		InfoMetadataUpdateMySQLCluster,
 		"metadata: update mysql cluster completed. id: %s")
+	message.Messages[InfoMetadataDeleteMySQLCluster] = config.NewErrMessage(
+		message.DefaultMessageHeader,
+		InfoMetadataDeleteMySQLCluster,
+		"metadata: delete mysql cluster completed. id: %s")
 }
 
 func initErrorMySQLCLusterMessage() {
@@ -113,6 +129,10 @@ func initErrorMySQLCLusterMessage() {
 		message.DefaultMessageHeader,
 		ErrMetadataGetMySQLClusterByName,
 		"metadata: get mysql cluster by name failed. cluster_name: %s\n%s")
+	message.Messages[ErrMetadataGetMySQLServerIDList] = config.NewErrMessage(
+		message.DefaultMessageHeader,
+		ErrMetadataGetMySQLServerIDList,
+		"metadata: get mysql server id from mysql cluster failed. id: %d\n%s")
 	message.Messages[ErrMetadataAddMySQLCluster] = config.NewErrMessage(
 		message.DefaultMessageHeader,
 		ErrMetadataAddMySQLCluster,
@@ -121,5 +141,8 @@ func initErrorMySQLCLusterMessage() {
 		message.DefaultMessageHeader,
 		ErrMetadataUpdateMySQLCluster,
 		"metadata: update mysql cluster failed. id: %d\n%s")
-
+	message.Messages[ErrMetadataDeleteMySQLCluster] = config.NewErrMessage(
+		message.DefaultMessageHeader,
+		ErrMetadataDeleteMySQLCluster,
+		"metadata: delete mysql cluster failed. id: %d\n%s")
 }

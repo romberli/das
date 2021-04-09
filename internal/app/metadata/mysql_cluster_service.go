@@ -23,14 +23,13 @@ var _ metadata.MySQLClusterService = (*MySQLClusterService)(nil)
 
 // MySQLClusterService implements Service interface
 type MySQLClusterService struct {
-	MySQLClusterRepo  metadata.MySQLClusterRepo
-	MySQLClusters     []metadata.MySQLCluster
-	MySQLServerIDList []int
+	MySQLClusterRepo metadata.MySQLClusterRepo
+	MySQLClusters    []metadata.MySQLCluster
 }
 
 // NewMySQLClusterService returns a new *MySQLClusterService
 func NewMySQLClusterService(repo metadata.MySQLClusterRepo) *MySQLClusterService {
-	return &MySQLClusterService{repo, []metadata.MySQLCluster{}, []int{}}
+	return &MySQLClusterService{repo, []metadata.MySQLCluster{}}
 }
 
 // NewMySQLClusterServiceWithDefault returns a new *MySQLClusterService with default repository
@@ -88,12 +87,12 @@ func (mcs *MySQLClusterService) GetByName(clusterName string) error {
 
 // GetMySQLServerIDList gets the mysql server id list of given cluster id
 func (mcs *MySQLClusterService) GetMySQLServerIDList(clusterID int) error {
-	mysqlCluster, err := mcs.MySQLClusterRepo.GetByID(clusterID)
+	mysqlCluster, err := mcs.MySQLClusterRepo.GetMySQLServerIDList(clusterID)
 	if err != nil {
 		return err
 	}
 
-	mcs.MySQLServerIDList, err = mysqlCluster.GetMySQLServerIDList()
+	mcs.MySQLClusters = append(mcs.MySQLClusters, mysqlCluster)
 
 	return err
 }
@@ -102,21 +101,14 @@ func (mcs *MySQLClusterService) GetMySQLServerIDList(clusterID int) error {
 func (mcs *MySQLClusterService) Create(fields map[string]interface{}) error {
 	// generate new map
 	_, clusterNameExists := fields[clusterNameStruct]
-	_, middlewareClusterIDExists := fields[middlewareClusterIDStruct]
-	_, monitorSystemIDExists := fields[monitorSystemIDStruct]
-	_, ownerIDExists := fields[ownerIDStruct]
 	_, envIDExists := fields[envIDStruct]
 
-	if !clusterNameExists || !middlewareClusterIDExists || !monitorSystemIDExists ||
-		!ownerIDExists || !envIDExists {
+	if !clusterNameExists || !envIDExists {
 		return message.NewMessage(
 			message.ErrFieldNotExists,
 			fmt.Sprintf(
-				"%s and %s and %s and %s and %s",
+				"%s and %s",
 				clusterNameStruct,
-				middlewareClusterIDStruct,
-				monitorSystemIDStruct,
-				ownerIDStruct,
 				envIDStruct))
 	}
 

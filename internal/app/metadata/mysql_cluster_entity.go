@@ -23,6 +23,7 @@ type MySQLClusterInfo struct {
 	DelFlag             int       `middleware:"del_flag" json:"del_flag"`
 	CreateTime          time.Time `middleware:"create_time" json:"create_time"`
 	LastUpdateTime      time.Time `middleware:"last_update_time" json:"last_update_time"`
+	MySQLServerIDList   []int
 }
 
 // NewMySQLClusterInfo returns a new MySQLClusterInfo
@@ -46,6 +47,7 @@ func NewMySQLClusterInfo(repo *MySQLClusterRepo,
 		delFlag,
 		createTime,
 		lastUpdateTime,
+		[]int{},
 	}
 }
 
@@ -70,6 +72,7 @@ func NewMySQLClusterInfoWithGlobal(
 		delFlag,
 		createTime,
 		lastUpdateTime,
+		[]int{},
 	}
 }
 
@@ -148,8 +151,8 @@ func (mci *MySQLClusterInfo) GetLastUpdateTime() time.Time {
 }
 
 // GetMySQLServerIDList gets the mysql server id list of this cluster
-func (mci *MySQLClusterInfo) GetMySQLServerIDList() ([]int, error) {
-	return mci.GetMySQLServerIDList()
+func (mci *MySQLClusterInfo) GetMySQLServerIDList() []int {
+	return mci.MySQLServerIDList
 }
 
 // Set sets mysql cluster with given fields, key is the field name and value is the relevant value of the key

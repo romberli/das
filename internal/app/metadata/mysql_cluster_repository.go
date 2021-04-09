@@ -122,7 +122,7 @@ func (mcr *MySQLClusterRepo) GetByEnv(envID int) ([]metadata.MySQLCluster, error
 			return nil, err
 		}
 
-		mysqlClusterList[row] = mysqlCluster
+		mysqlClusterList = append(mysqlClusterList, mysqlCluster)
 	}
 
 	return mysqlClusterList, nil
@@ -202,8 +202,10 @@ func (mcr *MySQLClusterRepo) GetID(clusterName string) (int, error) {
 }
 
 // GetMySQLServerIDList gets the mysql server id list of given cluster id
-func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) ([]int, error) {
-	sql := `select id from t_meta_mysql_server_info where del_flag = 0 and cluster_id = ?;`
+func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) (metadata.MySQLCluster, error) {
+	sql := `
+		select id from t_meta_mysql_server_info where del_flag = 0 and cluster_id = ?;
+	`
 	log.Debugf("metadata MySQLClusterRepo.GetMySQLServerIDList() select sql: %s", sql)
 	result, err := mcr.Execute(sql, clusterID)
 	if err != nil {
@@ -211,6 +213,7 @@ func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) ([]int, error) 
 	}
 
 	resultNum := result.RowNumber()
+	log.Debugf(fmt.Sprint(resultNum))
 	mysqlServerIDList := make([]int, resultNum)
 
 	for row := 0; row < resultNum; row++ {
@@ -221,8 +224,17 @@ func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) ([]int, error) 
 
 		mysqlServerIDList[row] = mysqlServerID
 	}
+	log.Debugf(fmt.Sprint(mysqlServerIDList))
 
-	return mysqlServerIDList, nil
+	mysqlCluster, err := mcr.GetByID(clusterID)
+
+	fields := make(map[string]interface{})
+
+	fields["MySQLServerIDList"] = mysqlServerIDList
+
+	mysqlCluster.Set(fields)
+
+	return mysqlCluster, nil
 
 }
 
@@ -275,10 +287,9 @@ func (mcr *MySQLClusterRepo) Update(entity metadata.MySQLCluster) error {
 // Delete deletes data in the middleware, it is recommended to use soft deletion,
 // therefore use update instead of delete
 func (mcr *MySQLClusterRepo) Delete(id int) error {
-	sql := `update t_meta_mysql_cluster_info set del_flag = 1 where id = ?;`
-	log.Debugf("metadata MySQLClusterRepo.Delete() update sql: %s", sql)
+	sql := `delete from t_meta_mysql_cluster_info where id = ?;`
+	log.Debugf("metadata MySQLCLusterRepo.Delete() delete sql(t_meta_mysql_cluster_info): %s", sql)
 
 	_, err := mcr.Execute(sql, id)
-
 	return err
 }

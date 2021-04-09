@@ -18,7 +18,7 @@ import (
 const (
 	mcIDJSON          = "id"
 	mcEnvIDJSON       = "env_id"
-	mcClusterNameJSON = "cluster_name"
+	mcClusterNameJSON = "name"
 )
 
 const (
@@ -28,6 +28,7 @@ const (
 	mcMonitorSystemIDStruct     = "MonitorSystemID"
 	mcOwnerIDStruct             = "OwnerID"
 	mcEnvIDStruct               = "EnvID"
+	mcMySQLServerIDListStruct   = "MySQLServerIDList"
 )
 
 // @Tags mysql cluster
@@ -132,9 +133,9 @@ func GetMySQLClusterByID(c *gin.Context) {
 
 func GetMySQLClusterByName(c *gin.Context) {
 	// get param
-	clusterName := c.Param(mcIDJSON)
+	clusterName := c.Param(mcClusterNameJSON)
 	if clusterName == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, mcIDJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, mcClusterNameJSON)
 		return
 	}
 	// init service
@@ -177,13 +178,14 @@ func GetMySQLServerIDList(c *gin.Context) {
 		return
 	}
 	// marshal service
-	jsonBytes, err := s.MarshalWithFields(appDBIDListStruct)
+	jsonBytes, err := s.MarshalWithFields(mcMySQLServerIDListStruct)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
 	jsonStr := string(jsonBytes)
+	log.Debug(jsonStr)
 	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMySQLServerIDList, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLServerIDList, id)
 }
