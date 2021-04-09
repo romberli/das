@@ -5,6 +5,12 @@ import (
 	"github.com/romberli/go-util/config"
 )
 
+func init() {
+	initDebugUserMessage()
+	initInfoUserMessage()
+	initErrorUserMessge()
+}
+
 const (
 	// debug
 	DebugMetadataGetUserAll     = 100901

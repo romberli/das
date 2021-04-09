@@ -6,9 +6,9 @@ import (
 )
 
 func init() {
-	initDebugDBMessage()
-	initInfoDBMessage()
-	initErrorDBMessage()
+	initDebugEnvMessage()
+	initInfoEnvMessage()
+	initErrorEnvMessage()
 }
 
 const (
