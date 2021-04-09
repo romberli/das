@@ -13,13 +13,6 @@ import (
 	"github.com/romberli/das/internal/dependency"
 )
 
-const (
-	addr   = "localhost:3306"
-	dbName = "das"
-	dbUser = "root"
-	dbPass = "123"
-)
-
 var _ dependency.Repository = (*MySQLClusterRepo)(nil)
 
 // MySQLClusterRepo implements Repository interface

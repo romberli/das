@@ -15,14 +15,14 @@ const (
 
 )
 
-func initDebugAppMessage() {
+func initDebugMiddlewareServerMessage() {
 
 }
 
-func initInfoAppMessage() {
+func initInfoMiddlewareServerMessage() {
 
 }
 
-func initErrorAppMessage() {
+func initErrorMiddlewareServerMessage() {
 
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/internal/dependency"
 	"github.com/romberli/das/pkg/message"
 )
 
@@ -86,8 +85,8 @@ func (mcs *MiddlewareClusterService) Create(fields map[string]interface{}) error
 	// generate new map
 	_, clusterNameExists := fields[middlewareClusterNameStruct]
 	_, ownerIDExists := fields[middlewareClusterOwnerIDStruct]
-	_, envIDExists := fields[middlewareClusterNameStruct]
-	if !clusterNameExists || !ownerIDExists || envIDExists {
+	_, envIDExists := fields[middlewareClusterEnvIDStruct]
+	if !clusterNameExists || !ownerIDExists || !envIDExists {
 		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s", middlewareClusterNameStruct, middlewareClusterOwnerIDStruct, middlewareClusterNameStruct))
 	}
 	// create a new entity

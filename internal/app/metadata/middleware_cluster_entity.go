@@ -61,10 +61,11 @@ func NewEmptyMiddlewareClusterInfoWithGlobal() *MiddlewareClusterInfo {
 }
 
 // NewMiddlewareClusterInfoWithDefault returns a new MiddlewareClusterInfo with default MiddlewareClusterRepo
-func NewMiddlewareClusterInfoWithDefault(middlewareClusterName string, envID int) *MiddlewareClusterInfo {
+func NewMiddlewareClusterInfoWithDefault(middlewareClusterName string, ownerID, envID int) *MiddlewareClusterInfo {
 	return &MiddlewareClusterInfo{
 		MiddlewareClusterRepo: NewMiddlewareClusterRepoWithGlobal(),
 		ClusterName:           middlewareClusterName,
+		OwnerID:               ownerID,
 		EnvID:                 envID,
 	}
 }

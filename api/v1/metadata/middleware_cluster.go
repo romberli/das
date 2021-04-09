@@ -1,6 +1,7 @@
 package metadata
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -16,9 +17,9 @@ import (
 )
 
 const (
-	middlewareClusterIDJSON   = "id"
-	middlewareClusterNameJSON = "cluster_name"
-	middlewareEnvIDJSON       = "env_id"
+	middlewareClusterIDJSON    = "id"
+	middlewareClusterNameJSON  = "cluster_name"
+	middlewareClusterEnvIDJSON = "env_id"
 
 	middlewareClusterNameStruct  = "ClusterName"
 	middlewareClusterEnvIDStruct = "EnvID"
@@ -27,7 +28,7 @@ const (
 // @Tags middleware cluster
 // @Summary get all middleware clusters
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id":1,"cluster_name":"online","env_id":1,"del_flag":0,"create_time":"2021-02-20T09:25:48.192194+08:00","last_update_time":"2021-02-20T09:25:48.192194+08:00"},{"cluster_name":"newTest","env_id":8,"del_flag":0,"create_time":"2021-02-20T09:18:27.459081+08:00","last_update_time":"2021-02-20T09:18:27.4636+08:00","id":12},{"last_update_time":"2021-02-22T17:09:10.588805+08:00","id":30,"cluster_name":"connection_test","env_id":1,"del_flag":0,"create_time":"2021-02-22T17:09:10.588805+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"id":13,"cluster_name":"test001","owner_id":1,"env_id":1,"del_flag":0,"create_time":"2021-04-09T10:55:43.920406+08:00","last_update_time":"2021-04-09T10:55:43.920406+08:00"}]}"
 // @Router /api/v1/metadata/middleware-cluster [get]
 func GetMiddlewareCluster(c *gin.Context) {
 	// init service
@@ -53,11 +54,11 @@ func GetMiddlewareCluster(c *gin.Context) {
 // @Tags middleware cluster
 // @Summary get middleware cluster by env
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"create_time":"2021-02-20T09:25:48.192194+08:00","last_update_time":"2021-02-20T09:25:48.192194+08:00","id":1,"cluster_name":"online","env_id":1,"del_flag":0}]}"
-// @Router /api/v1/metadata/middleware-cluster/:id [get]
+// @Success 200 {string} string "{"code": 200, "data": [{"del_flag":0,"create_time":"2021-04-09T10:55:43.920406+08:00","last_update_time":"2021-04-09T10:55:43.920406+08:00","id":13,"cluster_name":"test001","owner_id":1,"env_id":1}]}"
+// @Router /api/v1/metadata/middleware-cluster/env/:env_id [get]
 func GetMiddlewareClusterByEnv(c *gin.Context) {
 	// get param
-	envIDStr := c.Param(middlewareClusterEnvIDStruct)
+	envIDStr := c.Param(middlewareClusterEnvIDJSON)
 	if envIDStr == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterIDJSON)
 		return
@@ -70,7 +71,7 @@ func GetMiddlewareClusterByEnv(c *gin.Context) {
 	// init service
 	s := metadata.NewMiddlewareClusterServiceWithDefault()
 	// get entity
-	err = s.GetByID(envID)
+	err = s.GetByEnv(envID)
 	if err != nil {
 		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMiddlewareClusterByEnv, err.Error())
 		return
@@ -90,8 +91,8 @@ func GetMiddlewareClusterByEnv(c *gin.Context) {
 // @Tags middleware cluster
 // @Summary get middleware cluster by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"create_time":"2021-02-20T09:25:48.192194+08:00","last_update_time":"2021-02-20T09:25:48.192194+08:00","id":1,"cluster_name":"online","env_id":1,"del_flag":0}]}"
-// @Router /api/v1/metadata/middleware-cluster/:id [get]
+// @Success 200 {string} string "{"code": 200, "data": [{"id":13,"cluster_name":"test001","owner_id":1,"env_id":1,"del_flag":0,"create_time":"2021-04-09T10:55:43.920406+08:00","last_update_time":"2021-04-09T10:55:43.920406+08:00"}]}"
+// @Router /api/v1/metadata/middleware-cluster/get/:id [get]
 func GetMiddlewareClusterByID(c *gin.Context) {
 	// get param
 	idStr := c.Param(middlewareClusterIDJSON)
@@ -127,8 +128,8 @@ func GetMiddlewareClusterByID(c *gin.Context) {
 // @Tags middleware cluster
 // @Summary get middleware cluster by name
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"create_time":"2021-02-20T09:25:48.192194+08:00","last_update_time":"2021-02-20T09:25:48.192194+08:00","id":1,"cluster_name":"online","env_id":1,"del_flag":0}]}"
-// @Router /api/v1/metadata/middleware-cluster/:id [get]
+// @Success 200 {string} string "{"code": 200, "data": [{"id":13,"cluster_name":"test001","owner_id":1,"env_id":1,"del_flag":0,"create_time":"2021-04-09T10:55:43.920406+08:00","last_update_time":"2021-04-09T10:55:43.920406+08:00"}]}"
+// @Router /api/v1/metadata/middleware-cluster/cluster-name/:cluster_name [get]
 func GetMiddlewareClusterByName(c *gin.Context) {
 	// get params
 	middlewareClusterName := c.Param(middlewareClusterNameJSON)
@@ -157,10 +158,10 @@ func GetMiddlewareClusterByName(c *gin.Context) {
 }
 
 // @Tags application
-// @Summary get middleware cluster id list
+// @Summary get middleware server id list by cluster id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [1, 2]}"
-// @Router /api/vi/metadata/app/dbs/:id [get]
+// @Success 200 {string} string "{"code": 200, "data": [1,2]}"
+// @Router /api/vi/metadata/middleware-server/:id [get]
 func GetMiddlewareServerIDList(c *gin.Context) {
 	// get params
 	idStr := c.Param(middlewareClusterIDJSON)
@@ -180,13 +181,23 @@ func GetMiddlewareServerIDList(c *gin.Context) {
 		resp.ResponseNOK(c, msgmeta.ErrMetadataGetMiddlewareServerIDList, id, err.Error())
 		return
 	}
+	// marshal service
+	jsonBytes, err := json.Marshal(s.MiddlewareServerList)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetMiddlewareServerIDList, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMiddlewareServerIDList, id)
 
 }
 
 // @Tags middleware cluster
 // @Summary add a new middleware cluster
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"id":31,"cluster_name":"connection_test","env_id":1,"del_flag":0,"create_time":"2021-02-23T09:21:40.017914+08:00","last_update_time":"2021-02-23T09:21:40.017914+08:00"}]}"
+// @Success 200 {string} string "{"code": 200, "data": [{"del_flag":0,"create_time":"2021-04-09T16:02:25.541701+08:00","last_update_time":"2021-04-09T16:02:25.541701+08:00","id":14,"cluster_name":"rest_test","owner_id":1,"env_id":1}]}"
 // @Router /api/v1/metadata/middleware-cluster [post]
 func AddMiddlewareCluster(c *gin.Context) {
 	var fields map[string]interface{}
@@ -218,7 +229,7 @@ func AddMiddlewareCluster(c *gin.Context) {
 	// insert into middleware
 	err = s.Create(fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataAddMiddlewareCluster, fields[middlewareClusterNameStruct], err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataAddMiddlewareCluster, fields[middlewareClusterNameStruct], err.Error())
 		return
 	}
 	// marshal service
@@ -229,22 +240,28 @@ func AddMiddlewareCluster(c *gin.Context) {
 	}
 	// response
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataAddMiddlewareCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataAddMiddlewareCluster, fields[middlewareClusterNameStruct])
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataAddMiddlewareCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataAddMiddlewareCluster, fields[middlewareClusterNameStruct])
 }
 
 // @Tags middleware cluster
 // @Summary update middleware cluster by id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"cluster_name":"ccc","env_id":1,"del_flag":1,"create_time":"2021-02-22T15:23:21.279984+08:00","last_update_time":"2021-02-23T09:22:44.068998+08:00","id":29}]}"
-// @Router /api/v1/metadata/middleware-cluster/:id [post]
+// @Success 200 {string} string "{"code": 200, "data": [{"id":13,"cluster_name":"new_test","owner_id":1,"env_id":1,"del_flag":1,"create_time":"2021-04-09T10:55:43.920406+08:00","last_update_time":"2021-04-09T10:55:43.920406+08:00"}]}"
+// @Router /api/v1/metadata/middleware-cluster/update/:id [post]
 func UpdateMiddlewareClusterByID(c *gin.Context) {
 	var fields map[string]interface{}
 
 	// get params
-	id := c.Param(idJSON)
-	if id == constant.EmptyString {
+	idStr := c.Param(idJSON)
+	if idStr == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
 	}
 	data, err := c.GetRawData()
 	if err != nil {
@@ -269,7 +286,7 @@ func UpdateMiddlewareClusterByID(c *gin.Context) {
 	// update entity
 	err = s.Update(id, fields)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMetadataUpdateMiddlewareCluster, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataUpdateMiddlewareCluster, err.Error())
 		return
 	}
 	// marshal service
@@ -280,10 +297,45 @@ func UpdateMiddlewareClusterByID(c *gin.Context) {
 	}
 	// resp
 	jsonStr := string(jsonBytes)
-	log.Debug(message.NewMessage(message.DebugMetadataUpdateMiddlewareCluster, jsonStr).Error())
-	resp.ResponseOK(c, jsonStr, message.InfoMetadataUpdateMiddlewareCluster, id)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataUpdateMiddlewareCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataUpdateMiddlewareCluster, id)
 }
 
+// @Tags application
+// @Summary delete middleware cluster by id
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": []}"
+// @Router /api/v1/metadata/app/delete/:id [post]
 func DeleteMiddlewareClusterByID(c *gin.Context) {
+	var fields map[string]interface{}
 
+	// get params
+	idStr := c.Param(middlewareClusterIDJSON)
+	if idStr == constant.EmptyString {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterIDJSON)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
+		return
+	}
+	// init service
+	s := metadata.NewMiddlewareClusterServiceWithDefault()
+	// update entities
+	err = s.Delete(id)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDeleteMiddlewareCluster, id, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataDeleteMiddlewareCluster, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataDeleteMiddlewareCluster, fields[middlewareClusterNameStruct])
 }

@@ -77,7 +77,7 @@ type MiddlewareClusterService interface {
 	// and then updates its fields that was specified in fields argument,
 	// key is the filed name and value is the new field value,
 	// it saves the changes to the middleware
-	Update(id int, fields map[string]interface{})
+	Update(id int, fields map[string]interface{}) error
 	// Delete deletes the middleware cluster of given id in the middleware
 	Delete(id int) error
 	// Marshal marshals MiddlewareClusterService.MiddlewareClusters to json bytes
