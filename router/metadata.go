@@ -72,7 +72,7 @@ func RegisterMetadata(group *gin.RouterGroup) {
 		metadataGroup.POST("/mysql-cluster/delete/:id", metadata.DeleteMySQLClusterByID)
 		// mysql server
 		metadataGroup.GET("/mysql-server", metadata.GetMySQLServer)
-		metadataGroup.GET("/mysql-server/cluster-id", metadata.GetMySQLServerByClusterID)
+		metadataGroup.GET("/mysql-server/cluster-id/:cluster_id", metadata.GetMySQLServerByClusterID)
 		metadataGroup.GET("/mysql-server/get/:id", metadata.GetMySQLServerByID)
 		metadataGroup.GET("/mysql-server/host-info", metadata.GetMySQLServerByHostInfo)
 		metadataGroup.POST("/mysql-server", metadata.AddMySQLServer)
