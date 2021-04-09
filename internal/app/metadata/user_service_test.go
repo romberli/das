@@ -19,8 +19,62 @@ func TestUserServiceAll(t *testing.T) {
 	TestUserService_Delete(t)
 	TestUserService_Marshal(t)
 	TestUserService_MarshalWithFields(t)
+	TestUserService_GetByAccountName(t)
+	TestUserService_GetByEmail(t)
+	TestUserService_GetByTelephone(t)
+	TestUserService_GetByMobile(t)
+	TestUserService_GetByEmployeeID(t)
 }
 
+func TestUserService_GetByAccountName(t *testing.T) {
+	asst := assert.New(t)
+
+	s := NewUserService(userRepo)
+	err := s.GetByAccountName(OnlineUserAccountName)
+	asst.Nil(err, "test GetByAccountName() failed")
+	AccountName := s.Users[constant.ZeroInt].GetAccountName()
+	asst.Equal(OnlineUserAccountName, AccountName, "test GetByAccountName() failed")
+}
+
+func TestUserService_GetByEmail(t *testing.T) {
+	asst := assert.New(t)
+
+	s := NewUserService(userRepo)
+	err := s.GetByEmail(OnlineUserEmail)
+	asst.Nil(err, "test GetByEmail() failed")
+	Email := s.Users[constant.ZeroInt].GetEmail()
+	asst.Equal(OnlineUserEmail, Email, "test GetByEmail() failed")
+}
+
+func TestUserService_GetByTelephone(t *testing.T) {
+	asst := assert.New(t)
+
+	s := NewUserService(userRepo)
+	err := s.GetByTelephone(OnlineUserTelephone)
+	asst.Nil(err, "test GetByTelephone() failed")
+	Telephone := s.Users[constant.ZeroInt].GetTelephone()
+	asst.Equal(OnlineUserTelephone, Telephone, "test GetByTelephone() failed")
+}
+
+func TestUserService_GetByMobile(t *testing.T) {
+	asst := assert.New(t)
+
+	s := NewUserService(userRepo)
+	err := s.GetByMobile(OnlineUserMobile)
+	asst.Nil(err, "test GetByMobile() failed")
+	Mobile := s.Users[constant.ZeroInt].GetMobile()
+	asst.Equal(OnlineUserMobile, Mobile, "test GetByMobile() failed")
+}
+
+func TestUserService_GetByEmployeeID(t *testing.T) {
+	asst := assert.New(t)
+
+	s := NewUserService(userRepo)
+	err := s.GetByEmployeeID(OnlineUserEmployeeID)
+	asst.Nil(err, "test GetByEmployeeID() failed")
+	EmployeeID := s.Users[constant.ZeroInt].GetEmployeeID()
+	asst.Equal(OnlineUserEmployeeID, EmployeeID, "test GetByEmployeeID() failed")
+}
 func TestUserService_GetUsers(t *testing.T) {
 	asst := assert.New(t)
 
