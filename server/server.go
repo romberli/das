@@ -25,6 +25,7 @@ import (
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/linux"
 	"github.com/romberli/log"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/romberli/das/pkg/message"
 	"github.com/romberli/das/router"
@@ -71,7 +72,11 @@ func NewServer(addr string, pidFile string, readTimeout, writeTimeout int, route
 
 // NewServerWithDefaultRouter returns new *server with default gin router
 func NewServerWithDefaultRouter(addr string, pidFile string, readTimeout, writeTimeout int) *server {
-	r := router.NewGinRouter(gin.Default())
+	if log.GetLevel() != zapcore.DebugLevel {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	r := router.NewGinRouter()
 
 	return NewServer(addr, pidFile, readTimeout, writeTimeout, r)
 }
