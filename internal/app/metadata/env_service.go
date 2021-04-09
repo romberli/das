@@ -10,8 +10,6 @@ import (
 	"github.com/romberli/das/pkg/message"
 )
 
-const envNameStruct = "EnvName"
-
 var _ metadata.EnvService = (*EnvService)(nil)
 
 type EnvService struct {

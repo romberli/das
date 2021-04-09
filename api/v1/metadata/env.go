@@ -17,7 +17,7 @@ import (
 
 const (
 	idJSON      = "id"
-	envNameJSON = "name"
+	envNameJSON = "env_name"
 
 	delFlagStruct = "DelFlag"
 	envNameStruct = "EnvName"

@@ -10,7 +10,7 @@ import (
 )
 
 const (
-//envNameStruct = "EnvName"
+	envNameStruct = "EnvName"
 )
 
 var _ metadata.Env = (*EnvInfo)(nil)

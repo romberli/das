@@ -15,6 +15,14 @@ import (
 )
 
 const (
+	userNameJSON       = "user_name"
+	employeeIDJSON     = "employee_id"
+	accountNameJSON    = "account_name"
+	emailJSON          = "email"
+	telephoneJSON      = "telephone"
+	mobileJSON         = "mobile"
+	departmentNameJSON = "department_name"
+
 	userNameStruct       = "UserName"
 	departmentNameStruct = "DepartmentName"
 	employeeIDStruct     = "EmployeeID"
@@ -59,9 +67,9 @@ func GetUser(c *gin.Context) {
 // @Router /api/v1/metadata/user/:Name [get]
 func GetUserByName(c *gin.Context) {
 	// get param
-	userName := c.Param(userNameStruct)
+	userName := c.Param(userNameJSON)
 	if userName == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, userNameStruct)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, userNameJSON)
 		return
 	}
 	// init service
@@ -124,7 +132,7 @@ func GetUserByID(c *gin.Context) {
 // @Router /api/v1/metadata/user/:EmployeeID [get]
 func GetUserByEmployeeID(c *gin.Context) {
 	// get param
-	employeeID := c.Param(employeeIDStruct)
+	employeeID := c.Param(employeeIDJSON)
 	if employeeID == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, employeeIDStruct)
 		return
@@ -156,7 +164,7 @@ func GetUserByEmployeeID(c *gin.Context) {
 // @Router /api/v1/metadata/user/:AccountName [get]
 func GetUserByAccountName(c *gin.Context) {
 	// get param
-	accountName := c.Param(accountNameStruct)
+	accountName := c.Param(accountNameJSON)
 	if accountName == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, accountNameStruct)
 		return
@@ -188,7 +196,7 @@ func GetUserByAccountName(c *gin.Context) {
 // @Router /api/v1/metadata/user/:Email [get]
 func GetUserByEmail(c *gin.Context) {
 	// get param
-	email := c.Param(emailStruct)
+	email := c.Param(emailJSON)
 	if email == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, emailStruct)
 		return
@@ -220,7 +228,7 @@ func GetUserByEmail(c *gin.Context) {
 // @Router /api/v1/metadata/user/:Telephone [get]
 func GetUserByTelephone(c *gin.Context) {
 	// get param
-	telephone := c.Param(telephoneStruct)
+	telephone := c.Param(telephoneJSON)
 	if telephone == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, telephoneStruct)
 		return
@@ -252,7 +260,7 @@ func GetUserByTelephone(c *gin.Context) {
 // @Router /api/v1/metadata/user/:Mobile [get]
 func GetUserByMobile(c *gin.Context) {
 	// get param
-	mobile := c.Param(mobileStruct)
+	mobile := c.Param(mobileJSON)
 	if mobile == constant.EmptyString {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, mobileStruct)
 		return
