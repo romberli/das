@@ -11,10 +11,11 @@ import (
 )
 
 const (
-	middlewareClusterAddr       = "localhost:3306"
-	middlewareClusterDBName     = "das"
-	middlewareClusterDBUser     = "root"
-	middlewareClusterDBPass     = "rootroot"
+	middlewareClusterAddr   = "localhost:3306"
+	middlewareClusterDBName = "das"
+	middlewareClusterDBUser = "root"
+	middlewareClusterDBPass = "rootroot"
+
 	newMiddlewareClusterName    = "ttt"
 	onlineMiddlewareClusterName = "test"
 	onlineMiddlewareClusterID   = 8
@@ -54,6 +55,7 @@ func deleteMiddlewareClusterByID(id int) error {
 
 func TestMiddlewareClusterRepoAll(t *testing.T) {
 	TestMiddlewareClusterRepo_Execute(t)
+	TestMiddlewareClusterRepo_Transaction(t)
 	TestMiddlewareClusterRepo_GetAll(t)
 	TestMiddlewareClusterRepo_GetByEnv(t)
 	TestMiddlewareClusterRepo_GetByID(t)

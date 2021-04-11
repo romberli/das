@@ -3,7 +3,6 @@ package metadata
 import (
 	"encoding/json"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/jinzhu/now"
@@ -17,7 +16,7 @@ const (
 	defaultMiddlewareServerInfoClusterID            = 1
 	defaultMiddlewareServerInfoServerName           = "test"
 	defaultMiddlewareServerInfoMiddlewareRole       = 1
-	defaultMiddlewareServerInfoSHostIP              = "xxxxx"
+	defaultMiddlewareServerInfoHostIP               = "xxxxx"
 	defaultMiddlewareServerInfoPortNum              = 1
 	defaultMiddlewareServerInfoDelFlag              = 0
 	defaultMiddlewareServerInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
@@ -30,28 +29,34 @@ func initNewMiddlewareServerInfo() *MiddlewareServerInfo {
 
 	createTime, _ := now.Parse(defaultMiddlewareServerInfoCreateTimeString)
 	lastUpdateTime, _ := now.Parse(defaultMiddlewareServerInfoLastUpdateTimeString)
-	return NewMiddlewareServerInfoWithGlobal(
+	return NewMiddlewareServerInfo(
+		middlewareServerRepo,
 		defaultMiddlewareServerInfoID,
 		defaultMiddlewareServerInfoClusterID,
 		defaultMiddlewareServerInfoServerName,
 		defaultMiddlewareServerInfoMiddlewareRole,
-		defaultMiddlewareServerInfoSHostIP,
+		defaultMiddlewareServerInfoHostIP,
 		defaultMiddlewareServerInfoPortNum,
 		defaultMiddlewareServerInfoDelFlag,
 		createTime,
-		lastUpdateTime)
+		lastUpdateTime,
+	)
 }
 
-func middlewareServerStuctEqual(a, b *MiddlewareServerInfo) bool {
+func middlewareServerStructEqual(a, b *MiddlewareServerInfo) bool {
 	return a.ID == b.ID && a.ClusterID == b.ClusterID && a.ServerName == b.ServerName && a.MiddlewareRole == b.MiddlewareRole && a.HostIP == b.HostIP && a.PortNum == b.PortNum && a.DelFlag == b.DelFlag && a.CreateTime == b.CreateTime && a.LastUpdateTime == b.LastUpdateTime
 }
 
 func TestMiddlewareServerEntityAll(t *testing.T) {
 	TestMiddlewareServerInfo_Identity(t)
-	TestMiddlewareServerInfo_IsDeleted(t)
+	TestMiddlewareServerInfo_GetClusterID(t)
+	TestMiddlewareServerInfo_GetServerName(t)
+	TestMiddlewareServerInfo_GetMiddlewareRole(t)
+	TestMiddlewareServerInfo_GetHostIP(t)
+	TestMiddlewareServerInfo_GetPortNum(t)
+	TestMiddlewareServerInfo_GetDelFlag(t)
 	TestMiddlewareServerInfo_GetCreateTime(t)
 	TestMiddlewareServerInfo_GetLastUpdateTime(t)
-	TestMiddlewareServerInfo_Get(t)
 	TestMiddlewareServerInfo_Set(t)
 	TestMiddlewareServerInfo_Delete(t)
 	TestMiddlewareServerInfo_MarshalJSON(t)
@@ -62,14 +67,49 @@ func TestMiddlewareServerInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
 	middlewareServerInfo := initNewMiddlewareServerInfo()
-	asst.Equal(strconv.Itoa(defaultMiddlewareServerInfoID), middlewareServerInfo.Identity(), "test Identity() failed")
+	asst.Equal(defaultMiddlewareServerInfoID, middlewareServerInfo.Identity(), "test Identity() failed")
 }
 
-func TestMiddlewareServerInfo_IsDeleted(t *testing.T) {
+func TestMiddlewareServerInfo_GetClusterID(t *testing.T) {
 	asst := assert.New(t)
 
 	middlewareServerInfo := initNewMiddlewareServerInfo()
-	asst.False(middlewareServerInfo.IsDeleted(), "test IsDeleted() failed")
+	asst.Equal(defaultMiddlewareServerInfoClusterID, middlewareServerInfo.GetClusterID(), "test GetClusterID() failed")
+}
+
+func TestMiddlewareServerInfo_GetServerName(t *testing.T) {
+	asst := assert.New(t)
+
+	middlewareServerInfo := initNewMiddlewareServerInfo()
+	asst.Equal(defaultMiddlewareServerInfoServerName, middlewareServerInfo.GetServerName(), "test GetServerName() failed")
+}
+
+func TestMiddlewareServerInfo_GetMiddlewareRole(t *testing.T) {
+	asst := assert.New(t)
+
+	middlewareServerInfo := initNewMiddlewareServerInfo()
+	asst.Equal(defaultMiddlewareServerInfoMiddlewareRole, middlewareServerInfo.GetMiddlewareRole(), "test GetServerName() failed")
+}
+
+func TestMiddlewareServerInfo_GetHostIP(t *testing.T) {
+	asst := assert.New(t)
+
+	middlewareServerInfo := initNewMiddlewareServerInfo()
+	asst.Equal(defaultMiddlewareServerInfoHostIP, middlewareServerInfo.GetHostIP(), "test GetServerName() failed")
+}
+
+func TestMiddlewareServerInfo_GetPortNum(t *testing.T) {
+	asst := assert.New(t)
+
+	middlewareServerInfo := initNewMiddlewareServerInfo()
+	asst.Equal(defaultMiddlewareServerInfoPortNum, middlewareServerInfo.GetPortNum(), "test GetServerName() failed")
+}
+
+func TestMiddlewareServerInfo_GetDelFlag(t *testing.T) {
+	asst := assert.New(t)
+
+	middlewareServerInfo := initNewMiddlewareServerInfo()
+	asst.Equal(defaultMiddlewareServerInfoDelFlag, middlewareServerInfo.GetDelFlag(), "test GetServerName() failed")
 }
 
 func TestMiddlewareServerInfo_GetCreateTime(t *testing.T) {
@@ -84,15 +124,6 @@ func TestMiddlewareServerInfo_GetLastUpdateTime(t *testing.T) {
 
 	middlewareServerInfo := initNewMiddlewareServerInfo()
 	asst.True(reflect.DeepEqual(middlewareServerInfo.LastUpdateTime, middlewareServerInfo.GetLastUpdateTime()), "test GetLastUpdateTime() failed")
-}
-
-func TestMiddlewareServerInfo_Get(t *testing.T) {
-	asst := assert.New(t)
-
-	middlewareServerInfo := initNewMiddlewareServerInfo()
-	middlewareServerName, err := middlewareServerInfo.Get(middlewareServerNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(middlewareServerInfo.ServerName, middlewareServerName, "test Get() failed")
 }
 
 func TestMiddlewareServerInfo_Set(t *testing.T) {
@@ -110,7 +141,7 @@ func TestMiddlewareServerInfo_Delete(t *testing.T) {
 
 	middlewareServerInfo := initNewMiddlewareServerInfo()
 	middlewareServerInfo.Delete()
-	asst.True(middlewareServerInfo.IsDeleted(), "test Delete() failed")
+	asst.Equal(1, middlewareServerInfo.GetDelFlag(), "test Delete() failed")
 }
 
 func TestMiddlewareServerInfo_MarshalJSON(t *testing.T) {
@@ -123,7 +154,7 @@ func TestMiddlewareServerInfo_MarshalJSON(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
 	err = json.Unmarshal(data, &middlewareServerInfoUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test MarshalJSON() failed", err))
-	asst.True(middlewareServerStuctEqual(middlewareServerInfo, middlewareServerInfoUnmarshal), "test MarshalJSON() failed")
+	asst.True(middlewareServerStructEqual(middlewareServerInfo, middlewareServerInfoUnmarshal), "test MarshalJSON() failed")
 }
 
 func TestMiddlewareServerInfo_MarshalJSONWithFields(t *testing.T) {

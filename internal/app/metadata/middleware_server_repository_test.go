@@ -1,25 +1,30 @@
 package metadata
 
 import (
+	"github.com/romberli/das/internal/dependency/metadata"
 	"testing"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/romberli/das/internal/dependency"
 )
 
 const (
+	middlewareServerrAddr  = "localhost:3306"
+	middlewareServerDBName = "das"
+	middlewareServerDBUser = "root"
+	middlewareServerDBPass = "rootroot"
+
 	newMiddlewareServerName    = "newTest"
-	onlineMiddlewareServerName = "test"
+	onlineMiddlewareServerName = "test001"
+	onlineMiddlewareServerID   = 1
 )
 
 var middlewareServerRepo = initMiddlewareServerRepo()
 
 func initMiddlewareServerRepo() *MiddlewareServerRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
+	pool, err := mysql.NewMySQLPoolWithDefault(middlewareServerrAddr, middlewareServerDBName, middlewareServerDBUser, middlewareServerDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMiddlewareServerRepo() failed", err))
 		return nil
@@ -28,12 +33,12 @@ func initMiddlewareServerRepo() *MiddlewareServerRepo {
 	return NewMiddlewareServerRepo(pool)
 }
 
-func createMiddlewareServer() (dependency.Entity, error) {
+func createMiddlewareServer() (metadata.MiddlewareServer, error) {
 	middlewareServerInfo := NewMiddlewareServerInfoWithDefault(
 		defaultMiddlewareServerInfoClusterID,
 		defaultMiddlewareServerInfoServerName,
 		defaultMiddlewareServerInfoMiddlewareRole,
-		defaultMiddlewareServerInfoSHostIP,
+		defaultMiddlewareServerInfoHostIP,
 		defaultMiddlewareServerInfoPortNum,
 	)
 	entity, err := middlewareServerRepo.Create(middlewareServerInfo)
@@ -44,7 +49,7 @@ func createMiddlewareServer() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteMiddlewareServerByID(id string) error {
+func deleteMiddlewareServerByID(id int) error {
 	sql := `delete from t_meta_middleware_server_info where id = ?`
 	_, err := middlewareServerRepo.Execute(sql, id)
 	return err
@@ -52,8 +57,12 @@ func deleteMiddlewareServerByID(id string) error {
 
 func TestMiddlewareServerRepoAll(t *testing.T) {
 	TestMiddlewareServerRepo_Execute(t)
+	TestMiddlewareClusterRepo_Transaction(t)
 	TestMiddlewareServerRepo_GetAll(t)
+	TestMiddlewareServerRepo_GetByClusterID(t)
 	TestMiddlewareServerRepo_GetByID(t)
+	TestMiddlewareServerRepo_GetByHostInfo(t)
+	TestMiddlewareServerRepo_GetID(t)
 	TestMiddlewareServerRepo_Create(t)
 	TestMiddlewareServerRepo_Update(t)
 	TestMiddlewareServerRepo_Delete(t)
@@ -77,7 +86,7 @@ func TestMiddlewareServerRepo_Transaction(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	_, err = tx.Execute(sql, defaultMiddlewareServerInfoClusterID, defaultMiddlewareServerInfoServerName, defaultMiddlewareServerInfoMiddlewareRole, defaultMiddlewareServerInfoSHostIP, defaultMiddlewareServerInfoPortNum)
+	_, err = tx.Execute(sql, defaultMiddlewareServerInfoClusterID, defaultMiddlewareServerInfoServerName, defaultMiddlewareServerInfoMiddlewareRole, defaultMiddlewareServerInfoHostIP, defaultMiddlewareServerInfoPortNum)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
 	sql = `select server_name from t_meta_middleware_server_info where server_name=?`
@@ -94,7 +103,7 @@ func TestMiddlewareServerRepo_Transaction(t *testing.T) {
 	entities, err := middlewareServerRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		middlewareServerName, err := entity.Get(middlewareServerNameStruct)
+		middlewareServerName := entity.GetServerName()
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 		if middlewareServerName == defaultMiddlewareServerInfoServerName {
 			asst.Fail("test Transaction() failed")
@@ -108,19 +117,43 @@ func TestMiddlewareServerRepo_GetAll(t *testing.T) {
 
 	entities, err := middlewareServerRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	middlewareServerName, err := entities[0].Get("ServerName")
-	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(onlineMiddlewareServerName, middlewareServerName.(string), "test GetAll() failed")
+	middlewareServerName := entities[0].GetServerName()
+	asst.Equal(onlineMiddlewareServerName, middlewareServerName, "test GetAll() failed")
+}
+
+func TestMiddlewareServerRepo_GetByClusterID(t *testing.T) {
+	asst := assert.New(t)
+
+	entities, err := middlewareServerRepo.GetByClusterID(13)
+	asst.Nil(err, common.CombineMessageWithError("test GetByClusterID failed", err))
+	middlewareServerName := entities[0].GetServerName()
+	asst.Equal(onlineMiddlewareServerName, middlewareServerName, "test GetByClusterID failed")
 }
 
 func TestMiddlewareServerRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := middlewareServerRepo.GetByID("2")
+	entity, err := middlewareServerRepo.GetByID(1)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	middlewareServerName, err := entity.Get(middlewareServerNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(onlineMiddlewareServerName, middlewareServerName.(string), "test GetByID() failed")
+	middlewareServerName := entity.GetServerName()
+	asst.Equal(onlineMiddlewareServerName, middlewareServerName, "test GetByID() failed")
+}
+
+func TestMiddlewareServerRepo_GetByHostInfo(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := middlewareServerRepo.GetByHostInfo("1", 1)
+	asst.Nil(err, common.CombineMessageWithError("test GetByHostInfo() failed", err))
+	middlewareServerName := entity.GetServerName()
+	asst.Equal(onlineMiddlewareServerName, middlewareServerName, "test GetByHostInfo() failed")
+}
+
+func TestMiddlewareServerRepo_GetID(t *testing.T) {
+	asst := assert.New(t)
+
+	id, err := middlewareServerRepo.GetID("1", 1)
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	asst.Equal(onlineMiddlewareServerID, id, "")
 }
 
 func TestMiddlewareServerRepo_Create(t *testing.T) {
@@ -144,8 +177,8 @@ func TestMiddlewareServerRepo_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	entity, err = middlewareServerRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	middlewareServerName, err := entity.Get(middlewareServerNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	middlewareServerName := entity.GetServerName()
+
 	asst.Equal(newMiddlewareServerName, middlewareServerName, "test Update() failed")
 	// delete
 	err = deleteMiddlewareServerByID(entity.Identity())

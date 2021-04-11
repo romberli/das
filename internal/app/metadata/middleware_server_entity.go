@@ -1,19 +1,25 @@
 package metadata
 
 import (
-	"strconv"
+	"github.com/romberli/das/internal/dependency/metadata"
 	"time"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
-
-	"github.com/romberli/das/internal/dependency"
 )
 
-var _ dependency.Entity = (*MiddlewareServerInfo)(nil)
+const (
+	middlewareServerClusterIDStruct      = "ClusterID"
+	middlewareServerNameStruct           = "ServerName"
+	middlewareServerMiddlewareRoleStruct = "MiddlewareRole"
+	middlewareServerHostIPStruct         = "HostIP"
+	middlewareServerPortNumStruct        = "PortNum"
+)
+
+var _ metadata.MiddlewareServer = (*MiddlewareServerInfo)(nil)
 
 type MiddlewareServerInfo struct {
-	dependency.Repository
+	metadata.MiddlewareServerRepo
 	ID             int       `middleware:"id" json:"id"`
 	ClusterID      int       `middleware:"cluster_id" json:"cluster_id"`
 	ServerName     string    `middleware:"server_name" json:"server_name"`
@@ -26,7 +32,7 @@ type MiddlewareServerInfo struct {
 }
 
 // NewMiddlewareServerInfo returns a new MiddlewareServerInfo
-func NewMiddlewareServerInfo(repo *MiddlewareServerRepo, id int, clusterID int, serverName string, middlewareRole int, hostIP string, portNum int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareServerInfo {
+func NewMiddlewareServerInfo(repo metadata.MiddlewareServerRepo, id int, clusterID int, serverName string, middlewareRole int, hostIP string, portNum int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareServerInfo {
 	return &MiddlewareServerInfo{
 		repo,
 		id,
@@ -58,18 +64,18 @@ func NewMiddlewareServerInfoWithGlobal(id int, clusterID int, serverName string,
 }
 
 func NewEmptyMiddlewareServerInfoWithGlobal() *MiddlewareServerInfo {
-	return &MiddlewareServerInfo{Repository: NewMiddlewareServerRepoWithGlobal()}
+	return &MiddlewareServerInfo{MiddlewareServerRepo: NewMiddlewareServerRepoWithGlobal()}
 }
 
 // NewMiddlewareServerInfoWithDefault returns a new MiddlewareServerInfo with default MiddlewareServerRepo
 func NewMiddlewareServerInfoWithDefault(clusterID int, serverName string, middlewareRole int, hostIP string, portNum int) *MiddlewareServerInfo {
 	return &MiddlewareServerInfo{
-		Repository:     NewMiddlewareServerRepoWithGlobal(),
-		ClusterID:      clusterID,
-		ServerName:     serverName,
-		MiddlewareRole: middlewareRole,
-		HostIP:         hostIP,
-		PortNum:        portNum,
+		MiddlewareServerRepo: NewMiddlewareServerRepoWithGlobal(),
+		ClusterID:            clusterID,
+		ServerName:           serverName,
+		MiddlewareRole:       middlewareRole,
+		HostIP:               hostIP,
+		PortNum:              portNum,
 	}
 }
 
@@ -85,13 +91,38 @@ func NewMiddlewareServerInfoWithMapAndRandom(fields map[string]interface{}) (*Mi
 }
 
 // Identity returns ID of entity
-func (msi *MiddlewareServerInfo) Identity() string {
-	return strconv.Itoa(msi.ID)
+func (msi *MiddlewareServerInfo) Identity() int {
+	return msi.ID
+}
+
+// GetClusterID returns the middleware cluster id
+func (msi *MiddlewareServerInfo) GetClusterID() int {
+	return msi.ClusterID
+}
+
+// GetServerName returns the server name
+func (msi *MiddlewareServerInfo) GetServerName() string {
+	return msi.ServerName
+}
+
+// GetMiddlewareRole returns the middleware role
+func (msi *MiddlewareServerInfo) GetMiddlewareRole() int {
+	return msi.MiddlewareRole
+}
+
+// GetHostIP returns the host ip
+func (msi *MiddlewareServerInfo) GetHostIP() string {
+	return msi.HostIP
+}
+
+// GetPortNum returns the port number
+func (msi *MiddlewareServerInfo) GetPortNum() int {
+	return msi.PortNum
 }
 
 // IsDeleted checks if delete flag had been set
-func (msi *MiddlewareServerInfo) IsDeleted() bool {
-	return msi.DelFlag != constant.ZeroInt
+func (msi *MiddlewareServerInfo) GetDelFlag() int {
+	return msi.DelFlag
 }
 
 // GetCreateTime returns created time of entity
@@ -104,11 +135,6 @@ func (msi *MiddlewareServerInfo) GetLastUpdateTime() time.Time {
 	return msi.LastUpdateTime
 }
 
-// Get returns value of given field
-func (msi *MiddlewareServerInfo) Get(field string) (interface{}, error) {
-	return common.GetValueOfStruct(msi, field)
-}
-
 // Set sets entity with given fields, key is the field name and value is the relevant value of the key
 func (msi *MiddlewareServerInfo) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {
@@ -117,7 +143,6 @@ func (msi *MiddlewareServerInfo) Set(fields map[string]interface{}) error {
 			return err
 		}
 	}
-
 	return nil
 }
 

@@ -202,7 +202,11 @@ func (mcr *MiddlewareClusterRepo) Create(middlewareCluster metadata.MiddlewareCl
 	sql := `insert into t_meta_middleware_cluster_info(cluster_name, owner_id, env_id) values(?, ?, ?);`
 	log.Debugf("metadata MiddlewareClusterRepo.Create() insert sql: %s", sql)
 	// execute
-	_, err := mcr.Execute(sql, middlewareCluster.(*MiddlewareClusterInfo).ClusterName, middlewareCluster.(*MiddlewareClusterInfo).OwnerID, middlewareCluster.(*MiddlewareClusterInfo).EnvID)
+	_, err := mcr.Execute(sql,
+		middlewareCluster.(*MiddlewareClusterInfo).ClusterName,
+		middlewareCluster.(*MiddlewareClusterInfo).OwnerID,
+		middlewareCluster.(*MiddlewareClusterInfo).EnvID,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +223,13 @@ func (mcr *MiddlewareClusterRepo) Create(middlewareCluster metadata.MiddlewareCl
 func (mcr *MiddlewareClusterRepo) Update(middlewareCluster metadata.MiddlewareCluster) error {
 	sql := `update t_meta_middleware_cluster_info set cluster_name = ?, owner_id = ?, env_id = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata MiddlewareClusterRepo.Update() update sql: %s", sql)
-	_, err := mcr.Execute(sql, middlewareCluster.GetClusterName(), middlewareCluster.GetOwnerID(), middlewareCluster.GetEnvID(), middlewareCluster.GetDelFlag(), middlewareCluster.Identity())
+	_, err := mcr.Execute(sql,
+		middlewareCluster.GetClusterName(),
+		middlewareCluster.GetOwnerID(),
+		middlewareCluster.GetEnvID(),
+		middlewareCluster.GetDelFlag(),
+		middlewareCluster.Identity(),
+	)
 
 	return err
 }

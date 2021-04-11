@@ -2,31 +2,24 @@ package metadata
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/romberli/das/internal/dependency/metadata"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/internal/dependency"
 	"github.com/romberli/das/pkg/message"
 )
 
-const (
-	middlewareServerClusterIDStruct      = "ClusterID"
-	middlewareServerNameStruct           = "ServerName"
-	middlewareServerMiddlewareRoleStruct = "MiddlewareRole"
-	middlewareServerHostIPStruct         = "HostIP"
-	middlewareServerPortNumStruct        = "PortNum"
-)
-
-var _ dependency.Service = (*MiddlewareServerService)(nil)
+var _ metadata.MiddlewareServerService = (*MiddlewareServerService)(nil)
 
 type MiddlewareServerService struct {
-	dependency.Repository
-	Entities []dependency.Entity
+	metadata.MiddlewareServerRepo
+	MiddlewareServers []metadata.MiddlewareServer
 }
 
 // NewMiddlewareServerService returns a new *MiddlewareServerService
-func NewMiddlewareServerService(repo dependency.Repository) *MiddlewareServerService {
-	return &MiddlewareServerService{repo, []dependency.Entity{}}
+func NewMiddlewareServerService(repo metadata.MiddlewareServerRepo) *MiddlewareServerService {
+	return &MiddlewareServerService{repo, []metadata.MiddlewareServer{}}
 }
 
 // NewMiddlewareServerServiceWithDefault returns a new *MiddlewareServerService with default repository
@@ -34,58 +27,58 @@ func NewMiddlewareServerServiceWithDefault() *MiddlewareServerService {
 	return NewMiddlewareServerService(NewMiddlewareServerRepoWithGlobal())
 }
 
-// GetEntities returns entities of the service
-func (mss *MiddlewareServerService) GetEntities() []dependency.Entity {
-	entityList := make([]dependency.Entity, len(mss.Entities))
-	for i := range entityList {
-		entityList[i] = mss.Entities[i]
-	}
-
-	return entityList
+// GetMiddlewareServers returns middleware servers of the service
+func (mss *MiddlewareServerService) GetMiddlewareServers() []metadata.MiddlewareServer {
+	return mss.MiddlewareServers
 }
 
-// GetAll gets all middlewareServerEnvironment entities from the middleware
+// GetAll gets all middleware servers from the middleware
 func (mss *MiddlewareServerService) GetAll() error {
 	var err error
-	mss.Entities, err = mss.Repository.GetAll()
+	mss.MiddlewareServers, err = mss.MiddlewareServerRepo.GetAll()
 
 	return err
 }
 
-// GetByID gets an middlewareServerEnvironment entity that contains the given id from the middleware
-func (mss *MiddlewareServerService) GetByID(id string) error {
-	entity, err := mss.Repository.GetByID(id)
+// GetByClusterID gets middleware servers with given cluster id
+func (mss *MiddlewareServerService) GetByClusterID(clusterID int) error {
+	var err error
+	mss.MiddlewareServers, err = mss.MiddlewareServerRepo.GetByClusterID(clusterID)
+	return err
+}
+
+// GetByID gets a middleware server by the identity from the middleware
+func (mss *MiddlewareServerService) GetByID(id int) error {
+	middlewareServer, err := mss.MiddlewareServerRepo.GetByID(id)
 	if err != nil {
 		return err
 	}
 
-	mss.Entities = append(mss.Entities, entity)
+	mss.MiddlewareServers = append(mss.MiddlewareServers, middlewareServer)
 
 	return err
 }
 
-// Create creates a new middlewareServerEnvironment entity and insert it into the middleware
+// GetByHostInfo gets a middleware server with given host ip and port number
+func (mss *MiddlewareServerService) GetByHostInfo(hostIP string, portNum int) error {
+	middlewareServer, err := mss.MiddlewareServerRepo.GetByHostInfo(hostIP, portNum)
+	if err != nil {
+		return err
+	}
+	mss.MiddlewareServers = append(mss.MiddlewareServers, middlewareServer)
+	return err
+}
+
+// Create creates a middleware server in the middleware
 func (mss *MiddlewareServerService) Create(fields map[string]interface{}) error {
 	// generate new map
-	_, ok := fields[middlewareServerClusterIDStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, middlewareServerClusterIDStruct)
-	}
-	_, ok = fields[middlewareServerNameStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, middlewareServerNameStruct)
-	}
-	_, ok = fields[middlewareServerMiddlewareRoleStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, middlewareServerMiddlewareRoleStruct)
-	}
-	_, ok = fields[middlewareServerHostIPStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, middlewareServerHostIPStruct)
-	}
-	_, ok = fields[middlewareServerPortNumStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, middlewareServerPortNumStruct)
+	_, clusterIDExists := fields[middlewareServerClusterIDStruct]
+	_, serverNameExists := fields[middlewareServerNameStruct]
+	_, middlewareRoleExists := fields[middlewareServerMiddlewareRoleStruct]
+	_, hostIPExists := fields[middlewareServerHostIPStruct]
+	_, portNumExists := fields[middlewareServerPortNumStruct]
+	if !clusterIDExists || !serverNameExists || !middlewareRoleExists || !hostIPExists || !portNumExists {
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s, %s, %s, %s and %s", middlewareServerClusterIDStruct, middlewareServerNameStruct, middlewareServerMiddlewareRoleStruct, middlewareServerHostIPStruct, middlewareServerPortNumStruct))
 	}
 	// create a new entity
 	middlewareServerInfo, err := NewMiddlewareServerInfoWithMapAndRandom(fields)
@@ -93,47 +86,47 @@ func (mss *MiddlewareServerService) Create(fields map[string]interface{}) error 
 		return err
 	}
 	// insert into middleware
-	entity, err := mss.Repository.Create(middlewareServerInfo)
+	middlewareServer, err := mss.MiddlewareServerRepo.Create(middlewareServerInfo)
 	if err != nil {
 		return err
 	}
 
-	mss.Entities = append(mss.Entities, entity)
+	mss.MiddlewareServers = append(mss.MiddlewareServers, middlewareServer)
 	return nil
 }
 
-// Update gets an middleware ServerEnvironment entity that contains the given id from the middleware,
-// and then update its fields that was specified in fields argument,
+// Update gets a middleware server of the given id from the middleware,
+// and then updates its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (mss *MiddlewareServerService) Update(id string, fields map[string]interface{}) error {
+func (mss *MiddlewareServerService) Update(id int, fields map[string]interface{}) error {
 	err := mss.GetByID(id)
 	if err != nil {
 		return err
 	}
-	err = mss.Entities[constant.ZeroInt].Set(fields)
+	err = mss.MiddlewareServers[constant.ZeroInt].Set(fields)
 	if err != nil {
 		return err
 	}
 
-	return mss.Repository.Update(mss.Entities[constant.ZeroInt])
+	return mss.MiddlewareServerRepo.Update(mss.MiddlewareServers[constant.ZeroInt])
 }
 
-// Delete deletes the middlewareServerEnvironment entity that contains the given id in the middleware
-func (mss *MiddlewareServerService) Delete(id string) error {
-	return mss.Repository.Delete(id)
+// Delete deletes the middleware server of given id in the middleware
+func (mss *MiddlewareServerService) Delete(id int) error {
+	return mss.MiddlewareServerRepo.Delete(id)
 }
 
-// Marshal marshals service.Envs
+// Marshal marshals MiddlewareServerService.MiddlewareServers to json bytes
 func (mss *MiddlewareServerService) Marshal() ([]byte, error) {
-	return json.Marshal(mss.Entities)
+	return json.Marshal(mss.MiddlewareServers)
 }
 
-// Marshal marshals service.Envs with given fields
+// MarshalWithFields marshals only specified fields of the MiddlewareServerService to json bytes
 func (mss *MiddlewareServerService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(mss.Entities))
+	interfaceList := make([]interface{}, len(mss.MiddlewareServers))
 	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(mss.Entities[i], fields...)
+		entity, err := common.CopyStructWithFields(mss.MiddlewareServers[i], fields...)
 		if err != nil {
 			return nil, err
 		}

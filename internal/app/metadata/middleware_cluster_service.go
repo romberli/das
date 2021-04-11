@@ -87,7 +87,7 @@ func (mcs *MiddlewareClusterService) Create(fields map[string]interface{}) error
 	_, ownerIDExists := fields[middlewareClusterOwnerIDStruct]
 	_, envIDExists := fields[middlewareClusterEnvIDStruct]
 	if !clusterNameExists || !ownerIDExists || !envIDExists {
-		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s", middlewareClusterNameStruct, middlewareClusterOwnerIDStruct, middlewareClusterNameStruct))
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s, %s and %s", middlewareClusterNameStruct, middlewareClusterOwnerIDStruct, middlewareClusterNameStruct))
 	}
 	// create a new entity
 	middlewareClusterInfo, err := NewMiddlewareClusterInfoWithMapAndRandom(fields)
