@@ -1,25 +1,30 @@
 package metadata
 
 import (
+	"github.com/romberli/das/internal/dependency/metadata"
 	"testing"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/romberli/das/internal/dependency"
 )
 
 const (
+	middlewareClusterAddr   = "localhost:3306"
+	middlewareClusterDBName = "das"
+	middlewareClusterDBUser = "root"
+	middlewareClusterDBPass = "rootroot"
+
 	newMiddlewareClusterName    = "ttt"
 	onlineMiddlewareClusterName = "test"
+	onlineMiddlewareClusterID   = 8
 )
 
 var middlewareClusterRepo = initMiddlewareClusterRepo()
 
 func initMiddlewareClusterRepo() *MiddlewareClusterRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
+	pool, err := mysql.NewMySQLPoolWithDefault(middlewareClusterAddr, middlewareClusterDBName, middlewareClusterDBUser, middlewareClusterDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMiddlewareClusterRepo() failed", err))
 		return nil
@@ -28,8 +33,12 @@ func initMiddlewareClusterRepo() *MiddlewareClusterRepo {
 	return NewMiddlewareClusterRepo(pool)
 }
 
-func createMiddlewareCluster() (dependency.Entity, error) {
-	middlewareClusterInfo := NewMiddlewareClusterInfoWithDefault(defaultMiddlewareClusterInfoClusterName, defaultMiddlewareClusterInfoEnvID)
+func createMiddlewareCluster() (metadata.MiddlewareCluster, error) {
+	middlewareClusterInfo := NewMiddlewareClusterInfoWithDefault(
+		defaultMiddlewareClusterInfoClusterName,
+		defaultMiddlewareClusterInfoOwnerID,
+		defaultMiddlewareClusterInfoEnvID,
+	)
 	entity, err := middlewareClusterRepo.Create(middlewareClusterInfo)
 	if err != nil {
 		return nil, err
@@ -38,7 +47,7 @@ func createMiddlewareCluster() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteMiddlewareClusterByID(id string) error {
+func deleteMiddlewareClusterByID(id int) error {
 	sql := `delete from t_meta_middleware_cluster_info where id = ?`
 	_, err := middlewareClusterRepo.Execute(sql, id)
 	return err
@@ -46,8 +55,13 @@ func deleteMiddlewareClusterByID(id string) error {
 
 func TestMiddlewareClusterRepoAll(t *testing.T) {
 	TestMiddlewareClusterRepo_Execute(t)
+	TestMiddlewareClusterRepo_Transaction(t)
 	TestMiddlewareClusterRepo_GetAll(t)
+	TestMiddlewareClusterRepo_GetByEnv(t)
 	TestMiddlewareClusterRepo_GetByID(t)
+	TestMiddlewareClusterRepo_GetByName(t)
+	TestMiddlewareClusterRepo_GetID(t)
+	TestMiddlewareClusterRepo_GetMiddlewareServerIDList(t)
 	TestMiddlewareClusterRepo_Create(t)
 	TestMiddlewareClusterRepo_Update(t)
 	TestMiddlewareClusterRepo_Delete(t)
@@ -66,12 +80,12 @@ func TestMiddlewareClusterRepo_Execute(t *testing.T) {
 func TestMiddlewareClusterRepo_Transaction(t *testing.T) {
 	asst := assert.New(t)
 
-	sql := `insert into t_meta_middleware_cluster_info(cluster_name, env_id) values(?, ?);`
+	sql := `insert into t_meta_middleware_cluster_info(cluster_name, owner_id, env_id) values(?, ?, ?);`
 	tx, err := middlewareClusterRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	_, err = tx.Execute(sql, defaultMiddlewareClusterInfoClusterName, defaultMiddlewareClusterInfoEnvID)
+	_, err = tx.Execute(sql, defaultMiddlewareClusterInfoClusterName, defaultMiddlewareClusterInfoOwnerID, defaultMiddlewareClusterInfoEnvID)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
 	sql = `select cluster_name from t_meta_middleware_cluster_info where cluster_name=?`
@@ -88,8 +102,7 @@ func TestMiddlewareClusterRepo_Transaction(t *testing.T) {
 	entities, err := middlewareClusterRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		middlewareClusterName, err := entity.Get(middlewareClusterNameStruct)
-		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+		middlewareClusterName := entity.GetClusterName()
 		if middlewareClusterName == defaultMiddlewareClusterInfoClusterName {
 			asst.Fail("test Transaction() failed")
 			break
@@ -102,19 +115,56 @@ func TestMiddlewareClusterRepo_GetAll(t *testing.T) {
 
 	entities, err := middlewareClusterRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	middlewareClusterName, err := entities[0].Get("ClusterName")
-	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(onlineMiddlewareClusterName, middlewareClusterName.(string), "test GetAll() failed")
+	middlewareClusterName := entities[0].GetClusterName()
+	asst.Equal(onlineMiddlewareClusterName, middlewareClusterName, "test GetAll() failed")
+}
+
+func TestMiddlewareClusterRepo_GetByEnv(t *testing.T) {
+	asst := assert.New(t)
+
+	entities, err := middlewareClusterRepo.GetByEnv(1)
+	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
+	middlewareClusterName := entities[0].GetClusterName()
+	asst.Equal(onlineMiddlewareClusterName, middlewareClusterName, "test GetAll() failed")
 }
 
 func TestMiddlewareClusterRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := middlewareClusterRepo.GetByID("3")
+	entity, err := middlewareClusterRepo.GetByID(8)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	middlewareClusterName, err := entity.Get(middlewareClusterNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(onlineMiddlewareClusterName, middlewareClusterName.(string), "test GetByID() failed")
+	middlewareClusterName := entity.GetClusterName()
+	asst.Equal(onlineMiddlewareClusterName, middlewareClusterName, "test GetByID() failed")
+}
+
+func TestMiddlewareClusterRepo_GetByName(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := middlewareClusterRepo.GetByName("test")
+	asst.Nil(err, common.CombineMessageWithError("test GetByName() failed", err))
+	middlewareClusterName := entity.GetClusterName()
+	asst.Equal(onlineMiddlewareClusterName, middlewareClusterName, "test GetByID() failed")
+}
+
+func TestMiddlewareClusterRepo_GetID(t *testing.T) {
+	asst := assert.New(t)
+
+	id, err := middlewareClusterRepo.GetID("test", 1)
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	asst.Equal(onlineMiddlewareClusterID, id, "test GetID() failed")
+}
+
+func TestMiddlewareClusterRepo_GetMiddlewareServerIDList(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := createMiddlewareCluster()
+	asst.Nil(err, common.CombineMessageWithError("test GetMiddlewareServerIDList() failed", err))
+	middlewareServerIDList, err := middlewareClusterRepo.GetMiddlewareServerIDList(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetMiddlewareServerIDList() failed", err))
+	asst.Equal(0, len(middlewareServerIDList), "test GetMiddlewareServerIDList() failed")
+	// delete
+	err = deleteMiddlewareClusterByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetMiddlewareServerIDList() failed", err))
 }
 
 func TestMiddlewareClusterRepo_Create(t *testing.T) {
@@ -138,8 +188,7 @@ func TestMiddlewareClusterRepo_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	entity, err = middlewareClusterRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	middlewareClusterName, err := entity.Get(middlewareClusterNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	middlewareClusterName := entity.GetClusterName()
 	asst.Equal(newMiddlewareClusterName, middlewareClusterName, "test Update() failed")
 	// delete
 	err = deleteMiddlewareClusterByID(entity.Identity())

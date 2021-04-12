@@ -40,7 +40,7 @@ func RegisterMetadata(group *gin.RouterGroup) {
 		metadataGroup.GET("/middleware-cluster", metadata.GetMiddlewareCluster)
 		metadataGroup.GET("/middleware-cluster/env/:env_id", metadata.GetMiddlewareClusterByEnv)
 		metadataGroup.GET("/middleware-cluster/get/:id", metadata.GetMiddlewareClusterByID)
-		metadataGroup.GET("/middleware-cluster/cluster-name/:name", metadata.GetMiddlewareClusterByName)
+		metadataGroup.GET("/middleware-cluster/cluster-name/:cluster_name", metadata.GetMiddlewareClusterByName)
 		metadataGroup.GET("/middleware-cluster/middleware-server/:id", metadata.GetMiddlewareServerIDList)
 		metadataGroup.POST("/middleware-cluster", metadata.AddMiddlewareCluster)
 		metadataGroup.POST("/middleware-cluster/update/:id", metadata.UpdateMiddlewareClusterByID)
@@ -52,7 +52,7 @@ func RegisterMetadata(group *gin.RouterGroup) {
 		metadataGroup.GET("/middleware-server/host-info", metadata.GetMiddlewareServerByHostInfo)
 		metadataGroup.POST("/middleware-server", metadata.AddMiddlewareServer)
 		metadataGroup.POST("/middleware-server/update/:id", metadata.UpdateMiddlewareServerByID)
-		metadataGroup.POST("/middleware-server/delete/:id", metadata.DeleteMiddlewareClusterByID)
+		metadataGroup.POST("/middleware-server/delete/:id", metadata.DeleteMiddlewareServerByID)
 		// monitor system
 		metadataGroup.GET("/monitor-system", metadata.GetMonitorSystem)
 		metadataGroup.GET("/monitor-system/env/:env_id", metadata.GetMonitorSystemByEnv)

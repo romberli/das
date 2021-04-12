@@ -9,7 +9,7 @@ import (
 type MiddlewareCluster interface {
 	// Identity returns the identity
 	Identity() int
-	// ClusterName returns the env name
+	// GetClusterName returns the cluster name
 	GetClusterName() string
 	// GetOwnerID returns the owner id
 	GetOwnerID() int
@@ -45,7 +45,7 @@ type MiddlewareClusterRepo interface {
 	// GetByID gets a middleware cluster by the identity from the middleware
 	GetByID(id int) (MiddlewareCluster, error)
 	// GetByName gets a middleware cluster of given cluster name from the middle ware
-	GetByName(clusterName string) error
+	GetByName(clusterName string) (MiddlewareCluster, error)
 	// GetID gets the identity with given cluster name and env id from the middleware
 	GetID(clusterName string, envID int) (int, error)
 	// GetMiddlewareServerIDList gets the middleware server id list of given cluster id from the middle ware
@@ -77,7 +77,7 @@ type MiddlewareClusterService interface {
 	// and then updates its fields that was specified in fields argument,
 	// key is the filed name and value is the new field value,
 	// it saves the changes to the middleware
-	Update(id int, fields map[string]interface{})
+	Update(id int, fields map[string]interface{}) error
 	// Delete deletes the middleware cluster of given id in the middleware
 	Delete(id int) error
 	// Marshal marshals MiddlewareClusterService.MiddlewareClusters to json bytes
