@@ -1,24 +1,25 @@
 package metadata
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-var _ dependency.Entity = (*UserInfo)(nil)
+const ()
+
+var _ metadata.User = (*UserInfo)(nil)
 
 // UserInfo create userinfo struct
 type UserInfo struct {
-	dependency.Repository
+	metadata.UserRepo
 	ID             int       `middleware:"id" json:"id"`
 	UserName       string    `middleware:"user_name" json:"user_name"`
 	DepartmentName string    `middleware:"department_name" json:"department_name"`
-	EmployeeID     int       `middleware:"employee_id" json:"employee_id"`
+	EmployeeID     string    `middleware:"employee_id" json:"employee_id"`
 	AccountName    string    `middleware:"account_name" json:"account_name"`
 	Email          string    `middleware:"email" json:"email"`
 	Telephone      string    `middleware:"telephone" json:"telephone"`
@@ -30,7 +31,7 @@ type UserInfo struct {
 }
 
 // NewUserInfo returns a new UserInfo
-func NewUserInfo(repo *UserRepo, id int, userName string, departmentName string, employeeID int, accountName string, email string, telephone string, mobile string, role int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *UserInfo {
+func NewUserInfo(repo metadata.UserRepo, id int, userName string, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *UserInfo {
 	return &UserInfo{
 		repo,
 		id,
@@ -49,7 +50,7 @@ func NewUserInfo(repo *UserRepo, id int, userName string, departmentName string,
 }
 
 // NewUserInfoWithGlobal returns a new UserInfo with default UserRepo
-func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, departmentName string, employeeID int, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
 	return &UserInfo{
 		NewUserRepoWithGlobal(),
 		id,
@@ -69,16 +70,16 @@ func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time
 
 // NewEmptyUserInfoWithGlobal return userinfo
 func NewEmptyUserInfoWithGlobal() *UserInfo {
-	return &UserInfo{Repository: NewUserRepoWithGlobal()}
+	return &UserInfo{UserRepo: NewUserRepoWithGlobal()}
 }
 
 // NewUserInfoWithDefault returns a new UserInfo with default UserRepo
-func NewUserInfoWithDefault(userName string, departmentName string, employeeID int, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfoWithDefault(userName string, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
 	return &UserInfo{
-		Repository:     NewUserRepoWithGlobal(),
+		UserRepo:       NewUserRepoWithGlobal(),
 		UserName:       userName,
 		DepartmentName: departmentName,
-		EmployeeID:     employeeID,
+		EmployeeID:     constant.DefaultRandomString,
 		AccountName:    accountName,
 		Email:          email,
 		Telephone:      constant.DefaultRandomString,
@@ -99,14 +100,14 @@ func NewUserInfoWithMapAndRandom(fields map[string]interface{}) (*UserInfo, erro
 }
 
 // Identity returns ID of entity
-func (ui *UserInfo) Identity() string {
-	return strconv.Itoa(ui.ID)
+func (ui *UserInfo) Identity() int {
+	return ui.ID
 }
 
-// IsDeleted checks if delete flag had been set
-func (ui *UserInfo) IsDeleted() bool {
-	return ui.DelFlag != constant.ZeroInt
-}
+// // IsDeleted checks if delete flag had been set
+// func (ui *UserInfo) IsDeleted() bool {
+// 	return ui.DelFlag != constant.ZeroInt
+// }
 
 // GetCreateTime returns created time of entity
 func (ui *UserInfo) GetCreateTime() time.Time {
@@ -123,8 +124,18 @@ func (ui *UserInfo) GetDepartmentName() string {
 	return ui.DepartmentName
 }
 
+// GetMobile returns mobile of entity
+func (ui *UserInfo) GetMobile() string {
+	return ui.Mobile
+}
+
+// GetUserName returns username of entity
+func (ui *UserInfo) GetUserName() string {
+	return ui.UserName
+}
+
 // GetEmployeeID returns last updated time of entity
-func (ui *UserInfo) GetEmployeeID() int {
+func (ui *UserInfo) GetEmployeeID() string {
 	return ui.EmployeeID
 }
 
@@ -146,6 +157,11 @@ func (ui *UserInfo) GetTelephone() string {
 // GetRole returns last updated time of entity
 func (ui *UserInfo) GetRole() int {
 	return ui.Role
+}
+
+// GetDelFlag returns last updated time of entity
+func (ui *UserInfo) GetDelFlag() int {
+	return ui.DelFlag
 }
 
 // Get returns value of given field

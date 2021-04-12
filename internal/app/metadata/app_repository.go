@@ -101,6 +101,7 @@ func (ar *AppRepo) GetByID(id int) (metadata.App, error) {
 	case 0:
 		return nil, errors.New(fmt.Sprintf("metadata AppInfo.GetByID(): data does not exists, id: %d", id))
 	case 1:
+		//appInfo := NewEmptyAppInfoWithRepo(ar)
 		appInfo := NewEmptyAppInfoWithGlobal()
 		// map to struct
 		err = result.MapToStructByRowIndex(appInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)

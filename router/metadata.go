@@ -32,7 +32,7 @@ func RegisterMetadata(group *gin.RouterGroup) {
 		// env
 		metadataGroup.GET("/env", metadata.GetEnv)
 		metadataGroup.GET("/env/get/:id", metadata.GetEnvByID)
-		metadataGroup.GET("/env/env-name/:name", metadata.GetEnvByName)
+		metadataGroup.GET("/env/env-name/:env_name", metadata.GetEnvByName)
 		metadataGroup.POST("/env", metadata.AddEnv)
 		metadataGroup.POST("/env/update/:id", metadata.UpdateEnvByID)
 		metadataGroup.POST("/env/delete/:id", metadata.DeleteEnvByID)
@@ -80,10 +80,10 @@ func RegisterMetadata(group *gin.RouterGroup) {
 		metadataGroup.POST("/mysql-server/delete/:id", metadata.DeleteMySQLServerByID)
 		// user
 		metadataGroup.GET("/user", metadata.GetUser)
-		metadataGroup.GET("/user/user-name/:name", metadata.GetUserByName)
+		metadataGroup.GET("/user/user-name/:user_name", metadata.GetUserByName)
 		metadataGroup.GET("/user/get/:id", metadata.GetUserByID)
 		metadataGroup.GET("/user/employee-id/:employee_id", metadata.GetUserByEmployeeID)
-		metadataGroup.GET("/user/account-name/:name", metadata.GetUserByAccountName)
+		metadataGroup.GET("/user/account-name/:account_name", metadata.GetUserByAccountName)
 		metadataGroup.GET("/user/email/:email", metadata.GetUserByEmail)
 		metadataGroup.GET("/user/telephone/:telephone", metadata.GetUserByTelephone)
 		metadataGroup.GET("/user/mobile/:mobile", metadata.GetUserByMobile)
