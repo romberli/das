@@ -72,6 +72,5 @@ func initErrorMiddlewareClusteMessage() {
 	message.Messages[ErrMetadataGetMiddlewareServerIDList] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetMiddlewareServerIDList, "metadata: get middleware server id list failed.\n%s")
 	message.Messages[ErrMetadataAddMiddlewareCluster] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataAddMiddlewareCluster, "metadata: add new middleware cluster failed. env_name: %s\n%s")
 	message.Messages[ErrMetadataUpdateMiddlewareCluster] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster failed. id: %d\n%s")
-	message.Messages[ErrMetadataDeleteMiddlewareCluster] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataDeleteMiddlewareCluster, "metadata: delete middleware cluster failed. id: %d\n%s")
-
+	message.Messages[ErrMetadataDeleteMiddlewareCluster] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataDeleteMiddlewareCluster, "metadata: delete middleware cluster failed. cluster_name: %s\n%s")
 }

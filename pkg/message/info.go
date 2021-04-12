@@ -26,11 +26,6 @@ const (
 	InfoMetadataAddMySQLServer     = 200803
 	InfoMetadataUpdateMySQLServer  = 200804
 
-	InfoMetadataGetMiddlewareServerAll  = 200601
-	InfoMetadataGetMiddlewareServerByID = 200602
-	InfoMetadataAddMiddlewareServer     = 200603
-	InfoMetadataUpdateMiddlewareServer  = 200604
-
 	InfoMetadataGetUserAll  = 200901
 	InfoMetadataGetUserByID = 200902
 	InfoMetadataAddUser     = 200903
@@ -63,11 +58,6 @@ func initInfoMessage() {
 	Messages[InfoMetadataGetMySQLServerByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMySQLServerByID, "metadata: get mysql server by id completed. id: %s")
 	Messages[InfoMetadataAddMySQLServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMySQLServer, "metadata: add new mysql server completed. env_name: %s")
 	Messages[InfoMetadataUpdateMySQLServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMySQLServer, "metadata: update mysql server completed. id: %s")
-
-	Messages[InfoMetadataGetMiddlewareServerAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareServerAll, "metadata: get middleware server all completed. id: %s")
-	Messages[InfoMetadataGetMiddlewareServerByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetMiddlewareServerByID, "metadata: get middleware server by id completed. id: %s")
-	Messages[InfoMetadataAddMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataAddMiddlewareServer, "metadata: add new middleware server completed. server_name: %s")
-	Messages[InfoMetadataUpdateMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataUpdateMiddlewareServer, "metadata: update middleware server completed. id: %s")
 
 	Messages[InfoMetadataGetUserAll] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetUserAll, "metadata: get user all completed")
 	Messages[InfoMetadataGetUserByID] = config.NewErrMessage(DefaultMessageHeader, InfoMetadataGetUserByID, "metadata: get user by id completed. id: %s")

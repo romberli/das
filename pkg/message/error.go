@@ -69,11 +69,6 @@ const (
 	ErrMetadataAddMySQLServer     = 400803
 	ErrMetadataUpdateMySQLServer  = 400804
 
-	ErrMetadataGetMiddlewareServerAll  = 400601
-	ErrMetadataGetMiddlewareServerByID = 400602
-	ErrMetadataAddMiddlewareServer     = 400603
-	ErrMetadataUpdateMiddlewareServer  = 400604
-
 	ErrMetadataGetUserAll  = 400901
 	ErrMetadataGetUserByID = 400902
 	ErrMetadataAddUser     = 400903
@@ -149,11 +144,6 @@ func initErrorMessage() {
 	Messages[ErrMetadataGetMySQLServerByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMySQLServerByID, "metadata: get mysql server by id failed. id: %s\n%s")
 	Messages[ErrMetadataAddMySQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMySQLServer, "metadata: add new mysql server failed. cluster_id: %s server_name: %s host_ip: %s port_num: %s deployment_type: %s version: %s\n%s")
 	Messages[ErrMetadataUpdateMySQLServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMySQLServer, "metadata: update mysql server failed. id: %s\n%s")
-
-	Messages[ErrMetadataGetMiddlewareServerAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareServerAll, "metadata: get all middleware server failed.\n%s")
-	Messages[ErrMetadataGetMiddlewareServerByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareServerByID, "metadata: get middleware server by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMiddlewareServer, "metadata: add new middleware server failed. env_name: %s\n%s")
-	Messages[ErrMetadataUpdateMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMiddlewareServer, "metadata: update middleware server failed. id: %s\n%s")
 
 	Messages[ErrMetadataGetUserAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetUserAll, "metadata: get all user failed.\n%s")
 	Messages[ErrMetadataGetUserByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetUserByID, "metadata: get user by id failed. id: %s\n%s")

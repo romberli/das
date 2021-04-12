@@ -22,7 +22,7 @@ Accept: application/json
 POST http://{{baseURL}}/api/v1/metadata/middleware-cluster
 Content-Type: application/json
 
-{"cluster_name": "rest_test", "owner_id": 1, "env_id": 1}
+{"cluster_name": "rest_test", "owner_id": 1, "envid": 1}
 
 ### update middleware-cluster by id
 POST http://{{baseURL}}/api/v1/metadata/middleware-cluster/update/13

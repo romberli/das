@@ -52,7 +52,7 @@ func RegisterMetadata(group *gin.RouterGroup) {
 		metadataGroup.GET("/middleware-server/host-info", metadata.GetMiddlewareServerByHostInfo)
 		metadataGroup.POST("/middleware-server", metadata.AddMiddlewareServer)
 		metadataGroup.POST("/middleware-server/update/:id", metadata.UpdateMiddlewareServerByID)
-		metadataGroup.POST("/middleware-server/delete/:id", metadata.DeleteMiddlewareClusterByID)
+		metadataGroup.POST("/middleware-server/delete/:id", metadata.DeleteMiddlewareServerByID)
 		// monitor system
 		metadataGroup.GET("/monitor-system", metadata.GetMonitorSystem)
 		metadataGroup.GET("/monitor-system/env/:env_id", metadata.GetMonitorSystemByEnv)

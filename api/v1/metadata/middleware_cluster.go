@@ -253,9 +253,9 @@ func UpdateMiddlewareClusterByID(c *gin.Context) {
 	var fields map[string]interface{}
 
 	// get params
-	idStr := c.Param(idJSON)
+	idStr := c.Param(middlewareClusterIDJSON)
 	if idStr == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, idJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, middlewareClusterIDJSON)
 		return
 	}
 	id, err := strconv.Atoi(idStr)
@@ -325,7 +325,7 @@ func DeleteMiddlewareClusterByID(c *gin.Context) {
 	// update entities
 	err = s.Delete(id)
 	if err != nil {
-		resp.ResponseNOK(c, msgmeta.ErrMetadataDeleteMiddlewareCluster, id, err.Error())
+		resp.ResponseNOK(c, msgmeta.ErrMetadataDeleteMiddlewareCluster, fields[middlewareClusterNameStruct], err.Error())
 		return
 	}
 	// marshal service
