@@ -8,18 +8,23 @@ import (
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
 const (
-	newMonitorSystemName    = "newTest"
-	onlineMonitorSystemName = "test"
+	// modify these connection information
+	monitorSystemAddr   = "127.0.0.1:3306"
+	monitorSystemDBName = "das"
+	monitorSystemDBUser = "root"
+	monitorSystemDBPass = "mysql123"
+
+	newMonitorSystemName = "newTest"
 )
 
 var monitorSystemRepo = initMonitorSystemRepo()
 
 func initMonitorSystemRepo() *MonitorSystemRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
+	pool, err := mysql.NewMySQLPoolWithDefault(monitorSystemAddr, monitorSystemDBName, monitorSystemDBUser, monitorSystemDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMonitorSystemRepo() failed", err))
 		return nil
@@ -28,8 +33,10 @@ func initMonitorSystemRepo() *MonitorSystemRepo {
 	return NewMonitorSystemRepo(pool)
 }
 
-func createMonitorSystem() (dependency.Entity, error) {
-	monitorSystemInfo := NewMonitorSystemInfoWithDefault(defaultMonitorSystemInfoSystemName, defaultMonitorSystemInfoSystemType, defaultMonitorSystemInfoHostIP, defaultMonitorSystemInfoPortNum, defaultMonitorSystemInfoPortNumSlow, defaultMonitorSystemInfoBaseUrl)
+func createMonitorSystem() (metadata.MonitorSystem, error) {
+	monitorSystemInfo := NewMonitorSystemInfoWithDefault(defaultMonitorSystemInfoSystemName,
+		defaultMonitorSystemInfoSystemType, defaultMonitorSystemInfoHostIP, defaultMonitorSystemInfoPortNum,
+		defaultMonitorSystemInfoPortNumSlow, defaultMonitorSystemInfoBaseUrl, defaultMonitorSystemInfoEnvID)
 	entity, err := monitorSystemRepo.Create(monitorSystemInfo)
 	if err != nil {
 		return nil, err
@@ -38,7 +45,7 @@ func createMonitorSystem() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteMonitorSystemByID(id string) error {
+func deleteMonitorSystemByID(id int) error {
 	sql := `delete from t_meta_monitor_system_info where id = ?`
 	_, err := monitorSystemRepo.Execute(sql, id)
 	return err
@@ -47,6 +54,7 @@ func deleteMonitorSystemByID(id string) error {
 func TestMonitorSystemRepoAll(t *testing.T) {
 	TestMonitorSystemRepo_Execute(t)
 	TestMonitorSystemRepo_GetAll(t)
+	TestMonitorSystemRepo_GetByEnv(t)
 	TestMonitorSystemRepo_GetByID(t)
 	TestMonitorSystemRepo_Create(t)
 	TestMonitorSystemRepo_Update(t)
@@ -67,12 +75,13 @@ func TestMonitorSystemRepo_Execute(t *testing.T) {
 func TestMonitorSystemRepo_Transaction(t *testing.T) {
 	asst := assert.New(t)
 
-	sql := `insert into t_meta_monitor_system_info(system_name, system_type, host_ip, port_num, port_num_slow, base_url) values(?, ?, ?, ?, ?, ?);`
+	sql := `insert into t_meta_monitor_system_info(system_name, system_type, host_ip, port_num, port_num_slow, base_url, env_id) values(?, ?, ?, ?, ?, ?, ?);`
 	tx, err := monitorSystemRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	err = tx.Begin()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-	_, err = tx.Execute(sql, defaultMonitorSystemInfoSystemName, defaultMonitorSystemInfoSystemType, defaultMonitorSystemInfoHostIP, defaultMonitorSystemInfoPortNum, defaultMonitorSystemInfoPortNumSlow, defaultMonitorSystemInfoBaseUrl)
+	_, err = tx.Execute(sql, defaultMonitorSystemInfoSystemName, defaultMonitorSystemInfoSystemType, defaultMonitorSystemInfoHostIP,
+		defaultMonitorSystemInfoPortNum, defaultMonitorSystemInfoPortNumSlow, defaultMonitorSystemInfoBaseUrl, defaultMonitorSystemInfoEnvID)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
 	sql = `select system_name from t_meta_monitor_system_info where system_name = ?`
@@ -89,7 +98,7 @@ func TestMonitorSystemRepo_Transaction(t *testing.T) {
 	entities, err := monitorSystemRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		monitorSystemName, err := entity.Get(monitorSystemNameStruct)
+		monitorSystemName := entity.GetSystemName()
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 		if monitorSystemName == defaultMonitorSystemInfoSystemName {
 			asst.Fail("test Transaction() failed")
@@ -101,21 +110,44 @@ func TestMonitorSystemRepo_Transaction(t *testing.T) {
 func TestMonitorSystemRepo_GetAll(t *testing.T) {
 	asst := assert.New(t)
 
+	entity, err := createMonitorSystem()
+	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
 	entities, err := monitorSystemRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	monitorSystemName, err := entities[0].Get("MonitorSystemName")
+	monitorSystemName := entities[0].GetSystemName()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(onlineMonitorSystemName, monitorSystemName.(string), "test GetAll() failed")
+	asst.Equal(defaultMonitorSystemInfoSystemName, monitorSystemName, "test GetAll() failed")
+	// delete
+	err = deleteMonitorSystemByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
+}
+
+func TestMonitorSystemRepo_GetByEnv(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := createMonitorSystem()
+	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
+	entities, err := monitorSystemRepo.GetByEnv(defaultMonitorSystemInfoEnvID)
+	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
+	asst.Equal(defaultMonitorSystemInfoEnvID, entities[0].GetEnvID(), common.CombineMessageWithError("test GetByEnv() failed", err))
+	// delete
+	err = deleteMonitorSystemByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
 }
 
 func TestMonitorSystemRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := monitorSystemRepo.GetByID("1")
+	entity, err := createMonitorSystem()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	monitorSystemName, err := entity.Get(monitorSystemNameStruct)
+	db, err := monitorSystemRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(onlineMonitorSystemName, monitorSystemName.(string), "test GetByID() failed")
+	monitorSystemName := db.GetSystemName()
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
+	asst.Equal(defaultMonitorSystemInfoSystemName, monitorSystemName, "test GetByID() failed")
+	// delete
+	err = deleteMonitorSystemByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 }
 
 func TestMonitorSystemRepo_Create(t *testing.T) {
@@ -139,7 +171,7 @@ func TestMonitorSystemRepo_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	entity, err = monitorSystemRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	monitorSystemName, err := entity.Get(monitorSystemNameStruct)
+	monitorSystemName := entity.GetSystemName()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(newMonitorSystemName, monitorSystemName, "test Update() failed")
 	// delete

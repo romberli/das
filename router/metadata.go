@@ -27,8 +27,8 @@ func RegisterMetadata(group *gin.RouterGroup) {
 		metadataGroup.POST("/db", metadata.AddDB)
 		metadataGroup.POST("/db/update/:id", metadata.UpdateDBByID)
 		metadataGroup.POST("/db/delete/:id", metadata.DeleteDBByID)
-		metadataGroup.POST("/db/add-db/:id", metadata.DBAddApp)
-		metadataGroup.POST("/db/delete-db/:id", metadata.DBDeleteApp)
+		metadataGroup.POST("/db/add-app/:id", metadata.DBAddApp)
+		metadataGroup.POST("/db/delete-app/:id", metadata.DBDeleteApp)
 		// env
 		metadataGroup.GET("/env", metadata.GetEnv)
 		metadataGroup.GET("/env/get/:id", metadata.GetEnvByID)

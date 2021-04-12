@@ -34,7 +34,7 @@ func (ds *DBService) GetDBs() []metadata.DB {
 	return ds.DBs
 }
 
-// GetAll gets all entities from the middleware
+// GetAll gets all databases from the middleware
 func (ds *DBService) GetAll() error {
 	var err error
 
@@ -43,7 +43,7 @@ func (ds *DBService) GetAll() error {
 	return err
 }
 
-// GetByEnv gets all entities of given env
+// GetByEnv gets all databases of given env_id
 func (ds *DBService) GetByEnv(envID int) error {
 	var err error
 
@@ -52,7 +52,7 @@ func (ds *DBService) GetByEnv(envID int) error {
 	return err
 }
 
-// GetByID gets an database entity that contains the given id from the middleware
+// GetByID gets an database of the given id from the middleware
 func (ds *DBService) GetByID(id int) error {
 	db, err := ds.DBRepo.GetByID(id)
 	if err != nil {
@@ -76,7 +76,7 @@ func (ds *DBService) GetAppIDList(dbID int) error {
 	return err
 }
 
-// Create creates a new database entity and insert it into the middleware
+// Create creates an new database in the middleware
 func (ds *DBService) Create(fields map[string]interface{}) error {
 	// generate new map
 	_, dbNameExists := fields[dbDBNameStruct]
@@ -84,7 +84,8 @@ func (ds *DBService) Create(fields map[string]interface{}) error {
 	_, clusterTypeExists := fields[dbClusterTypeStruct]
 	_, envIDExists := fields[dbEnvIDStruct]
 	if !dbNameExists || !clusterIDExists || !clusterTypeExists || !envIDExists {
-		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s", dbDBNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s and %s and %s",
+			dbDBNameStruct, dbClusterIDStruct, dbClusterTypeStruct, dbEnvIDStruct))
 	}
 	// create a new entity
 	dbInfo, err := NewDBInfoWithMapAndRandom(fields)

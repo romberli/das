@@ -71,9 +71,9 @@ func initInfoDBMessage() {
 
 func initErrorDBMessage() {
 	message.Messages[ErrMetadataGetDBAll] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetDBAll, "metadata: get all databases failed.\n%s")
-	message.Messages[ErrMetadataGetDBByEnv] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetDBByEnv, "metadata: get databases by environment failed.\n%s")
+	message.Messages[ErrMetadataGetDBByEnv] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetDBByEnv, "metadata: get databases by environment failed. env_id: %d\n%s")
 	message.Messages[ErrMetadataGetDBByID] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetDBByID, "metadata: get database by id failed. id: %d\n%s")
-	message.Messages[ErrMetadataGetAppIDList] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetAppIDList, "metadata: get app id list failed.\n%s")
+	message.Messages[ErrMetadataGetAppIDList] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataGetAppIDList, "metadata: get app id list failed. id: %d\n%s")
 	message.Messages[ErrMetadataAddDB] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataAddDB, "metadata: add new databases failed. db_name: %s, cluster_id: %d, cluster_type: %d, env_id: %d\n%s")
 	message.Messages[ErrMetadataUpdateDB] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataUpdateDB, "metadata: update database failed. id: %d\n%s")
 	message.Messages[ErrMetadataDeleteDB] = config.NewErrMessage(message.DefaultMessageHeader, ErrMetadataDeleteDB, "metadata: delete database failed. id: %d\n%s")

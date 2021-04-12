@@ -89,12 +89,12 @@ func (dr *DBRepo) GetByEnv(envID int) ([]metadata.DB, error) {
 		select id, db_name, cluster_id, cluster_type, owner_id, env_id, del_flag, create_time, last_update_time
 		from t_meta_db_info
 		where del_flag = 0
-		and env_id = ?
+		and env_id = ? 
 		order by id;
 	`
-	log.Debugf("metadata DBRepo.GetAll() sql: \n%s", sql, envID)
+	log.Debugf("metadata DBRepo.GetByEnv sql: \n%s", sql)
 
-	result, err := dr.Execute(sql)
+	result, err := dr.Execute(sql, envID)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (dr *DBRepo) GetByID(id int) (metadata.DB, error) {
 	case 0:
 		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByID(): data does not exists, id: %d", id))
 	case 1:
-		dbInfo := NewEmptyDBInfoWithGlobal()
+		dbInfo := NewEmptyDBInfoWithRepo(dr)
 		// map to struct
 		err = result.MapToStructByRowIndex(dbInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
 		if err != nil {
@@ -162,8 +162,16 @@ func (dr *DBRepo) GetID(dbName string, clusterID int, clusterType int) (int, err
 
 // GetAppIDList gets an app identity list that uses this db
 func (dr *DBRepo) GetAppIDList(dbID int) ([]int, error) {
-	sql := `select app_id from t_meta_app_db_map where del_flag = 0 and db_id = ?;`
-	log.Debugf("metadata AppRepo.GetDBIDList() select sql: %s", sql)
+	sql := `
+		select app_id
+		from t_meta_db_info di
+				 inner join t_meta_app_db_map adm on di.id = adm.db_id
+		where di.del_flag = 0
+		and adm.del_flag = 0
+		and di.id = ?;
+	`
+	log.Debugf("metadata DBRepo.GetAppIDList() select sql: %s", sql)
+
 	result, err := dr.Execute(sql, dbID)
 	if err != nil {
 		return nil, err
@@ -178,7 +186,7 @@ func (dr *DBRepo) GetAppIDList(dbID int) ([]int, error) {
 			return nil, err
 		}
 
-		appIDList = append(appIDList, appID)
+		appIDList[row] = appID
 	}
 
 	return appIDList, nil
@@ -188,6 +196,7 @@ func (dr *DBRepo) GetAppIDList(dbID int) ([]int, error) {
 func (dr *DBRepo) Create(db metadata.DB) (metadata.DB, error) {
 	sql := `insert into t_meta_db_info(db_name, cluster_id, cluster_type, owner_id, env_id) values(?, ?, ?, ?, ?);`
 	log.Debugf("metadata DBRepo.Create() insert sql: %s", sql)
+
 	// execute
 	_, err := dr.Execute(sql, db.GetDBName(), db.GetClusterID(), db.GetClusterType(), db.GetOwnerID(), db.GetEnvID())
 	if err != nil {
@@ -220,7 +229,7 @@ func (dr *DBRepo) Delete(id int) error {
 	defer func() {
 		err = tx.Close()
 		if err != nil {
-			log.Errorf("metadata AppRepo.Delete(): close database connection failed.\n%s", err.Error())
+			log.Errorf("metadata DBRepo.Delete(): close database connection failed.\n%s", err.Error())
 		}
 	}()
 
@@ -229,13 +238,13 @@ func (dr *DBRepo) Delete(id int) error {
 		return err
 	}
 	sql := `delete from t_meta_db_info where id = ?;`
-	log.Debugf("metadata DBRepo.Delete() update sql: %s", sql)
+	log.Debugf("metadata DBRepo.Delete() delete sql(t_meta_db_info): %s", sql)
 	_, err = dr.Execute(sql, id)
 	if err != nil {
 		return err
 	}
 	sql = `delete from t_meta_app_db_map where db_id = ?;`
-	log.Debugf("metadata DBRepo.Delete() update sql: %s", sql)
+	log.Debugf("metadata DBRepo.Delete() delete sql(t_meta_app_db_map): %s", sql)
 	_, err = dr.Execute(sql, id)
 	if err != nil {
 		return err
@@ -245,18 +254,18 @@ func (dr *DBRepo) Delete(id int) error {
 }
 
 // AddApp adds a new map of the app and database in the middleware
-func (dr *DBRepo) AddApp(appID, dbID int) error {
+func (dr *DBRepo) AddApp(dbID, appID int) error {
 	sql := `insert into t_meta_app_db_map(app_id, db_id) values(?, ?);`
-	log.Debugf("metadata AppRepo.AddDB() insert sql: %s", sql)
+	log.Debugf("metadata DBRepo.AddApp() insert sql: %s", sql)
 	_, err := dr.Execute(sql, appID, dbID)
 
 	return err
 }
 
 // DeleteApp deletes a map of the app and database in the middleware
-func (dr *DBRepo) DeleteApp(appID, dbID int) error {
+func (dr *DBRepo) DeleteApp(dbID, appID int) error {
 	sql := `delete from t_meta_app_db_map where app_id = ? and db_id = ?;`
-	log.Debugf("metadata AppRepo.DeleteDB() delete sql: %s", sql)
+	log.Debugf("metadata DBRepo.DeleteApp() delete sql: %s", sql)
 	_, err := dr.Execute(sql, appID, dbID)
 
 	return err
