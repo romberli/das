@@ -11,7 +11,7 @@ GET http://{{baseURL}}/api/v1/metadata/db/get/1
 Accept: application/json
 
 ### get all apps by id
-GET http://{{baseURL}}/api/v1/metadata/db/apps/8
+GET http://{{baseURL}}/api/v1/metadata/db/apps/1
 Accept: application/json
 
 ### add new database
@@ -31,13 +31,13 @@ POST http://{{baseURL}}/api/v1/metadata/db/delete/10
 Content-Type: application/json
 
 ### add new app by id
-POST http://{{baseURL}}/api/v1/metadata/db/add-db/8
+POST http://{{baseURL}}/api/v1/metadata/db/add-app/1
 Content-Type: application/json
 
 {"app_id": 4}
 
 ### delete app by id
-POST http://{{baseURL}}/api/v1/metadata/db/delete-db/8
+POST http://{{baseURL}}/api/v1/metadata/db/delete-app/1
 Content-Type: application/json
 
-{"app_id": 3}
+{"app_id": 4}

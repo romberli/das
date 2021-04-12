@@ -1,0 +1,35 @@
+### get all mysql clusters
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster
+Accept: application/json
+
+### get mysql cluster by env_id
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster/env/1
+Accept: application/json
+
+### get mysql cluster by id
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster/get/97
+Accept: application/json
+
+### get mysql cluster by cluster_name
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster/cluster-name/api_test
+Accept: application/json
+
+### get mysql_server.id of mysql cluster
+GET http://{{baseURL}}/api/v1/metadata/mysql-cluster/mysql-server/97
+Accept: application/json
+
+### add new mysql cluster
+POST http://{{baseURL}}/api/v1/metadata/mysql-cluster
+Content-Type: application/json
+
+{"cluster_name": "api_test", "env_id": 1}
+
+### update mysql cluster by id
+POST http://{{baseURL}}/api/v1/metadata/mysql-cluster/update/97
+Content-Type: application/json
+
+{"cluster_name": "test", "del_flag": 0}
+
+### delete mysql cluster by id
+POST http://{{baseURL}}/api/v1/metadata/mysql-cluster/delete/95
+Content-Type: application/json

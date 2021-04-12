@@ -20,9 +20,7 @@ const (
 	msClusterIDJSON = "cluster_id"
 	msHostIPJSON    = "host_ip"
 	msPortNumJSON   = "port_num"
-)
 
-const (
 	msClusterIDStruct      = "ClusterID"
 	msServerNameStruct     = "ServerName"
 	msHostIPStruct         = "HostIP"
@@ -134,7 +132,7 @@ func GetMySQLServerByID(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLServerByID, id)
 }
 
-// TODO: Modify Swagger commment
+// TODO: Modify Swagger comment
 // @Tags mysql server
 // @Summary get mysql servers by host info
 // @Produce  application/json

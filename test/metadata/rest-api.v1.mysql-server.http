@@ -1,0 +1,33 @@
+### get all mysql servers
+GET http://{{baseURL}}/api/v1/metadata/mysql-server
+Accept: application/json
+
+### get mysql server by cluster-id
+GET http://{{baseURL}}/api/v1/metadata/mysql-server/cluster-id/1
+Accept: application/json
+
+
+### get mysql server by id
+GET http://{{baseURL}}/api/v1/metadata/mysql-server/get/86
+Accept: application/json
+
+### get mysql server by id
+GET http://{{baseURL}}/api/v1/metadata/mysql-server/host-info?host_ip=192.168.1.1&port_num=3306
+Accept: application/json
+
+
+### add new mysql server
+POST http://{{baseURL}}/api/v1/metadata/mysql-server
+Content-Type: application/json
+
+{"cluster_id": 1, "server_name": "test", "host_ip": "192.168.1.1", "port_num": 3306, "deployment_type": 1}
+
+### update mysql server by id
+POST http://{{baseURL}}/api/v1/metadata/mysql-server/update/86
+Content-Type: application/json
+
+{"cluster_id": 97, "del_flag": 0}
+
+### delete mysql server by id
+POST http://{{baseURL}}/api/v1/metadata/mysql-server/delete/1
+Content-Type: application/json

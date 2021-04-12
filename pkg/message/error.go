@@ -53,31 +53,6 @@ const (
 	ErrGenerateNewMapWithTag            = 400045
 	ErrMarshalService                   = 400046
 	ErrTypeConversion                   = 400047
-
-	ErrMetadataGetMySQLClusterAll  = 400701
-	ErrMetadataGetMySQLClusterByID = 400702
-	ErrMetadataAddMySQLCluster     = 400703
-	ErrMetadataUpdateMySQLCluster  = 400704
-
-	ErrMetadataGetMySQLServerAll  = 400801
-	ErrMetadataGetMySQLServerByID = 400802
-	ErrMetadataAddMySQLServer     = 400803
-	ErrMetadataUpdateMySQLServer  = 400804
-
-	ErrMetadataGetMiddlewareClusterAll  = 400501
-	ErrMetadataGetMiddlewareClusterByID = 400502
-	ErrMetadataAddMiddlewareCluster     = 400503
-	ErrMetadataUpdateMiddlewareCluster  = 400504
-
-	ErrMetadataGetMiddlewareServerAll  = 400601
-	ErrMetadataGetMiddlewareServerByID = 400602
-	ErrMetadataAddMiddlewareServer     = 400603
-	ErrMetadataUpdateMiddlewareServer  = 400604
-
-	ErrMetadataGetMonitorSystemAll  = 400601
-	ErrMetadataGetMonitorSystemByID = 400602
-	ErrMetadataAddMonitorSystem     = 400603
-	ErrMetadataUpdateMonitorSystem  = 400604
 )
 
 func initErrorMessage() {
@@ -129,20 +104,4 @@ func initErrorMessage() {
 	Messages[ErrGenerateNewMapWithTag] = config.NewErrMessage(DefaultMessageHeader, ErrGenerateNewMapWithTag, "generate new map with tag %s failed.\n%s")
 	Messages[ErrMarshalService] = config.NewErrMessage(DefaultMessageHeader, ErrMarshalService, "marshal service failed.\n%s")
 	Messages[ErrTypeConversion] = config.NewErrMessage(DefaultMessageHeader, ErrTypeConversion, "type conversion failed.\n%s")
-	// metadata
-
-	Messages[ErrMetadataGetMiddlewareClusterAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterAll, "metadata: get all middleware cluster failed.\n%s")
-	Messages[ErrMetadataGetMiddlewareClusterByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareClusterByID, "metadata: get middleware cluster by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMiddlewareCluster, "metadata: add new middleware cluster failed. env_name: %s\n%s")
-	Messages[ErrMetadataUpdateMiddlewareCluster] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMiddlewareCluster, "metadata: update middleware cluster failed. id: %s\n%s")
-
-	Messages[ErrMetadataGetMiddlewareServerAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareServerAll, "metadata: get all middleware server failed.\n%s")
-	Messages[ErrMetadataGetMiddlewareServerByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMiddlewareServerByID, "metadata: get middleware server by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMiddlewareServer, "metadata: add new middleware server failed. env_name: %s\n%s")
-	Messages[ErrMetadataUpdateMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMiddlewareServer, "metadata: update middleware server failed. id: %s\n%s")
-
-	Messages[ErrMetadataGetMonitorSystemAll] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMonitorSystemAll, "metadata: get all monitor systems failed.\n%s")
-	Messages[ErrMetadataGetMonitorSystemByID] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataGetMonitorSystemByID, "metadata: get monitor system by id failed. id: %s\n%s")
-	Messages[ErrMetadataAddMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataAddMonitorSystem, "metadata: add new monitor system failed. system_name: %s\n%s")
-	Messages[ErrMetadataUpdateMonitorSystem] = config.NewErrMessage(DefaultMessageHeader, ErrMetadataUpdateMonitorSystem, "metadata: update monitor system failed. id: %s\n%s")
 }

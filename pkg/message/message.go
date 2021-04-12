@@ -24,7 +24,6 @@ const DefaultMessageHeader = "DAS"
 var Messages = map[int]*config.ErrMessage{}
 
 func init() {
-	initDebugMessage()
 	initInfoMessage()
 	initErrorMessage()
 }
