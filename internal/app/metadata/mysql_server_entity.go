@@ -1,20 +1,19 @@
 package metadata
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-var _ dependency.Entity = (*MySQLServerInfo)(nil)
+var _ metadata.MySQLServer = (*MySQLServerInfo)(nil)
 
 // MySQLServerInfo is a struct map to table in the database
 type MySQLServerInfo struct {
-	dependency.Repository
+	metadata.MySQLServerRepo
 	ID             int       `middleware:"id" json:"id"`
 	ClusterID      int       `middleware:"cluster_id" json:"cluster_id"`
 	ServerName     string    `middleware:"server_name" json:"server_name"`
@@ -28,7 +27,7 @@ type MySQLServerInfo struct {
 }
 
 // NewMySQLServerInfo returns a new MySQLServerInfo
-func NewMySQLServerInfo(repo *MySQLServerRepo,
+func NewMySQLServerInfo(repo metadata.MySQLServerRepo,
 	id int,
 	clusterID int,
 	serverName string,
@@ -81,7 +80,7 @@ func NewMySQLServerInfoWithGlobal(
 
 // NewEmptyMySQLServerInfoWithGlobal returns a new MySQLServerInfo with default MySQLServerRepo
 func NewEmptyMySQLServerInfoWithGlobal() *MySQLServerInfo {
-	return &MySQLServerInfo{Repository: NewMySQLServerRepoWithGlobal()}
+	return &MySQLServerInfo{MySQLServerRepo: NewMySQLServerRepoWithGlobal()}
 }
 
 // NewMySQLServerInfoWithDefault returns a new MySQLServerInfo with default MySQLServerRepo
@@ -92,13 +91,13 @@ func NewMySQLServerInfoWithDefault(
 	portNum int,
 	deploymentType int) *MySQLServerInfo {
 	return &MySQLServerInfo{
-		Repository:     NewMySQLServerRepoWithGlobal(),
-		ClusterID:      clusterID,
-		ServerName:     serverName,
-		HostIP:         hostIP,
-		PortNum:        portNum,
-		DeploymentType: deploymentType,
-		Version:        constant.DefaultRandomString,
+		MySQLServerRepo: NewMySQLServerRepoWithGlobal(),
+		ClusterID:       clusterID,
+		ServerName:      serverName,
+		HostIP:          hostIP,
+		PortNum:         portNum,
+		DeploymentType:  deploymentType,
+		Version:         constant.DefaultRandomString,
 	}
 }
 
@@ -113,13 +112,43 @@ func NewMySQLServerInfoWithMapAndRandom(fields map[string]interface{}) (*MySQLSe
 }
 
 // Identity returns ID of entity
-func (msi *MySQLServerInfo) Identity() string {
-	return strconv.Itoa(msi.ID)
+func (msi *MySQLServerInfo) Identity() int {
+	return msi.ID
 }
 
-// IsDeleted checks if delete flag had been set
-func (msi *MySQLServerInfo) IsDeleted() bool {
-	return msi.DelFlag != constant.ZeroInt
+// GetClusterID returns the mysql cluster id
+func (msi *MySQLServerInfo) GetClusterID() int {
+	return msi.ClusterID
+}
+
+// GetServerName returns the server name
+func (msi *MySQLServerInfo) GetServerName() string {
+	return msi.ServerName
+}
+
+// GetHostIP returns the host ip
+func (msi *MySQLServerInfo) GetHostIP() string {
+	return msi.HostIP
+}
+
+// GetPortNum returns the port number
+func (msi *MySQLServerInfo) GetPortNum() int {
+	return msi.PortNum
+}
+
+// GetDeploymentType returns the deployment type
+func (msi *MySQLServerInfo) GetDeploymentType() int {
+	return msi.DeploymentType
+}
+
+// GetVersion returns the version
+func (msi *MySQLServerInfo) GetVersion() string {
+	return msi.Version
+}
+
+// GetDelFlag returns the delete flag
+func (msi *MySQLServerInfo) GetDelFlag() int {
+	return msi.DelFlag
 }
 
 // GetCreateTime returns created time of entity
@@ -130,11 +159,6 @@ func (msi *MySQLServerInfo) GetCreateTime() time.Time {
 // GetLastUpdateTime returns last updated time of entity
 func (msi *MySQLServerInfo) GetLastUpdateTime() time.Time {
 	return msi.LastUpdateTime
-}
-
-// Get returns value of given field
-func (msi *MySQLServerInfo) Get(field string) (interface{}, error) {
-	return common.GetValueOfStruct(msi, field)
 }
 
 // Set sets entity with given fields, key is the field name and value is the relevant value of the key

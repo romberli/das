@@ -8,7 +8,7 @@ import (
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
 const (
@@ -36,7 +36,7 @@ func initMySQLServerRepo() *MySQLServerRepo {
 	return NewMySQLServerRepo(pool)
 }
 
-func createMySQLServer() (dependency.Entity, error) {
+func createMySQLServer() (metadata.MySQLServer, error) {
 	mysqlServerInfo := NewMySQLServerInfoWithDefault(
 		defaultMySQLServerInfoClusterID,
 		defaultMySQLServerInfoServerName,
@@ -51,7 +51,7 @@ func createMySQLServer() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteMySQLServerByID(id string) error {
+func deleteMySQLServerByID(id int) error {
 	sql := `delete from t_meta_mysql_server_info where id = ?`
 	_, err := mysqlServerRepo.Execute(sql, id)
 	return err
@@ -59,9 +59,13 @@ func deleteMySQLServerByID(id string) error {
 
 func TestMySQLServerRepoAll(t *testing.T) {
 	TestMySQLServerRepo_Execute(t)
+	TestMySQLServerRepo_Transaction(t)
 	TestMySQLServerRepo_Create(t)
 	TestMySQLServerRepo_GetAll(t)
+	TestMySQLServerRepo_GetByClusterID(t)
 	TestMySQLServerRepo_GetByID(t)
+	TestMySQLServerRepo_GetByHostInfo(t)
+	TestMySQLServerRepo_GetID(t)
 	TestMySQLServerRepo_Update(t)
 	TestMySQLServerRepo_Delete(t)
 }
@@ -118,10 +122,8 @@ func TestMySQLServerRepo_Transaction(t *testing.T) {
 	entities, err := mysqlServerRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		hostIP, err := entity.Get(hostIPStruct)
-		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-		portNum, err := entity.Get(portNumStruct)
-		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+		hostIP := entity.GetHostIP()
+		portNum := entity.GetPortNum()
 		if hostIP == testTransactionHostIP && portNum == testTransactionPortNum {
 			asst.Fail("test Transaction() failed")
 			break
@@ -150,25 +152,54 @@ func TestMySQLServerRepo_GetAll(t *testing.T) {
 
 	entities, err := mysqlServerRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	hostIP, err := entities[0].Get("HostIP")
-	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(testInitHostIP, hostIP.(string), "test GetAll() failed")
-	portNum, err := entities[0].Get("PortNum")
-	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(testInitPortNum, portNum.(int), "test GetAll() failed")
+	hostIP := entities[0].GetHostIP()
+	asst.Equal(testInitHostIP, hostIP, "test GetAll() failed")
+	portNum := entities[0].GetPortNum()
+	asst.Equal(testInitPortNum, portNum, "test GetAll() failed")
+}
+
+func TestMySQLServerRepo_GetByClusterID(t *testing.T) {
+	asst := assert.New(t)
+
+	entitys, err := mysqlServerRepo.GetByClusterID(testInitClusterID)
+
+	for _, entity := range entitys {
+		asst.Nil(err, common.CombineMessageWithError("test GetByClusterID() failed", err))
+		hostIP := entity.GetHostIP()
+		asst.Equal(testInitHostIP, hostIP, "test GetByClusterID() failed")
+		portNum := entity.GetPortNum()
+		asst.Equal(testInitPortNum, portNum, "test GetByClusterID() failed")
+	}
 }
 
 func TestMySQLServerRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := mysqlServerRepo.GetByID("1")
+	entity, err := mysqlServerRepo.GetByID(1)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	hostIP, err := entity.Get(hostIPStruct)
-	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(testInitHostIP, hostIP.(string), "test GetByID() failed")
-	portNum, err := entity.Get(portNumStruct)
-	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(testInitPortNum, portNum.(int), "test GetByID() failed")
+	hostIP := entity.GetHostIP()
+	asst.Equal(testInitHostIP, hostIP, "test GetByID() failed")
+	portNum := entity.GetPortNum()
+	asst.Equal(testInitPortNum, portNum, "test GetByID() failed")
+}
+
+func TestMySQLServerRepo_GetByHostInfo(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := mysqlServerRepo.GetByHostInfo(testInitHostIP, testInitPortNum)
+	asst.Nil(err, common.CombineMessageWithError("test GetByHostInfo() failed", err))
+	hostIP := entity.GetHostIP()
+	asst.Equal(testInitHostIP, hostIP, "test GetByHostInfo() failed")
+	portNum := entity.GetPortNum()
+	asst.Equal(testInitPortNum, portNum, "test GetByHostInfo() failed")
+}
+
+func TestMySQLServerRepo_GetID(t *testing.T) {
+	asst := assert.New(t)
+
+	id, err := mysqlServerRepo.GetID(testInitHostIP, testInitPortNum)
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	asst.NotEqual(0, id, "test GetID() failed")
 }
 
 func TestMySQLServerRepo_Create(t *testing.T) {
@@ -194,11 +225,9 @@ func TestMySQLServerRepo_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	entity, err = mysqlServerRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	hostIP, err := entity.Get(hostIPStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	hostIP := entity.GetHostIP()
 	asst.Equal(testUpdateHostIP, hostIP, "test Update() failed")
-	portNum, err := entity.Get(portNumStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	portNum := entity.GetPortNum()
 	asst.Equal(testUpdatePortNum, portNum, "test Update() failed")
 	// delete
 	err = deleteMySQLServerByID(entity.Identity())

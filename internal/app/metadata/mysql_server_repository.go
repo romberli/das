@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware"
@@ -10,10 +9,10 @@ import (
 	"github.com/romberli/log"
 
 	"github.com/romberli/das/global"
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-var _ dependency.Repository = (*MySQLServerRepo)(nil)
+var _ metadata.MySQLServerRepo = (*MySQLServerRepo)(nil)
 
 // MySQLServerRepo implements Repository interface
 type MySQLServerRepo struct {
@@ -53,7 +52,7 @@ func (msr *MySQLServerRepo) Transaction() (middleware.Transaction, error) {
 }
 
 // GetAll returns all available entities
-func (msr *MySQLServerRepo) GetAll() ([]dependency.Entity, error) {
+func (msr *MySQLServerRepo) GetAll() ([]metadata.MySQLServer, error) {
 	sql := `
 		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
@@ -77,17 +76,53 @@ func (msr *MySQLServerRepo) GetAll() ([]dependency.Entity, error) {
 	if err != nil {
 		return nil, err
 	}
-	// init []dependency.Entity
-	entityList := make([]dependency.Entity, result.RowNumber())
-	for i := range entityList {
-		entityList[i] = mysqlServerInfoList[i]
+	// init []metadata.MySQLServer
+	mysqlServerList := make([]metadata.MySQLServer, result.RowNumber())
+	for i := range mysqlServerList {
+		mysqlServerList[i] = mysqlServerInfoList[i]
 	}
 
-	return entityList, nil
+	return mysqlServerList, nil
 }
 
-// GetByID Select returns an available entity of the given id
-func (msr *MySQLServerRepo) GetByID(id string) (dependency.Entity, error) {
+// GetByClusterID Select returns an available mysqlServer of the given cluster id
+func (msr *MySQLServerRepo) GetByClusterID(clusterID int) ([]metadata.MySQLServer, error) {
+	sql := `
+		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
+			create_time, last_update_time
+		from t_meta_mysql_server_info 
+		where del_flag = 0
+		and cluster_id = ?;
+	`
+	log.Debugf("metadata MySQLServerRepo.GetByClusterID() sql: \n%s\nplaceholders: %s", sql, clusterID)
+
+	result, err := msr.Execute(sql, clusterID)
+	if err != nil {
+		return nil, err
+	}
+
+	resultNum := result.RowNumber()
+	mysqlServerList := make([]metadata.MySQLServer, resultNum)
+
+	for row := 0; row < resultNum; row++ {
+		mysqlServerID, err := result.GetInt(row, constant.ZeroInt)
+		if err != nil {
+			return nil, err
+		}
+
+		mysqlServer, err := msr.GetByID(mysqlServerID)
+		if err != nil {
+			return nil, err
+		}
+
+		mysqlServerList[row] = mysqlServer
+	}
+
+	return mysqlServerList, nil
+}
+
+// GetByID Select returns an available mysqlServer of the given id
+func (msr *MySQLServerRepo) GetByID(id int) (metadata.MySQLServer, error) {
 	sql := `
 		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
@@ -103,7 +138,7 @@ func (msr *MySQLServerRepo) GetByID(id string) (dependency.Entity, error) {
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, fmt.Errorf("metadata MySQLServerInfo.GetByID(): data does not exists, id: %s", id)
+		return nil, fmt.Errorf("metadata MySQLServerInfo.GetByID(): data does not exists, id: %d", id)
 	case 1:
 		mysqlServerInfo := NewEmptyMySQLServerInfoWithGlobal()
 		// map to struct
@@ -114,24 +149,56 @@ func (msr *MySQLServerRepo) GetByID(id string) (dependency.Entity, error) {
 
 		return mysqlServerInfo, nil
 	default:
-		return nil, fmt.Errorf("metadata MySQLServerInfo.GetByID(): duplicate key exists, id: %s", id)
+		return nil, fmt.Errorf("metadata MySQLServerInfo.GetByID(): duplicate key exists, id: %d", id)
 	}
 }
 
-// GetID checks identity of given entity from the middleware
-func (msr *MySQLServerRepo) GetID(entity dependency.Entity) (string, error) {
+// GetByHostInfo gets a mysql server with given host ip and port number
+func (msr *MySQLServerRepo) GetByHostInfo(hostIP string, portNum int) (metadata.MySQLServer, error) {
+	sql := `
+		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
+			create_time, last_update_time
+		from t_meta_mysql_server_info
+		where del_flag = 0
+		and host_ip = ? and port_num = ?;
+	`
+	log.Debugf("metadata MySQLServerRepo.GetByHostInfo() sql: \n%s\nplaceholders: %s, %d", sql, hostIP, portNum)
+
+	result, err := msr.Execute(sql, hostIP, portNum)
+	if err != nil {
+		return nil, err
+	}
+	switch result.RowNumber() {
+	case 0:
+		return nil, fmt.Errorf("metadata MySQLServerInfo.GetByHostInfo(): data does not exists, hostIP: %s, portNum: %d", hostIP, portNum)
+	case 1:
+		mysqlServerInfo := NewEmptyMySQLServerInfoWithGlobal()
+		// map to struct
+		err = result.MapToStructByRowIndex(mysqlServerInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+		if err != nil {
+			return nil, err
+		}
+
+		return mysqlServerInfo, nil
+	default:
+		return nil, fmt.Errorf("metadata MySQLServerInfo.GetByHostInfo(): duplicate key exists, hostIP: %s, portNum: %d", hostIP, portNum)
+	}
+}
+
+// GetID checks idmysqlServer of given mysqlServer from the middleware
+func (msr *MySQLServerRepo) GetID(hostIP string, portNum int) (int, error) {
 	sql := `select id from t_meta_mysql_server_info where del_flag = 0 and host_ip = ? and port_num = ?;`
 	log.Debugf("metadata MySQLServerRepo.GetID() select sql: %s", sql)
-	result, err := msr.Execute(sql, entity.(*MySQLServerInfo).HostIP, entity.(*MySQLServerInfo).PortNum)
+	result, err := msr.Execute(sql, hostIP, portNum)
 	if err != nil {
-		return constant.EmptyString, err
+		return constant.ZeroInt, err
 	}
 
-	return result.GetString(constant.ZeroInt, constant.ZeroInt)
+	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
-// Create creates data with given entity in the middleware
-func (msr *MySQLServerRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
+// Create creates data with given mysqlServer in the middleware
+func (msr *MySQLServerRepo) Create(mysqlServer metadata.MySQLServer) (metadata.MySQLServer, error) {
 	sql := `
 		insert into t_meta_mysql_server_info(
 			cluster_id, server_name, host_ip, port_num, deployment_type, version) 
@@ -139,34 +206,34 @@ func (msr *MySQLServerRepo) Create(entity dependency.Entity) (dependency.Entity,
 	log.Debugf("metadata MySQLServerRepo.Create() insert sql: %s", sql)
 	// execute
 	_, err := msr.Execute(sql,
-		entity.(*MySQLServerInfo).ClusterID,
-		entity.(*MySQLServerInfo).ServerName,
-		entity.(*MySQLServerInfo).HostIP,
-		entity.(*MySQLServerInfo).PortNum,
-		entity.(*MySQLServerInfo).DeploymentType,
-		entity.(*MySQLServerInfo).Version,
+		mysqlServer.GetClusterID(),
+		mysqlServer.GetServerName(),
+		mysqlServer.GetHostIP(),
+		mysqlServer.GetPortNum(),
+		mysqlServer.GetDeploymentType(),
+		mysqlServer.GetVersion(),
 	)
 	if err != nil {
 		return nil, err
 	}
 	// get id
-	id, err := msr.GetID(entity)
+	id, err := msr.GetID(mysqlServer.GetHostIP(), mysqlServer.GetPortNum())
 	if err != nil {
 		return nil, err
 	}
-	// get entity
+	// get mysqlServer
 	return msr.GetByID(id)
 }
 
-// Update updates data with given entity in the middleware
-func (msr *MySQLServerRepo) Update(entity dependency.Entity) error {
+// Update updates data with given mysqlServer in the middleware
+func (msr *MySQLServerRepo) Update(mysqlServer metadata.MySQLServer) error {
 	sql := `
 		update t_meta_mysql_server_info set 
 			cluster_id = ?, server_name = ?, host_ip = ?, port_num = ?, deployment_type = ?, 
 			version = ?, del_flag = ? 
 		where id = ?;`
 	log.Debugf("metadata MySQLServerRepo.Update() update sql: %s", sql)
-	mysqlServerInfo := entity.(*MySQLServerInfo)
+	mysqlServerInfo := mysqlServer.(*MySQLServerInfo)
 	_, err := msr.Execute(sql,
 		mysqlServerInfo.ClusterID,
 		mysqlServerInfo.ServerName,
@@ -182,14 +249,9 @@ func (msr *MySQLServerRepo) Update(entity dependency.Entity) error {
 
 // Delete deletes data in the middleware, it is recommended to use soft deletion,
 // therefore use update instead of delete
-func (msr *MySQLServerRepo) Delete(id string) error {
-	sql := `update t_meta_mysql_server_info set del_flag = 1 where id = ?;`
-	log.Debugf("metadata MySQLServerRepo.Delete() update sql: %s", sql)
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return err
-	}
-	_, err = msr.Execute(sql, idInt)
-
+func (msr *MySQLServerRepo) Delete(id int) error {
+	sql := `delete from t_meta_mysql_server_info where id = ?;`
+	log.Debugf("metadata MySQLServerRepo.Delete() delete sql(t_meta_mysql_server_info): %s", sql)
+	_, err := msr.Execute(sql, id)
 	return err
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/romberli/go-util/middleware"
 )
 
+// MySQLServer is the entity interface
 type MySQLServer interface {
 	// Identity returns the identity
 	Identity() int
@@ -37,6 +38,7 @@ type MySQLServer interface {
 	MarshalJSONWithFields(fields ...string) ([]byte, error)
 }
 
+// MySQLServerRepo is the repository interface
 type MySQLServerRepo interface {
 	// Execute executes given command and placeholders on the mysql
 	Execute(command string, args ...interface{}) (middleware.Result, error)
@@ -60,6 +62,7 @@ type MySQLServerRepo interface {
 	Delete(id int) error
 }
 
+// MySQLServerService is the service interface
 type MySQLServerService interface {
 	// GetMySQLServers returns mysql servers of the service
 	GetMySQLServers() []MySQLServer
@@ -70,14 +73,14 @@ type MySQLServerService interface {
 	// GetByID gets a mysql server of the given id from the mysql
 	GetByID(id int) error
 	// GetByHostInfo gets a mysql server with given host ip and port number
-	GetByHostInfo(hostIP string, portNum int) (MySQLServer, error)
+	GetByHostInfo(hostIP string, portNum int) error
 	// Create creates a mysql server in the mysql
 	Create(fields map[string]interface{}) error
 	// Update gets a mysql server of the given id from the mysql,
 	// and then updates its fields that was specified in fields argument,
 	// key is the filed name and value is the new field value,
 	// it saves the changes to the mysql
-	Update(id int, fields map[string]interface{})
+	Update(id int, fields map[string]interface{}) error
 	// Delete deletes the mysql server of given id in the mysql
 	Delete(id int) error
 	// Marshal marshals MySQLServerService.MySQLServers to json bytes

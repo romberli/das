@@ -2,13 +2,13 @@ package metadata
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
+	"github.com/romberli/das/internal/dependency/metadata"
 	"github.com/romberli/das/pkg/message"
-
-	"github.com/romberli/das/internal/dependency"
 )
 
 const (
@@ -16,21 +16,20 @@ const (
 	middlewareClusterIDStruct = "MiddlewareClusterID"
 	monitorSystemIDStruct     = "MonitorSystemID"
 	ownerIDStruct             = "OwnerID"
-	ownerGroupStruct          = "OwnerGroup"
 	envIDStruct               = "EnvID"
 )
 
-var _ dependency.Service = (*MySQLClusterService)(nil)
+var _ metadata.MySQLClusterService = (*MySQLClusterService)(nil)
 
 // MySQLClusterService implements Service interface
 type MySQLClusterService struct {
-	dependency.Repository
-	Entities []dependency.Entity
+	MySQLClusterRepo metadata.MySQLClusterRepo
+	MySQLClusters    []metadata.MySQLCluster
 }
 
 // NewMySQLClusterService returns a new *MySQLClusterService
-func NewMySQLClusterService(repo dependency.Repository) *MySQLClusterService {
-	return &MySQLClusterService{repo, []dependency.Entity{}}
+func NewMySQLClusterService(repo metadata.MySQLClusterRepo) *MySQLClusterService {
+	return &MySQLClusterService{repo, []metadata.MySQLCluster{}}
 }
 
 // NewMySQLClusterServiceWithDefault returns a new *MySQLClusterService with default repository
@@ -38,32 +37,62 @@ func NewMySQLClusterServiceWithDefault() *MySQLClusterService {
 	return NewMySQLClusterService(NewMySQLClusterRepoWithGlobal())
 }
 
-// GetEntities returns entities of the service
-func (mcs *MySQLClusterService) GetEntities() []dependency.Entity {
-	entityList := make([]dependency.Entity, len(mcs.Entities))
-	for i := range entityList {
-		entityList[i] = mcs.Entities[i]
+// GetMySQLClusters returns entities of the service
+func (mcs *MySQLClusterService) GetMySQLClusters() []metadata.MySQLCluster {
+	mysqlClusterList := make([]metadata.MySQLCluster, len(mcs.MySQLClusters))
+	for i := range mysqlClusterList {
+		mysqlClusterList[i] = mcs.MySQLClusters[i]
 	}
 
-	return entityList
+	return mysqlClusterList
 }
 
 // GetAll gets all mysql cluster entities from the middleware
 func (mcs *MySQLClusterService) GetAll() error {
 	var err error
-	mcs.Entities, err = mcs.Repository.GetAll()
+	mcs.MySQLClusters, err = mcs.MySQLClusterRepo.GetAll()
+
+	return err
+}
+
+// GetByEnv gets mysql clusters of given env id
+func (mcs *MySQLClusterService) GetByEnv(envID int) error {
+	var err error
+
+	mcs.MySQLClusters, err = mcs.MySQLClusterRepo.GetByEnv(envID)
 
 	return err
 }
 
 // GetByID gets an mysql cluster entity that contains the given id from the middleware
-func (mcs *MySQLClusterService) GetByID(id string) error {
-	entity, err := mcs.Repository.GetByID(id)
+func (mcs *MySQLClusterService) GetByID(id int) error {
+	mysqlCluster, err := mcs.MySQLClusterRepo.GetByID(id)
 	if err != nil {
 		return err
 	}
 
-	mcs.Entities = append(mcs.Entities, entity)
+	mcs.MySQLClusters = append(mcs.MySQLClusters, mysqlCluster)
+
+	return err
+}
+
+// GetByName gets a mysql cluster of given cluster name
+func (mcs *MySQLClusterService) GetByName(clusterName string) error {
+	mysqlCluster, err := mcs.MySQLClusterRepo.GetByName(clusterName)
+
+	mcs.MySQLClusters = append(mcs.MySQLClusters, mysqlCluster)
+
+	return err
+}
+
+// GetMySQLServerIDList gets the mysql server id list of given cluster id
+func (mcs *MySQLClusterService) GetMySQLServerIDList(clusterID int) error {
+	mysqlCluster, err := mcs.MySQLClusterRepo.GetMySQLServerIDList(clusterID)
+	if err != nil {
+		return err
+	}
+
+	mcs.MySQLClusters = append(mcs.MySQLClusters, mysqlCluster)
 
 	return err
 }
@@ -71,36 +100,30 @@ func (mcs *MySQLClusterService) GetByID(id string) error {
 // Create creates a new mysql cluster entity and insert it into the middleware
 func (mcs *MySQLClusterService) Create(fields map[string]interface{}) error {
 	// generate new map
-	if _, ok := fields[clusterNameStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, clusterNameStruct)
+	_, clusterNameExists := fields[clusterNameStruct]
+	_, envIDExists := fields[envIDStruct]
+
+	if !clusterNameExists || !envIDExists {
+		return message.NewMessage(
+			message.ErrFieldNotExists,
+			fmt.Sprintf(
+				"%s and %s",
+				clusterNameStruct,
+				envIDStruct))
 	}
-	if _, ok := fields[middlewareClusterIDStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, middlewareClusterIDStruct)
-	}
-	if _, ok := fields[monitorSystemIDStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, monitorSystemIDStruct)
-	}
-	if _, ok := fields[ownerIDStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, ownerIDStruct)
-	}
-	if _, ok := fields[ownerGroupStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, ownerGroupStruct)
-	}
-	if _, ok := fields[envIDStruct]; !ok {
-		return message.NewMessage(message.ErrFieldNotExists, envIDStruct)
-	}
+
 	// create a new entity
 	mysqlClusterInfo, err := NewMySQLClusterInfoWithMapAndRandom(fields)
 	if err != nil {
 		return err
 	}
 	// insert into middleware
-	entity, err := mcs.Repository.Create(mysqlClusterInfo)
+	mysqlCluster, err := mcs.MySQLClusterRepo.Create(mysqlClusterInfo)
 	if err != nil {
 		return err
 	}
 
-	mcs.Entities = append(mcs.Entities, entity)
+	mcs.MySQLClusters = append(mcs.MySQLClusters, mysqlCluster)
 	return nil
 }
 
@@ -108,38 +131,38 @@ func (mcs *MySQLClusterService) Create(fields map[string]interface{}) error {
 // and then update its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
-func (mcs *MySQLClusterService) Update(id string, fields map[string]interface{}) error {
+func (mcs *MySQLClusterService) Update(id int, fields map[string]interface{}) error {
 	err := mcs.GetByID(id)
 	if err != nil {
 		return err
 	}
-	err = mcs.Entities[constant.ZeroInt].Set(fields)
+	err = mcs.MySQLClusters[constant.ZeroInt].Set(fields)
 	if err != nil {
 		return err
 	}
 
-	return mcs.Repository.Update(mcs.Entities[constant.ZeroInt])
+	return mcs.MySQLClusterRepo.Update(mcs.MySQLClusters[constant.ZeroInt])
 }
 
 // Delete deletes the mysql cluster entity that contains the given id in the middleware
-func (mcs *MySQLClusterService) Delete(id string) error {
-	return mcs.Repository.Delete(id)
+func (mcs *MySQLClusterService) Delete(id int) error {
+	return mcs.MySQLClusterRepo.Delete(id)
 }
 
 // Marshal marshals service.Envs
 func (mcs *MySQLClusterService) Marshal() ([]byte, error) {
-	return json.Marshal(mcs.Entities)
+	return json.Marshal(mcs.MySQLClusters)
 }
 
 // MarshalWithFields marshals service.Envs with given fields
 func (mcs *MySQLClusterService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(mcs.Entities))
+	interfaceList := make([]interface{}, len(mcs.MySQLClusters))
 	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(mcs.Entities[i], fields...)
+		mysqlCluster, err := common.CopyStructWithFields(mcs.MySQLClusters[i], fields...)
 		if err != nil {
 			return nil, err
 		}
-		interfaceList[i] = entity
+		interfaceList[i] = mysqlCluster
 	}
 
 	return json.Marshal(interfaceList)
