@@ -171,7 +171,7 @@ func initConfig() error {
 			return multierror.Append(message.NewMessage(message.ErrAbsoluteLogFilePath), err)
 		}
 	}
-	_, _, err = log.InitLogger(fileNameAbs, level, format, maxSize, maxDays, maxBackups)
+	_, _, err = log.InitFileLogger(fileNameAbs, level, format, maxSize, maxDays, maxBackups)
 	if err != nil {
 		return multierror.Append(message.NewMessage(message.ErrInitLogger), err)
 	}
