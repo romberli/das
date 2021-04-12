@@ -19,9 +19,7 @@ const (
 	mcIDJSON          = "id"
 	mcEnvIDJSON       = "env_id"
 	mcClusterNameJSON = "name"
-)
 
-const (
 	mcIDStruct                  = "ID"
 	mcClusterNameStruct         = "ClusterName"
 	mcMiddlewareClusterIDStruct = "MiddlewareClusterID"

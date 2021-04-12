@@ -1,19 +1,19 @@
 ### get all appsystems
-GET http://127.0.0.1:6090/api/v1/metadata/app-system
+GET http://{{baseURL}}/api/v1/metadata/app-system
 Accept: application/json
 
 ### get appsystem by id
-GET http://127.0.0.1:6090/api/v1/metadata/app-system/66
+GET http://{{baseURL}}/api/v1/metadata/app-system/66
 Accept: application/json
 
 ### add new appsystem
-POST http://127.0.0.1:6090/api/v1/metadata/app-system
+POST http://{{baseURL}}/api/v1/metadata/app-system
 Content-Type: application/json
 
 {"system_name": "tes123t123123123","level":1,"owner_id":1,"owner_group":"k"}
 
 ### get appsystem by id
-POST http://127.0.0.1:6090/api/v1/metadata/app-system/66
+POST http://{{baseURL}}/api/v1/metadata/app-system/66
 Content-Type: application/json
 
 {"system_name": "1", "del_flag":0}
