@@ -35,7 +35,7 @@ type EnvRepo interface {
 	// GetAll gets all environments from the middleware
 	GetAll() ([]Env, error)
 	// GetByID gets an environment by the identity from the middleware
-	GetByID(id string) (Env, error)
+	GetByID(id int) (Env, error)
 	// GetID gets the identity with given environment name from the middleware
 	GetID(envName string) (int, error)
 	// GetEnvByName gets Env of given environment name
@@ -63,7 +63,7 @@ type EnvService interface {
 	// and then updates its fields that was specified in fields argument,
 	// key is the filed name and value is the new field value,
 	// it saves the changes to the middleware
-	Update(id int, fields map[string]interface{})
+	Update(id int, fields map[string]interface{}) error
 	// Delete deletes the environment of given id in the middleware
 	Delete(id int) error
 	// Marshal marshals EnvService.Envs to json bytes

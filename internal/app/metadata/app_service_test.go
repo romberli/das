@@ -19,6 +19,9 @@ func TestAppServiceAll(t *testing.T) {
 	TestAppService_Delete(t)
 	TestAppService_Marshal(t)
 	TestAppService_MarshalWithFields(t)
+	TestAppService_DeleteDB(t)
+	TestAppService_AddDB(t)
+	TestAppService_GetDBIDList(t)
 }
 
 func TestAppService_GetEntities(t *testing.T) {
@@ -128,4 +131,35 @@ func TestAppService_MarshalWithFields(t *testing.T) {
 	// delete
 	err = deleteAppByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
+}
+
+func TestAppService_AddDB(t *testing.T) {
+	asst := assert.New(t)
+	entity, err := createApp()
+	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	s := NewAppService(appRepo)
+	dbID, err := entity.GetDBIDList()
+	asst.Nil(err, common.CombineMessageWithError("entity.GetDBIDList() failed", err))
+	err = s.AddDB(entity.Identity(), dbID[0])
+	asst.Nil(err, common.CombineMessageWithError("test AddDB() failed", err))
+}
+
+func TestAppService_DeleteDB(t *testing.T) {
+	asst := assert.New(t)
+	entity, err := createApp()
+	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	s := NewAppService(appRepo)
+	dbID, err := entity.GetDBIDList()
+	asst.Nil(err, common.CombineMessageWithError("entity.GetDBIDList() failed", err))
+	err = s.DeleteDB(entity.Identity(), dbID[0])
+	asst.Nil(err, common.CombineMessageWithError("test DeleteDB() failed", err))
+}
+
+func TestAppService_GetDBIDList(t *testing.T) {
+	asst := assert.New(t)
+	entity, err := createApp()
+	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	s := NewAppService(appRepo)
+	err = s.GetDBIDList(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetDBIDList() failed", err))
 }

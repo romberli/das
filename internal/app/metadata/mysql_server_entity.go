@@ -88,17 +88,17 @@ func NewEmptyMySQLServerInfoWithGlobal() *MySQLServerInfo {
 func NewMySQLServerInfoWithDefault(
 	clusterID int,
 	serverName string,
-	hostIP string, 
+	hostIP string,
 	portNum int,
 	deploymentType int) *MySQLServerInfo {
 	return &MySQLServerInfo{
-		Repository: NewMySQLServerRepoWithGlobal(),
-		ClusterID: clusterID,
-		ServerName: serverName,
-		HostIP:     hostIP,
-		PortNum:    portNum,
+		Repository:     NewMySQLServerRepoWithGlobal(),
+		ClusterID:      clusterID,
+		ServerName:     serverName,
+		HostIP:         hostIP,
+		PortNum:        portNum,
 		DeploymentType: deploymentType,
-		Version: constant.DefaultRandomString,
+		Version:        constant.DefaultRandomString,
 	}
 }
 

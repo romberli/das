@@ -50,8 +50,6 @@ type UserRepo interface {
 	GetByName(userName string) ([]User, error)
 	// GetByID gets a user by the identity from the middleware
 	GetByID(id int) (User, error)
-	// GetByEmployeeID gets a user of given employee id from the middleware
-	GetByEmployeeID(employeeID string) (User, error)
 	// GetByAccountName gets a user of given account name from the middleware
 	GetByAccountName(accountName string) (User, error)
 	// GetByEmail gets a user of given email from the middleware
@@ -60,14 +58,16 @@ type UserRepo interface {
 	GetByTelephone(telephone string) (User, error)
 	// GetByTelephone gets a user of given mobile from the middleware
 	GetByMobile(mobile string) (User, error)
-	// GetID gets the identity with given employee id from the middleware
-	GetID(employeeID string) (int, error)
+	// GetID gets the identity with given accountName from the middleware
+	GetID(accountName string) (int, error)
 	// Create creates a user in the middleware
 	Create(db User) (User, error)
 	// Update updates a user in the middleware
 	Update(db User) error
 	// Delete deletes a user in the middleware
 	Delete(id int) error
+	// GetByEmployeeID gets a user of given employee id from the middleware
+	GetByEmployeeID(employeeID string) (User, error)
 }
 
 type UserService interface {
@@ -79,8 +79,6 @@ type UserService interface {
 	GetByName(userName string) error
 	// GetByID gets a user by the identity
 	GetByID(id int) error
-	// GetByEmployeeID gets a user of given employee id
-	GetByEmployeeID(employeeID string) error
 	// GetByAccountName gets a user of given account name
 	GetByAccountName(accountName string) error
 	// GetByEmail gets a user of given email
@@ -102,4 +100,6 @@ type UserService interface {
 	Marshal() ([]byte, error)
 	// MarshalWithFields marshals only specified fields of the UserService to json bytes
 	MarshalWithFields(fields ...string) ([]byte, error)
+	// GetByEmployeeID gets a user of given employee id
+	GetByEmployeeID(employeeID string) error
 }

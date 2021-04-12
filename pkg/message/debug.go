@@ -5,11 +5,6 @@ import (
 )
 
 const (
-	DebugMetadataGetEnvAll  = 100301
-	DebugMetadataGetEnvByID = 100302
-	DebugMetadataAddEnv     = 100303
-	DebugMetadataUpdateEnv  = 100304
-
 	DebugMetadataGetMiddlewareClusterAll  = 100501
 	DebugMetadataGetMiddlewareClusterByID = 100502
 	DebugMetadataAddMiddlewareCluster     = 100503
@@ -30,11 +25,6 @@ const (
 	DebugMetadataAddMySQLServer     = 100803
 	DebugMetadataUpdateMySQLServer  = 100804
 
-	DebugMetadataGetUserAll  = 100901
-	DebugMetadataGetUserByID = 100902
-	DebugMetadataAddUser     = 100903
-	DebugMetadataUpdateUser  = 100904
-
 	DebugMetadataGetMonitorSystemAll  = 100601
 	DebugMetadataGetMonitorSystemByID = 100602
 	DebugMetadataAddMonitorSystem     = 100603
@@ -42,10 +32,6 @@ const (
 )
 
 func initDebugMessage() {
-	Messages[DebugMetadataGetEnvAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetEnvAll, "metadata: get all environments message: %s")
-	Messages[DebugMetadataGetEnvByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetEnvByID, "metadata: get environment by id message: %s")
-	Messages[DebugMetadataAddEnv] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddEnv, "metadata: add new environment message: %s")
-	Messages[DebugMetadataUpdateEnv] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateEnv, "metadata: update environment message: %s")
 
 	Messages[DebugMetadataGetMySQLClusterAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMySQLClusterAll, "metadata: get all mysql clusters message: %s")
 	Messages[DebugMetadataGetMySQLClusterByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMySQLClusterByID, "metadata: get mysql cluster by id message: %s")
@@ -66,11 +52,6 @@ func initDebugMessage() {
 	Messages[DebugMetadataGetMiddlewareServerByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMiddlewareServerByID, "metadata: get middleware server by id message: %s")
 	Messages[DebugMetadataAddMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddMiddlewareServer, "metadata: add new middleware server message: %s")
 	Messages[DebugMetadataUpdateMiddlewareServer] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateMiddlewareServer, "metadata: update middleware server message: %s")
-
-	Messages[DebugMetadataGetUserAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetUserAll, "metadata: get all user message: %s")
-	Messages[DebugMetadataGetUserByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetUserByID, "metadata: get user by id message: %s")
-	Messages[DebugMetadataAddUser] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataAddUser, "metadata: add new user message: %s")
-	Messages[DebugMetadataUpdateUser] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataUpdateUser, "metadata: update user message: %s")
 
 	Messages[DebugMetadataGetMonitorSystemAll] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMonitorSystemAll, "metadata: get all monitor systems message: %s")
 	Messages[DebugMetadataGetMonitorSystemByID] = config.NewErrMessage(DefaultMessageHeader, DebugMetadataGetMonitorSystemByID, "metadata: get monitor system by id message: %s")
