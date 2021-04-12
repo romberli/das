@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	addr   = "localhost:3306"
-	dbName = "das"
-	dbUser = "root"
-	dbPass = "123"
+	addr   = "192.168.171.159:3306"
+	dbName = "db_test"
+	dbUser = "tester"
+	dbPass = "mysql.1234"
 )
 
 var _ metadata.MySQLClusterRepo = (*MySQLClusterRepo)(nil)

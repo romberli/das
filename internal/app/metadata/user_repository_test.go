@@ -3,17 +3,23 @@ package metadata
 import (
 	"testing"
 
+	"github.com/romberli/das/internal/dependency/metadata"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/romberli/das/internal/dependency"
 )
 
 const (
-	onlineUserName = "test"
-	newUserName    = "nun"
+	onlineUserName           = "online"
+	newUserName              = "nun"
+	newonlineID              = 2
+	OnlineUserAccountName    = "1"
+	OnlineUserDepartmentName = "1"
+	OnlineUserEmployeeID     = "1"
+	OnlineUserEmail          = "1"
+	OnlineUserTelephone      = "1"
+	OnlineUserMobile         = "1"
 )
 
 var userRepo = initUserRepo()
@@ -28,7 +34,7 @@ func initUserRepo() *UserRepo {
 	return NewUserRepo(pool)
 }
 
-func createUser() (dependency.Entity, error) {
+func createUser() (metadata.User, error) {
 	userInfo := NewUserInfoWithDefault(
 		defaultUserInfoUserName,
 		defaultUserInfoDepartmentName,
@@ -47,7 +53,7 @@ func createUser() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteUserByID(id string) error {
+func deleteUserByID(id int) error {
 	sql := `delete from t_meta_user_info where id = ?`
 	_, err := userRepo.Execute(sql, id)
 	return err
@@ -60,6 +66,86 @@ func TestUserRepoAll(t *testing.T) {
 	TestUserRepo_Create(t)
 	TestUserRepo_Update(t)
 	TestUserRepo_Delete(t)
+	TestUserRepo_GetByName(t)
+	TestUserRepo_GetByAccountName(t)
+	TestUserRepo_GetByEmail(t)
+	TestUserRepo_GetByTelephone(t)
+	TestUserRepo_GetByMobile(t)
+	TestUserRepo_GetID(t)
+	TestUserRepo_GetByEmployeeID(t)
+}
+
+func TestUserRepo_GetByName(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := userRepo.GetByName(onlineUserName)
+	asst.Nil(err, common.CombineMessageWithError("test GetByName() failed", err))
+	userName := entity[0].GetUserName()
+	asst.Nil(err, common.CombineMessageWithError("test GetByName() failed", err))
+	asst.Equal(onlineUserName, userName, "test GetByName() failed")
+}
+
+func TestUserRepo_GetByAccountName(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := userRepo.GetByAccountName(OnlineUserAccountName)
+	asst.Nil(err, common.CombineMessageWithError("test GetByAccountName failed", err))
+	userName := entity.GetUserName()
+	asst.Nil(err, common.CombineMessageWithError("test GetByAccountName failed", err))
+	asst.Equal(onlineUserName, userName, "test GetByAccountName failed")
+}
+
+func TestUserRepo_GetByEmail(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := userRepo.GetByEmail(OnlineUserEmail)
+	asst.Nil(err, common.CombineMessageWithError("test GetByEmail failed", err))
+	userName := entity.GetUserName()
+	asst.Nil(err, common.CombineMessageWithError("test GetByEmail failed", err))
+	asst.Equal(onlineUserName, userName, "test GetByEmail failed")
+
+}
+
+func TestUserRepo_GetByTelephone(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := userRepo.GetByTelephone(OnlineUserTelephone)
+	asst.Nil(err, common.CombineMessageWithError("test GetByTelephone failed", err))
+	userName := entity.GetUserName()
+	asst.Nil(err, common.CombineMessageWithError("test GetByTelephone failed", err))
+	asst.Equal(onlineUserName, userName, "test GetByTelephone failed")
+}
+
+func TestUserRepo_GetByMobile(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := userRepo.GetByMobile(OnlineUserMobile)
+	asst.Nil(err, common.CombineMessageWithError("test GetByMobile failed", err))
+	userName := entity.GetUserName()
+	asst.Nil(err, common.CombineMessageWithError("test GetByMobile failed", err))
+	asst.Equal(onlineUserName, userName, "test GetByMobile failed")
+}
+
+func TestUserRepo_GetID(t *testing.T) {
+	asst := assert.New(t)
+
+	UserID, err := userRepo.GetID(OnlineUserAccountName)
+	asst.Nil(err, common.CombineMessageWithError("test GetID failed", err))
+	entity, err := userRepo.GetByID(UserID)
+	asst.Nil(err, common.CombineMessageWithError("test GetID failed", err))
+	userAccountName := entity.GetAccountName()
+	asst.Equal(OnlineUserAccountName, userAccountName, "test GetID failed")
+
+}
+
+func TestUserRepo_GetByEmployeeID(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := userRepo.GetByEmployeeID(OnlineUserEmployeeID)
+	asst.Nil(err, common.CombineMessageWithError("test GetByEmployeeID failed", err))
+	userName := entity.GetUserName()
+	asst.Nil(err, common.CombineMessageWithError("test GetByEmployeeID failed", err))
+	asst.Equal(onlineUserName, userName, "test GetByEmployeeID failed")
 }
 
 func TestUserRepo_Execute(t *testing.T) {
@@ -108,7 +194,7 @@ func TestUserRepo_Transaction(t *testing.T) {
 	entities, err := userRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		userName, err := entity.Get(userNameStruct)
+		userName := entity.GetUserName()
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 		if userName == defaultUserInfoUserName {
 			asst.Fail("test Transaction() failed")
@@ -122,19 +208,19 @@ func TestUserRepo_GetAll(t *testing.T) {
 
 	entities, err := userRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	userName, err := entities[0].Get("UserName")
+	userName := entities[0].GetUserName()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(onlineUserName, userName.(string), "test GetAll() failed")
+	asst.Equal(onlineUserName, userName, "test GetAll() failed")
 }
 
 func TestUserRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := userRepo.GetByID("66")
+	entity, err := userRepo.GetByID(2)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	userName, err := entity.Get(userNameStruct)
+	userName := entity.GetUserName()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(onlineUserName, userName.(string), "test GetByID() failed")
+	asst.Equal(onlineUserName, userName, "test GetByID() failed")
 }
 
 func TestUserRepo_Create(t *testing.T) {
@@ -144,7 +230,8 @@ func TestUserRepo_Create(t *testing.T) {
 
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteUserByID(entity.Identity())
+	id := entity.Identity()
+	err = deleteUserByID(id)
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
@@ -159,7 +246,7 @@ func TestUserRepo_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	entity, err = userRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	userName, err := entity.Get(userNameStruct)
+	userName := entity.GetUserName()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(newUserName, userName, "test Update() failed")
 	// delete

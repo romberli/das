@@ -1,0 +1,69 @@
+### GetUser
+GET http://127.0.0.1:6090/api/v1/metadata/user
+Content-Type: application/json
+
+### GetUserByName
+GET http://127.0.0.1:6090/api/v1/metadata/user/user-name/user_name
+Content-Type: application/json
+
+### GetUserByID
+GET http://127.0.0.1:6090/api/v1/metadata/user/get/5
+Content-Type: application/json
+
+### GetUserByEmployeeID
+GET http://127.0.0.1:6090/api/v1/metadata/user/employee-id/employee_id
+Content-Type: application/json
+
+### GetUserByAccountName
+GET http://127.0.0.1:6090/api/v1/metadata/user/account-name/account_name
+Content-Type: application/json
+
+### GetUserByEmail
+GET http://127.0.0.1:6090/api/v1/metadata/user/email/email
+Content-Type: application/json
+
+### GetUserByTelephone
+GET http://127.0.0.1:6090/api/v1/metadata/user/telephone/telephone
+Content-Type: application/json
+
+### GetUserByMobile
+GET http://127.0.0.1:6090/api/v1/metadata/user/mobile/mobile
+Content-Type: application/json
+
+### AddUser 
+POST http://127.0.0.1:6090/api/v1/metadata/user
+Content-Type: application/json
+
+ {"department_name": "department_name","employee_id": "employee_id21", "telephone": "telephone","role": 2,"del_flag": 0,"user_name": "user_name21","account_name": "account_na1me2","email": "emai12l","mobile": "mobile" }
+
+### UpdateUserByID
+POST http://127.0.0.1:6090/api/v1/metadata/user/update/3
+Content-Type: application/json
+
+  {"department_name": "department_name","employee_id": "employee_id2", "telephone": "telephone","role": 2,"del_flag": 0,"user_name": "user_name2","account_name": "account_name2","email": "emai2l","mobile": "mobile" }
+
+### DeleteUserByID
+POST http://127.0.0.1:6090/api/v1/metadata/user/delete/1
+Content-Type: application/json
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        	
+        
