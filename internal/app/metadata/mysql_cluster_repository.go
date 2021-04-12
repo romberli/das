@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware"
@@ -10,17 +9,17 @@ import (
 	"github.com/romberli/log"
 
 	"github.com/romberli/das/global"
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
 const (
-	addr   = "localhost:3306"
-	dbName = "das"
-	dbUser = "root"
-	dbPass = "123"
+	addr   = "192.168.171.159:3306"
+	dbName = "db_test"
+	dbUser = "tester"
+	dbPass = "mysql.1234"
 )
 
-var _ dependency.Repository = (*MySQLClusterRepo)(nil)
+var _ metadata.MySQLClusterRepo = (*MySQLClusterRepo)(nil)
 
 // MySQLClusterRepo implements Repository interface
 type MySQLClusterRepo struct {
@@ -37,7 +36,7 @@ func NewMySQLClusterRepoWithGlobal() *MySQLClusterRepo {
 	return NewMySQLClusterRepo(global.MySQLPool)
 }
 
-// Execute implements dependency.Repository interface,
+// Execute implements metadata.MySQLClusterRepo interface,
 // it executes command with arguments on database
 func (mcr *MySQLClusterRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
 	conn, err := mcr.Database.Get()
@@ -60,10 +59,10 @@ func (mcr *MySQLClusterRepo) Transaction() (middleware.Transaction, error) {
 }
 
 // GetAll returns all available entities
-func (mcr *MySQLClusterRepo) GetAll() ([]dependency.Entity, error) {
+func (mcr *MySQLClusterRepo) GetAll() ([]metadata.MySQLCluster, error) {
 	sql := `
 		select id, cluster_name, middleware_cluster_id, monitor_system_id, 
-			owner_id, owner_group, env_id, del_flag, create_time, last_update_time
+			owner_id, env_id, del_flag, create_time, last_update_time
 		from t_meta_mysql_cluster_info
 		where del_flag = 0
 		order by id;
@@ -84,25 +83,61 @@ func (mcr *MySQLClusterRepo) GetAll() ([]dependency.Entity, error) {
 	if err != nil {
 		return nil, err
 	}
-	// init []dependency.Entity
-	entityList := make([]dependency.Entity, result.RowNumber())
-	for i := range entityList {
-		entityList[i] = mysqlClusterInfoList[i]
+	// init []metadata.MySQLCluster
+	mysqlClusterList := make([]metadata.MySQLCluster, result.RowNumber())
+	for i := range mysqlClusterList {
+		mysqlClusterList[i] = mysqlClusterInfoList[i]
 	}
 
-	return entityList, nil
+	return mysqlClusterList, nil
+}
+
+// GetByEnv gets mysql clusters of given env id from the middleware
+func (mcr *MySQLClusterRepo) GetByEnv(envID int) ([]metadata.MySQLCluster, error) {
+	sql := `
+		select id, cluster_name, middleware_cluster_id, monitor_system_id, 
+			owner_id, env_id, del_flag, create_time, last_update_time
+		from t_meta_mysql_cluster_info
+		where del_flag = 0
+		and env_id = ?;
+	`
+	log.Debugf("metadata MySQLServerRepo.GetByEnv() sql: \n%s\nplaceholders: %s", sql, envID)
+
+	result, err := mcr.Execute(sql, envID)
+	if err != nil {
+		return nil, err
+	}
+
+	resultNum := result.RowNumber()
+	mysqlClusterList := make([]metadata.MySQLCluster, resultNum)
+
+	for row := 0; row < resultNum; row++ {
+		mysqlClusterID, err := result.GetInt(row, constant.ZeroInt)
+		if err != nil {
+			return nil, err
+		}
+
+		mysqlCluster, err := mcr.GetByID(mysqlClusterID)
+		if err != nil {
+			return nil, err
+		}
+
+		mysqlClusterList = append(mysqlClusterList, mysqlCluster)
+	}
+
+	return mysqlClusterList, nil
 }
 
 // GetByID Select returns an available entity of the given id
-func (mcr *MySQLClusterRepo) GetByID(id string) (dependency.Entity, error) {
+func (mcr *MySQLClusterRepo) GetByID(id int) (metadata.MySQLCluster, error) {
 	sql := `
 		select id, cluster_name, middleware_cluster_id, monitor_system_id, 
-			owner_id, owner_group, env_id, del_flag, create_time, last_update_time
+			owner_id, env_id, del_flag, create_time, last_update_time
 		from t_meta_mysql_cluster_info
 		where del_flag = 0
 		and id = ?;
 	`
-	log.Debugf("metadata MySQLClusterRepo.GetByID() sql: \n%s\nplaceholders: %s", sql, id)
+	log.Debugf("metadata MySQLClusterRepo.GetByID() sql: \n%s\nplaceholders: %d", sql, id)
 
 	result, err := mcr.Execute(sql, id)
 	if err != nil {
@@ -110,7 +145,7 @@ func (mcr *MySQLClusterRepo) GetByID(id string) (dependency.Entity, error) {
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, fmt.Errorf("metadata MySQLClusterInfo.GetByID(): data does not exists, id: %s", id)
+		return nil, fmt.Errorf("metadata MySQLClusterInfo.GetByID(): data does not exists, id: %d", id)
 	case 1:
 		mysqlClusterInfo := NewEmptyMySQLClusterInfoWithGlobal()
 		// map to struct
@@ -121,42 +156,107 @@ func (mcr *MySQLClusterRepo) GetByID(id string) (dependency.Entity, error) {
 
 		return mysqlClusterInfo, nil
 	default:
-		return nil, fmt.Errorf("metadata MySQLClusterInfo.GetByID(): duplicate key exists, id: %s", id)
+		return nil, fmt.Errorf("metadata MySQLClusterInfo.GetByID(): duplicate key exists, id: %d", id)
+	}
+}
+
+// GetByName gets a mysql cluster of given cluster name from the middle ware
+func (mcr *MySQLClusterRepo) GetByName(clusterName string) (metadata.MySQLCluster, error) {
+	sql := `
+		select id, cluster_name, middleware_cluster_id, monitor_system_id, 
+			owner_id, env_id, del_flag, create_time, last_update_time
+		from t_meta_mysql_cluster_info where del_flag = 0 and cluster_name = ?;
+	`
+	log.Debugf("metadata MySQLClusterRepo.GetByName() select sql: %s", sql)
+	result, err := mcr.Execute(sql, clusterName)
+	if err != nil {
+		return nil, err
+	}
+	switch result.RowNumber() {
+	case 0:
+		return nil, fmt.Errorf("metadata MySQLClusterInfo.GetByID(): data does not exists, clusterName: %s", clusterName)
+	case 1:
+		mysqlClusterInfo := NewEmptyMySQLClusterInfoWithGlobal()
+		// map to struct
+		err = result.MapToStructByRowIndex(mysqlClusterInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+		if err != nil {
+			return nil, err
+		}
+
+		return mysqlClusterInfo, nil
+	default:
+		return nil, fmt.Errorf("metadata MySQLClusterInfo.GetByID(): duplicate key exists, clusterName: %s", clusterName)
 	}
 }
 
 // GetID checks identity of given entity from the middleware
-func (mcr *MySQLClusterRepo) GetID(entity dependency.Entity) (string, error) {
+func (mcr *MySQLClusterRepo) GetID(clusterName string) (int, error) {
 	sql := `select id from t_meta_mysql_cluster_info where del_flag = 0 and cluster_name = ?;`
 	log.Debugf("metadata MySQLClusterRepo.GetID() select sql: %s", sql)
-	result, err := mcr.Execute(sql, entity.(*MySQLClusterInfo).ClusterName)
+	result, err := mcr.Execute(sql, clusterName)
 	if err != nil {
-		return constant.EmptyString, err
+		return constant.ZeroInt, err
 	}
 
-	return result.GetString(constant.ZeroInt, constant.ZeroInt)
+	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
-// Create creates data with given entity in the middleware
-func (mcr *MySQLClusterRepo) Create(entity dependency.Entity) (dependency.Entity, error) {
+// GetMySQLServerIDList gets the mysql server id list of given cluster id
+func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) (metadata.MySQLCluster, error) {
 	sql := `
-		insert into t_meta_mysql_cluster_info(cluster_name,middleware_cluster_id,
-			 monitor_system_id, owner_id, owner_group, env_id) 
-		values(?,?,?,?,?,?);`
-	log.Debugf("metadata MySQLClusterRepo.Create() insert sql: %s", sql)
-	// execute
-	_, err := mcr.Execute(sql,
-		entity.(*MySQLClusterInfo).ClusterName,
-		entity.(*MySQLClusterInfo).MiddlewareClusterID,
-		entity.(*MySQLClusterInfo).MonitorSystemID,
-		entity.(*MySQLClusterInfo).OwnerID,
-		entity.(*MySQLClusterInfo).OwnerGroup,
-		entity.(*MySQLClusterInfo).EnvID)
+		select id from t_meta_mysql_server_info where del_flag = 0 and cluster_id = ?;
+	`
+	log.Debugf("metadata MySQLClusterRepo.GetMySQLServerIDList() select sql: %s", sql)
+	result, err := mcr.Execute(sql, clusterID)
 	if err != nil {
 		return nil, err
 	}
-	// get id
-	id, err := mcr.GetID(entity)
+
+	resultNum := result.RowNumber()
+	log.Debugf(fmt.Sprint(resultNum))
+	mysqlServerIDList := make([]int, resultNum)
+
+	for row := 0; row < resultNum; row++ {
+		mysqlServerID, err := result.GetInt(row, constant.ZeroInt)
+		if err != nil {
+			return nil, err
+		}
+
+		mysqlServerIDList[row] = mysqlServerID
+	}
+	log.Debugf(fmt.Sprint(mysqlServerIDList))
+
+	mysqlCluster, err := mcr.GetByID(clusterID)
+
+	fields := make(map[string]interface{})
+
+	fields["MySQLServerIDList"] = mysqlServerIDList
+
+	mysqlCluster.Set(fields)
+
+	return mysqlCluster, nil
+
+}
+
+// Create creates data with given entity in the middleware
+func (mcr *MySQLClusterRepo) Create(mysqlCluster metadata.MySQLCluster) (metadata.MySQLCluster, error) {
+	sql := `
+		insert into t_meta_mysql_cluster_info(cluster_name,middleware_cluster_id,
+			 monitor_system_id, owner_id, env_id) 
+		values(?,?,?,?,?);`
+	log.Debugf("metadata MySQLClusterRepo.Create() insert sql: %s", sql)
+	// execute
+	_, err := mcr.Execute(sql,
+		mysqlCluster.GetClusterName(),
+		mysqlCluster.GetMiddlewareClusterID(),
+		mysqlCluster.GetMonitorSystemID(),
+		mysqlCluster.GetOwnerID(),
+		mysqlCluster.GetEnvID())
+	if err != nil {
+		return nil, err
+	}
+	// getclusterID
+	id, err := mcr.GetID(mysqlCluster.GetClusterName())
 	if err != nil {
 		return nil, err
 	}
@@ -165,10 +265,10 @@ func (mcr *MySQLClusterRepo) Create(entity dependency.Entity) (dependency.Entity
 }
 
 // Update updates data with given entity in the middleware
-func (mcr *MySQLClusterRepo) Update(entity dependency.Entity) error {
+func (mcr *MySQLClusterRepo) Update(entity metadata.MySQLCluster) error {
 	sql := `
 		update t_meta_mysql_cluster_info set cluster_name = ?, middleware_cluster_id = ?, 
-			monitor_system_id = ?, owner_id = ?, owner_group = ?, 
+			monitor_system_id = ?, owner_id = ?, 
 			env_id = ?, del_flag = ? 
 		where id = ?;`
 	log.Debugf("metadata MySQLClusterRepo.Update() update sql: %s", sql)
@@ -178,7 +278,6 @@ func (mcr *MySQLClusterRepo) Update(entity dependency.Entity) error {
 		mysqlClusterInfo.MiddlewareClusterID,
 		mysqlClusterInfo.MonitorSystemID,
 		mysqlClusterInfo.OwnerID,
-		mysqlClusterInfo.OwnerGroup,
 		mysqlClusterInfo.EnvID,
 		mysqlClusterInfo.DelFlag, mysqlClusterInfo.ID)
 
@@ -187,14 +286,10 @@ func (mcr *MySQLClusterRepo) Update(entity dependency.Entity) error {
 
 // Delete deletes data in the middleware, it is recommended to use soft deletion,
 // therefore use update instead of delete
-func (mcr *MySQLClusterRepo) Delete(id string) error {
-	sql := `update t_meta_mysql_cluster_info set del_flag = 1 where id = ?;`
-	log.Debugf("metadata MySQLClusterRepo.Delete() update sql: %s", sql)
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return err
-	}
-	_, err = mcr.Execute(sql, idInt)
+func (mcr *MySQLClusterRepo) Delete(id int) error {
+	sql := `delete from t_meta_mysql_cluster_info where id = ?;`
+	log.Debugf("metadata MySQLCLusterRepo.Delete() delete sql(t_meta_mysql_cluster_info): %s", sql)
 
+	_, err := mcr.Execute(sql, id)
 	return err
 }

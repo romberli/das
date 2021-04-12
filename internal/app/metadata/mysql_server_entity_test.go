@@ -3,7 +3,6 @@ package metadata
 import (
 	"encoding/json"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/jinzhu/now"
@@ -59,9 +58,6 @@ func equalMySQLServerInfo(a, b *MySQLServerInfo) bool {
 
 func TestMySQLServerEntityAll(t *testing.T) {
 	TestMySQLServerInfo_Identity(t)
-	TestMySQLServerInfo_IsDeleted(t)
-	TestMySQLServerInfo_GetCreateTime(t)
-	TestMySQLServerInfo_GetLastUpdateTime(t)
 	TestMySQLServerInfo_Get(t)
 	TestMySQLServerInfo_Set(t)
 	TestMySQLServerInfo_Delete(t)
@@ -73,28 +69,7 @@ func TestMySQLServerInfo_Identity(t *testing.T) {
 	asst := assert.New(t)
 
 	mysqlServerInfo := initNewMySQLServerInfo()
-	asst.Equal(strconv.Itoa(defaultMySQLServerInfoID), mysqlServerInfo.Identity(), "test Identity() failed")
-}
-
-func TestMySQLServerInfo_IsDeleted(t *testing.T) {
-	asst := assert.New(t)
-
-	mysqlServerInfo := initNewMySQLServerInfo()
-	asst.False(mysqlServerInfo.IsDeleted(), "test IsDeleted() failed")
-}
-
-func TestMySQLServerInfo_GetCreateTime(t *testing.T) {
-	asst := assert.New(t)
-
-	mysqlServerInfo := initNewMySQLServerInfo()
-	asst.True(reflect.DeepEqual(mysqlServerInfo.CreateTime, mysqlServerInfo.GetCreateTime()), "test GetCreateTime failed")
-}
-
-func TestMySQLServerInfo_GetLastUpdateTime(t *testing.T) {
-	asst := assert.New(t)
-
-	mysqlServerInfo := initNewMySQLServerInfo()
-	asst.True(reflect.DeepEqual(mysqlServerInfo.LastUpdateTime, mysqlServerInfo.GetLastUpdateTime()), "test GetLastUpdateTime() failed")
+	asst.Equal(defaultMySQLServerInfoID, mysqlServerInfo.Identity(), "test Identity() failed")
 }
 
 func TestMySQLServerInfo_Get(t *testing.T) {
@@ -102,25 +77,29 @@ func TestMySQLServerInfo_Get(t *testing.T) {
 
 	mysqlServerInfo := initNewMySQLServerInfo()
 
-	clusterID, err := mysqlServerInfo.Get(clusterIDStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(mysqlServerInfo.ClusterID, clusterID, "test Get() failed")
+	clusterID := mysqlServerInfo.GetClusterID()
+	asst.Equal(mysqlServerInfo.ClusterID, clusterID, "test GetClusterID() failed")
 
-	hostIP, err := mysqlServerInfo.Get(hostIPStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(mysqlServerInfo.HostIP, hostIP, "test Get() failed")
+	hostIP := mysqlServerInfo.GetHostIP()
+	asst.Equal(mysqlServerInfo.HostIP, hostIP, "test GetHostIP() failed")
 
-	portNum, err := mysqlServerInfo.Get(portNumStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(mysqlServerInfo.PortNum, portNum, "test Get() failed")
+	portNum := mysqlServerInfo.GetPortNum()
+	asst.Equal(mysqlServerInfo.PortNum, portNum, "test GetPortNum() failed")
 
-	deploymentType, err := mysqlServerInfo.Get(deploymentTypeStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(mysqlServerInfo.DeploymentType, deploymentType, "test Get() failed")
+	deploymentType := mysqlServerInfo.GetDeploymentType()
+	asst.Equal(mysqlServerInfo.DeploymentType, deploymentType, "test GetDeploymentType() failed")
 
-	version, err := mysqlServerInfo.Get(versionStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Get() failed", err))
-	asst.Equal(mysqlServerInfo.Version, version, "test Get() failed")
+	version := mysqlServerInfo.GetVersion()
+	asst.Equal(mysqlServerInfo.Version, version, "test GetVersion() failed")
+
+	delFlag := mysqlServerInfo.GetDelFlag()
+	asst.Equal(mysqlServerInfo.DelFlag, delFlag, "test GetDelFlag() failed")
+
+	createTime := mysqlServerInfo.GetCreateTime()
+	asst.True(reflect.DeepEqual(mysqlServerInfo.CreateTime, createTime), "test GetCreateTime() failed")
+
+	lastUpdateTime := mysqlServerInfo.GetLastUpdateTime()
+	asst.True(reflect.DeepEqual(mysqlServerInfo.LastUpdateTime, lastUpdateTime), "test GetLastUpdateTime() failed")
 }
 
 func TestMySQLServerInfo_Set(t *testing.T) {
@@ -159,7 +138,7 @@ func TestMySQLServerInfo_Delete(t *testing.T) {
 
 	mysqlServerInfo := initNewMySQLServerInfo()
 	mysqlServerInfo.Delete()
-	asst.True(mysqlServerInfo.IsDeleted(), "test Delete() failed")
+	asst.Equal(1, mysqlServerInfo.GetDelFlag(), "test Delete() failed")
 }
 
 func TestMySQLServerInfo_MarshalJSON(t *testing.T) {

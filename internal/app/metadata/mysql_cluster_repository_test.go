@@ -8,7 +8,7 @@ import (
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
 const (
@@ -32,7 +32,7 @@ func initMySQLClusterRepo() *MySQLClusterRepo {
 	return NewMySQLClusterRepo(pool)
 }
 
-func createMySQLCluster() (dependency.Entity, error) {
+func createMySQLCluster() (metadata.MySQLCluster, error) {
 	mysqlClusterInfo := NewMySQLClusterInfoWithDefault(
 		defaultMySQLClusterInfoClusterName,
 		defaultMySQLClusterInfoEnvID)
@@ -44,7 +44,7 @@ func createMySQLCluster() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteMySQLClusterByID(id string) error {
+func deleteMySQLClusterByID(id int) error {
 	sql := `delete from t_meta_mysql_cluster_info where id = ?`
 	_, err := mysqlClusterRepo.Execute(sql, id)
 	return err
@@ -52,9 +52,14 @@ func deleteMySQLClusterByID(id string) error {
 
 func TestMySQLClusterRepoAll(t *testing.T) {
 	TestMySQLClusterRepo_Execute(t)
+	TestMySQLClusterRepo_Transaction(t)
 	TestMySQLClusterRepo_Create(t)
 	TestMySQLClusterRepo_GetAll(t)
+	TestMySQLClusterRepo_GetByEnv(t)
 	TestMySQLClusterRepo_GetByID(t)
+	TestMySQLClusterRepo_GetByName(t)
+	TestMySQLClusterRepo_GetID(t)
+	TestMySQLClusterRepo_GetMySQLServerIDList(t)
 	TestMySQLClusterRepo_Update(t)
 	TestMySQLClusterRepo_Delete(t)
 }
@@ -76,8 +81,8 @@ func TestMySQLClusterRepo_Transaction(t *testing.T) {
 	sql := `
 	insert into t_meta_mysql_cluster_info(
 		id, cluster_name, middleware_cluster_id, monitor_system_id, 
-		owner_id, owner_group, env_id) 
-	values(?,?,?,?,?,?,?);`
+		owner_id, env_id) 
+	values(?,?,?,?,?,?);`
 
 	tx, err := mysqlClusterRepo.Transaction()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
@@ -89,7 +94,6 @@ func TestMySQLClusterRepo_Transaction(t *testing.T) {
 		defaultMySQLClusterInfoMiddlewareClusterID,
 		defaultMySQLClusterInfoMonitorSystemID,
 		defaultMySQLClusterInfoOwnerID,
-		defaultMySQLClusterInfoOwnerGroup,
 		defaultMySQLClusterInfoEnvID)
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	// check if inserted
@@ -107,8 +111,7 @@ func TestMySQLClusterRepo_Transaction(t *testing.T) {
 	entities, err := mysqlClusterRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, entity := range entities {
-		mysqlClusterName, err := entity.Get(clusterNameStruct)
-		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
+		mysqlClusterName := entity.GetClusterName()
 		if mysqlClusterName == testTransactionClusterName {
 			asst.Fail("test Transaction() failed")
 			break
@@ -122,8 +125,8 @@ func TestMySQLClusterRepo_GetAll(t *testing.T) {
 	sql := `
 	insert into t_meta_mysql_cluster_info(
 		id, cluster_name, middleware_cluster_id, monitor_system_id, 
-		owner_id, owner_group, env_id) 
-	values(?,?,?,?,?,?,?);`
+		owner_id, env_id) 
+	values(?,?,?,?,?,?);`
 
 	// init data avoid empty set
 	_, err := mysqlClusterRepo.Execute(sql,
@@ -132,25 +135,64 @@ func TestMySQLClusterRepo_GetAll(t *testing.T) {
 		defaultMySQLClusterInfoMiddlewareClusterID,
 		defaultMySQLClusterInfoMonitorSystemID,
 		defaultMySQLClusterInfoOwnerID,
-		defaultMySQLClusterInfoOwnerGroup,
 		defaultMySQLClusterInfoEnvID)
 	// asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 
 	entities, err := mysqlClusterRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	mysqlClusterName, err := entities[0].Get("ClusterName")
-	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(testInitClusterName, mysqlClusterName.(string), "test GetAll() failed")
+	mysqlClusterName := entities[0].GetClusterName()
+	asst.Equal(testInitClusterName, mysqlClusterName, "test GetAll() failed")
+}
+
+func TestMySQLClusterRepo_GetByEnv(t *testing.T) {
+	asst := assert.New(t)
+
+	entitys, err := mysqlClusterRepo.GetByEnv(testInitClusterID)
+	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
+
+	for _, entity := range entitys {
+		clusterName := entity.GetClusterName()
+		asst.Equal(testInitClusterName, clusterName, "test GetByEnv() failed")
+	}
 }
 
 func TestMySQLClusterRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := mysqlClusterRepo.GetByID("1")
+	entity, err := mysqlClusterRepo.GetByID(testInitClusterID)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	mysqlClusterName, err := entity.Get(clusterNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(testInitClusterName, mysqlClusterName.(string), "test GetByID() failed")
+	mysqlClusterName := entity.GetClusterName()
+	asst.Equal(testInitClusterName, mysqlClusterName, "test GetByID() failed")
+}
+
+func TestMySQLClusterRepo_GetByName(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := mysqlClusterRepo.GetByName(testInitClusterName)
+	asst.Nil(err, common.CombineMessageWithError("test GetByName() failed", err))
+	clusterName := entity.GetClusterName()
+	asst.Equal(testInitClusterName, clusterName, "test GetByName() failed")
+}
+
+func TestMySQLClusterRepo_GetID(t *testing.T) {
+	asst := assert.New(t)
+
+	id, err := mysqlClusterRepo.GetID(testInitClusterName)
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	asst.NotEqual(0, id, "test GetID() failed")
+}
+
+func TestMySQLClusterRepo_GetMySQLServerIDList(t *testing.T) {
+	asst := assert.New(t)
+
+	mysqlServerIDList, err := mysqlClusterRepo.GetMySQLServerIDList(testInitClusterID)
+	// mysqlServerIDList, err := mysqlClusterRepo.GetMySQLServerIDList(97)
+	asst.Nil(err, common.CombineMessageWithError("test GetMySQLServerIDList() failed", err))
+	for _, mysqlServerID := range mysqlServerIDList {
+		mysqlServer, err := mysqlServerRepo.GetByID(mysqlServerID)
+		asst.Nil(err, common.CombineMessageWithError("test GetMySQLServerIDList() failed", err))
+		asst.Equal(mysqlServer.GetClusterID(), testInitClusterID, "test GetMySQLServerIDList() failed", err)
+	}
 }
 
 func TestMySQLClusterRepo_Create(t *testing.T) {
@@ -174,8 +216,7 @@ func TestMySQLClusterRepo_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	entity, err = mysqlClusterRepo.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	mysqlClusterName, err := entity.Get(clusterNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	mysqlClusterName := entity.GetClusterName()
 	asst.Equal(testUpdateClusterName, mysqlClusterName, "test Update() failed")
 	// delete
 	err = deleteMySQLClusterByID(entity.Identity())

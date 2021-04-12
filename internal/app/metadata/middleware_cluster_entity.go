@@ -1,21 +1,26 @@
 package metadata
 
 import (
-	"strconv"
+	"github.com/romberli/das/internal/dependency/metadata"
 	"time"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
-
-	"github.com/romberli/das/internal/dependency"
 )
 
-var _ dependency.Entity = (*MiddlewareClusterInfo)(nil)
+const (
+	middlewareClusterNameStruct    = "ClusterName"
+	middlewareClusterOwnerIDStruct = "OwnerID"
+	middlewareClusterEnvIDStruct   = "EnvID"
+)
+
+var _ metadata.MiddlewareCluster = (*MiddlewareClusterInfo)(nil)
 
 type MiddlewareClusterInfo struct {
-	dependency.Repository
+	metadata.MiddlewareClusterRepo
 	ID             int       `middleware:"id" json:"id"`
 	ClusterName    string    `middleware:"cluster_name" json:"cluster_name"`
+	OwnerID        int       `middleware:"owner_id" json:"owner_id"`
 	EnvID          int       `middleware:"env_id" json:"env_id"`
 	DelFlag        int       `middleware:"del_flag" json:"del_flag"`
 	CreateTime     time.Time `middleware:"create_time" json:"create_time"`
@@ -23,11 +28,12 @@ type MiddlewareClusterInfo struct {
 }
 
 // NewMiddlewareClusterInfo returns a new MiddlewareClusterInfo
-func NewMiddlewareClusterInfo(repo *MiddlewareClusterRepo, id int, middlewareClusterName string, envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareClusterInfo {
+func NewMiddlewareClusterInfo(repo metadata.MiddlewareClusterRepo, id int, middlewareClusterName string, ownerID int, envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareClusterInfo {
 	return &MiddlewareClusterInfo{
 		repo,
 		id,
 		middlewareClusterName,
+		ownerID,
 		envID,
 		delFlag,
 		createTime,
@@ -36,11 +42,12 @@ func NewMiddlewareClusterInfo(repo *MiddlewareClusterRepo, id int, middlewareClu
 }
 
 // NewMiddlewareClusterInfo returns a new MiddlewareClusterInfo with default MiddlewareClusterRepo
-func NewMiddlewareClusterInfoWithGlobal(id int, middlewareClusterName string, envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareClusterInfo {
+func NewMiddlewareClusterInfoWithGlobal(id int, middlewareClusterName string, ownerID int, envID int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *MiddlewareClusterInfo {
 	return &MiddlewareClusterInfo{
 		NewMiddlewareClusterRepoWithGlobal(),
 		id,
 		middlewareClusterName,
+		ownerID,
 		envID,
 		delFlag,
 		createTime,
@@ -48,16 +55,18 @@ func NewMiddlewareClusterInfoWithGlobal(id int, middlewareClusterName string, en
 	}
 }
 
+// NewEmptyMiddlewareClusterInfoWithGlobal retuen a new MiddlewareClusterInfo
 func NewEmptyMiddlewareClusterInfoWithGlobal() *MiddlewareClusterInfo {
-	return &MiddlewareClusterInfo{Repository: NewMiddlewareClusterRepoWithGlobal()}
+	return &MiddlewareClusterInfo{MiddlewareClusterRepo: NewMiddlewareClusterRepoWithGlobal()}
 }
 
 // NewMiddlewareClusterInfoWithDefault returns a new MiddlewareClusterInfo with default MiddlewareClusterRepo
-func NewMiddlewareClusterInfoWithDefault(middlewareClusterName string, envID int) *MiddlewareClusterInfo {
+func NewMiddlewareClusterInfoWithDefault(middlewareClusterName string, ownerID, envID int) *MiddlewareClusterInfo {
 	return &MiddlewareClusterInfo{
-		Repository:  NewMiddlewareClusterRepoWithGlobal(),
-		ClusterName: middlewareClusterName,
-		EnvID:       envID,
+		MiddlewareClusterRepo: NewMiddlewareClusterRepoWithGlobal(),
+		ClusterName:           middlewareClusterName,
+		OwnerID:               ownerID,
+		EnvID:                 envID,
 	}
 }
 
@@ -73,13 +82,28 @@ func NewMiddlewareClusterInfoWithMapAndRandom(fields map[string]interface{}) (*M
 }
 
 // Identity returns ID of entity
-func (mci *MiddlewareClusterInfo) Identity() string {
-	return strconv.Itoa(mci.ID)
+func (mci *MiddlewareClusterInfo) Identity() int {
+	return mci.ID
 }
 
-// IsDeleted checks if delete flag had been set
-func (mci *MiddlewareClusterInfo) IsDeleted() bool {
-	return mci.DelFlag != constant.ZeroInt
+// GetClusterName returns the cluster name
+func (mci *MiddlewareClusterInfo) GetClusterName() string {
+	return mci.ClusterName
+}
+
+// GetOwnerID returns the owner id
+func (mci *MiddlewareClusterInfo) GetOwnerID() int {
+	return mci.OwnerID
+}
+
+// GetEnvID returns the env id
+func (mci *MiddlewareClusterInfo) GetEnvID() int {
+	return mci.EnvID
+}
+
+// GetDelFlag returns the delete flag
+func (mci *MiddlewareClusterInfo) GetDelFlag() int {
+	return mci.DelFlag
 }
 
 // GetCreateTime returns created time of entity
@@ -92,9 +116,9 @@ func (mci *MiddlewareClusterInfo) GetLastUpdateTime() time.Time {
 	return mci.LastUpdateTime
 }
 
-// Get returns value of given field
-func (mci *MiddlewareClusterInfo) Get(field string) (interface{}, error) {
-	return common.GetValueOfStruct(mci, field)
+// GetMiddlewareServerIDList gets the middleware server id list of this cluster
+func (mci *MiddlewareClusterInfo) GetMiddlewareServerIDList() ([]int, error) {
+	return mci.MiddlewareClusterRepo.GetMiddlewareServerIDList(mci.Identity())
 }
 
 // Set sets entity with given fields, key is the field name and value is the relevant value of the key
@@ -105,7 +129,6 @@ func (mci *MiddlewareClusterInfo) Set(fields map[string]interface{}) error {
 			return err
 		}
 	}
-
 	return nil
 }
 

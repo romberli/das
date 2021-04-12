@@ -11,24 +11,26 @@ import (
 )
 
 func TestMiddlewareServerServiceAll(t *testing.T) {
-	TestMiddlewareClusterService_GetEntities(t)
-	TestMiddlewareClusterService_GetAll(t)
-	TestMiddlewareClusterService_GetByID(t)
-	TestMiddlewareClusterService_Create(t)
-	TestMiddlewareClusterService_Update(t)
-	TestMiddlewareClusterService_Delete(t)
-	TestMiddlewareClusterService_Marshal(t)
-	TestMiddlewareClusterService_MarshalWithFields(t)
+	TestMiddlewareServerService_GetMiddlewareServers(t)
+	TestMiddlewareServerService_GetAll(t)
+	TestMiddlewareServerService_GetByClusterID(t)
+	TestMiddlewareServerService_GetByID(t)
+	TestMiddlewareServerService_GetByHostInfo(t)
+	TestMiddlewareServerService_Create(t)
+	TestMiddlewareServerService_Update(t)
+	TestMiddlewareServerService_Delete(t)
+	TestMiddlewareServerService_Marshal(t)
+	TestMiddlewareServerService_MarshalWithFields(t)
 }
 
-func TestMiddlewareServerService_GetEntities(t *testing.T) {
+func TestMiddlewareServerService_GetMiddlewareServers(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMiddlewareServerService(middlewareServerRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
+	asst.Nil(err, "test GetMiddlewareServers() failed")
+	entities := s.GetMiddlewareServers()
+	asst.Greater(len(entities), constant.ZeroInt, "test GetMiddlewareServers() failed")
 }
 
 func TestMiddlewareServerService_GetAll(t *testing.T) {
@@ -36,19 +38,39 @@ func TestMiddlewareServerService_GetAll(t *testing.T) {
 
 	s := NewMiddlewareServerService(middlewareServerRepo)
 	err := s.GetAll()
-	asst.Nil(err, "test GetEnvs() failed")
-	entities := s.GetEntities()
-	asst.Greater(len(entities), constant.ZeroInt, "test GetEnvs() failed")
+	asst.Nil(err, "test GetAll() failed")
+	entities := s.GetMiddlewareServers()
+	asst.Greater(len(entities), constant.ZeroInt, "test GetAll() failed")
+}
+
+func TestMiddlewareServerService_GetByClusterID(t *testing.T) {
+	asst := assert.New(t)
+
+	s := NewMiddlewareServerService(middlewareServerRepo)
+	err := s.GetByClusterID(13)
+	asst.Nil(err, "test GetByClusterID() failed")
+	clusterID := s.MiddlewareServers[constant.ZeroInt].GetClusterID()
+	asst.Equal(13, clusterID, "test GetByClusterID() failed")
 }
 
 func TestMiddlewareServerService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewMiddlewareServerService(middlewareServerRepo)
-	err := s.GetByID("2")
+	err := s.GetByID(1)
 	asst.Nil(err, "test GetByID() failed")
-	id := s.Entities[constant.ZeroInt].Identity()
-	asst.Equal("2", id, "test GetByID() failed")
+	id := s.MiddlewareServers[constant.ZeroInt].Identity()
+	asst.Equal(1, id, "test GetByID() failed")
+}
+
+func TestMiddlewareServerService_GetByHostInfo(t *testing.T) {
+	asst := assert.New(t)
+
+	s := NewMiddlewareServerService(middlewareServerRepo)
+	err := s.GetByHostInfo("1", 1)
+	asst.Nil(err, "test GetByHostInfo() failed")
+	id := s.MiddlewareServers[constant.ZeroInt].Identity()
+	asst.Equal(1, id, "test GetByHostInfo() failed")
 }
 
 func TestMiddlewareServerService_Create(t *testing.T) {
@@ -59,12 +81,12 @@ func TestMiddlewareServerService_Create(t *testing.T) {
 		middlewareServerClusterIDStruct:      defaultMiddlewareServerInfoClusterID,
 		middlewareServerNameStruct:           defaultMiddlewareServerInfoServerName,
 		middlewareServerMiddlewareRoleStruct: defaultMiddlewareServerInfoMiddlewareRole,
-		middlewareServerHostIPStruct:         defaultMiddlewareServerInfoSHostIP,
+		middlewareServerHostIPStruct:         defaultMiddlewareServerInfoHostIP,
 		middlewareServerPortNumStruct:        defaultMiddlewareServerInfoPortNum,
 	})
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 	// delete
-	err = deleteMiddlewareClusterByID(s.Entities[0].Identity())
+	err = deleteMiddlewareServerByID(s.MiddlewareServers[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Create() failed", err))
 }
 
@@ -79,11 +101,10 @@ func TestMiddlewareServerService_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	err = s.GetByID(entity.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	middlewareServerName, err := s.GetEntities()[constant.ZeroInt].Get(middlewareServerNameStruct)
-	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
+	middlewareServerName := s.GetMiddlewareServers()[constant.ZeroInt].GetServerName()
 	asst.Equal(newMiddlewareServerName, middlewareServerName)
 	// delete
-	err = deleteMiddlewareServerByID(s.Entities[0].Identity())
+	err = deleteMiddlewareServerByID(s.MiddlewareServers[0].Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 }
 
@@ -112,11 +133,11 @@ func TestMiddlewareServerService_Marshal(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
 	err = json.Unmarshal(data, &entitiesUnmarshal)
 	asst.Nil(err, common.CombineMessageWithError("test Marshal() failed", err))
-	entities := s.GetEntities()
+	entities := s.GetMiddlewareServers()
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		entityUnmarshal := entitiesUnmarshal[i]
-		asst.True(middlewareServerStuctEqual(entity.(*MiddlewareServerInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
+		asst.True(middlewareServerStructEqual(entity.(*MiddlewareServerInfo), entityUnmarshal), common.CombineMessageWithError("test Marshal() failed", err))
 	}
 }
 

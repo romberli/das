@@ -53,7 +53,7 @@ func (ar *AppRepo) Transaction() (middleware.Transaction, error) {
 // GetAll gets all apps from the middleware
 func (ar *AppRepo) GetAll() ([]metadata.App, error) {
 	sql := `
-		select id, app_name, level,owner_id, del_flag, create_time, last_update_time
+		select id, app_name, level, owner_id, del_flag, create_time, last_update_time
 		from t_meta_app_info
 		where del_flag = 0
 		order by id;
@@ -101,6 +101,7 @@ func (ar *AppRepo) GetByID(id int) (metadata.App, error) {
 	case 0:
 		return nil, errors.New(fmt.Sprintf("metadata AppInfo.GetByID(): data does not exists, id: %d", id))
 	case 1:
+		//appInfo := NewEmptyAppInfoWithRepo(ar)
 		appInfo := NewEmptyAppInfoWithGlobal()
 		// map to struct
 		err = result.MapToStructByRowIndex(appInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)

@@ -8,17 +8,18 @@ import (
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/romberli/das/internal/dependency"
+	"github.com/romberli/das/internal/dependency/metadata"
 )
 
 const (
 	// modify these connection information
-	envAddr       = "192.168.137.11:3306"
-	envDBName     = "das"
-	envDBUser     = "root"
-	envDBPass     = "root"
+	envAddr       = "192.168.171.159:3306"
+	envDBName     = "db_test"
+	envDBUser     = "tester"
+	envDBPass     = "mysql.1234"
 	newEnvName    = "newTest"
-	onlineEnvName = "test"
+	onlineEnvName = "rel"
+	onlineID      = 2
 )
 
 var envRepo = initEnvRepo()
@@ -33,7 +34,7 @@ func initEnvRepo() *EnvRepo {
 	return NewEnvRepo(pool)
 }
 
-func createEnv() (dependency.Entity, error) {
+func createEnv() (metadata.Env, error) {
 	envInfo := NewEnvInfoWithDefault(defaultEnvInfoEnvName)
 	entity, err := envRepo.Create(envInfo)
 	if err != nil {
@@ -43,7 +44,7 @@ func createEnv() (dependency.Entity, error) {
 	return entity, nil
 }
 
-func deleteEnvByID(id string) error {
+func deleteEnvByID(id int) error {
 	sql := `delete from t_meta_env_info where id = ?`
 	_, err := envRepo.Execute(sql, id)
 	return err
@@ -56,6 +57,9 @@ func TestEnvRepoAll(t *testing.T) {
 	TestEnvRepo_Create(t)
 	TestEnvRepo_Update(t)
 	TestEnvRepo_Delete(t)
+	TestEnvRepo_GetID(t)
+	TestEnvRepo_GetEnvByName(t)
+
 }
 
 func TestEnvRepo_Execute(t *testing.T) {
@@ -94,9 +98,9 @@ func TestEnvRepo_Transaction(t *testing.T) {
 	envs, err := envRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
 	for _, env := range envs {
-		envName, err := env.Get(envNameStruct)
+		envName := env.GetEnvName()
 		asst.Nil(err, common.CombineMessageWithError("test Transaction() failed", err))
-		if envName.(string) == defaultEnvInfoEnvName {
+		if envName == defaultEnvInfoEnvName {
 			asst.Fail("test Transaction() failed")
 			break
 		}
@@ -108,19 +112,19 @@ func TestEnvRepo_GetAll(t *testing.T) {
 
 	entities, err := envRepo.GetAll()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	envName, err := entities[0].Get("EnvName")
+	envName := entities[0].GetEnvName()
 	asst.Nil(err, common.CombineMessageWithError("test GetAll() failed", err))
-	asst.Equal(onlineEnvName, envName.(string), "test GetAll() failed")
+	asst.Equal(onlineEnvName, envName, "test GetAll() failed")
 }
 
 func TestEnvRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := envRepo.GetByID("1")
+	entity, err := envRepo.GetByID(2)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	envName, err := entity.Get(envNameStruct)
+	envName := entity.GetEnvName()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
-	asst.Equal(onlineEnvName, envName.(string), "test GetByID() failed")
+	asst.Equal(onlineEnvName, envName, "test GetByID() failed")
 }
 
 func TestEnvRepo_Create(t *testing.T) {
@@ -145,7 +149,7 @@ func TestEnvRepo_Update(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	env, err = envRepo.GetByID(env.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
-	envName, err := env.Get(envNameStruct)
+	envName := env.GetEnvName()
 	asst.Nil(err, common.CombineMessageWithError("test Update() failed", err))
 	asst.Equal(newEnvName, envName, "test Update() failed")
 	// delete
@@ -156,19 +160,33 @@ func TestEnvRepo_Update(t *testing.T) {
 func TestEnvRepo_Delete(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := createEnv()
+	env, err := createEnv()
+	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
+	ID, err := envRepo.GetID(env.GetEnvName())
+	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
+	err = envRepo.Delete(ID)
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 	// delete
-	err = deleteEnvByID(entity.Identity())
+	err = deleteEnvByID(env.Identity())
 	asst.Nil(err, common.CombineMessageWithError("test Delete() failed", err))
 }
 
 func TestEnvRepo_GetEnvByName(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := envRepo.GetEnvByName("online")
+	entity, err := envRepo.GetEnvByName("rel")
 	asst.Nil(err, common.CombineMessageWithError("test GetEnvByName() failed", err))
-	envName, err := entity.Get(envNameStruct)
+	envName := entity.GetEnvName()
 	asst.Nil(err, common.CombineMessageWithError("test GetEnvByName() failed", err))
-	asst.Equal(onlineEnvName, envName.(string), "test GetEnvByName() failed")
+	asst.Equal(onlineEnvName, envName, "test GetEnvByName() failed")
+}
+
+func TestEnvRepo_GetID(t *testing.T) {
+	asst := assert.New(t)
+
+	env, err := envRepo.GetEnvByName("rel")
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	ID, err := envRepo.GetID(env.GetEnvName())
+	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
+	asst.Equal(onlineID, ID, "test GetID() failed")
 }
