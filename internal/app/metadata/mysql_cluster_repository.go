@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	addr   = "192.168.66.143:3306"
+	addr   = "192.168.171.159:3306"
 	dbName = "db_test"
 	dbUser = "tester"
 	dbPass = "mysql.1234"

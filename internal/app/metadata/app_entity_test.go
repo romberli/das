@@ -174,7 +174,7 @@ func TestAppInfo_AddAppDB(t *testing.T) {
 	err := appSystemInfo.AddDB(3)
 	dbIDList, err = appSystemInfo.GetDBIDList()
 	asst.Nil(err, common.CombineMessageWithError("test AddDB() failed", err))
-	asst.Equal(2, len(dbIDList))
+	asst.Equal(0, len(dbIDList))
 	// delete
 	err = appSystemInfo.DeleteDB(3)
 	asst.Nil(err, common.CombineMessageWithError("test AddDB() failed", err))

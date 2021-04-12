@@ -13,13 +13,13 @@ import (
 
 const (
 	// modify these connection information
-	envAddr       = "192.168.66.143:3306"
+	envAddr       = "192.168.171.159:3306"
 	envDBName     = "db_test"
 	envDBUser     = "tester"
 	envDBPass     = "mysql.1234"
 	newEnvName    = "newTest"
-	onlineEnvName = "online"
-	onlineID      = 1
+	onlineEnvName = "rel"
+	onlineID      = 2
 )
 
 var envRepo = initEnvRepo()
@@ -120,7 +120,7 @@ func TestEnvRepo_GetAll(t *testing.T) {
 func TestEnvRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := envRepo.GetByID(1)
+	entity, err := envRepo.GetByID(2)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	envName := entity.GetEnvName()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
@@ -174,7 +174,7 @@ func TestEnvRepo_Delete(t *testing.T) {
 func TestEnvRepo_GetEnvByName(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := envRepo.GetEnvByName("online")
+	entity, err := envRepo.GetEnvByName("rel")
 	asst.Nil(err, common.CombineMessageWithError("test GetEnvByName() failed", err))
 	envName := entity.GetEnvName()
 	asst.Nil(err, common.CombineMessageWithError("test GetEnvByName() failed", err))
@@ -184,7 +184,7 @@ func TestEnvRepo_GetEnvByName(t *testing.T) {
 func TestEnvRepo_GetID(t *testing.T) {
 	asst := assert.New(t)
 
-	env, err := envRepo.GetEnvByName("online")
+	env, err := envRepo.GetEnvByName("rel")
 	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))
 	ID, err := envRepo.GetID(env.GetEnvName())
 	asst.Nil(err, common.CombineMessageWithError("test GetID() failed", err))

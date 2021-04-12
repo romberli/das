@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	appAddr       = "192.168.66.143:3306"
+	appAddr       = "192.168.171.159:3306"
 	appDBName     = "db_test"
 	appDBUser     = "tester"
 	appDBPass     = "mysql.1234"
