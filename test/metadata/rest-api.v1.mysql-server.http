@@ -1,5 +1,3 @@
-### =============== mysql-server ===================
-
 ### get all mysql servers
 GET http://{{baseURL}}/api/v1/metadata/mysql-server
 Accept: application/json
