@@ -169,7 +169,7 @@ func (ar *AppRepo) GetDBIDList(id int) ([]int, error) {
 			return nil, err
 		}
 
-		dbIDList = append(dbIDList, dbID)
+		dbIDList[row] = dbID
 	}
 
 	return dbIDList, nil
@@ -220,7 +220,7 @@ func (ar *AppRepo) Delete(id int) error {
 	if err != nil {
 		return err
 	}
-	sql := `delete from t_meta_app_info where where id = ?;`
+	sql := `delete from t_meta_app_info where id = ?;`
 	log.Debugf("metadata AppRepo.Delete() delete sql(t_meta_app_info): %s", sql)
 	_, err = tx.Execute(sql, id)
 	if err != nil {

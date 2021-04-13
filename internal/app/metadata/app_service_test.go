@@ -48,10 +48,10 @@ func TestAppService_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
 	s := NewAppService(appRepo)
-	err := s.GetByID(66)
+	err := s.GetByID(2)
 	asst.Nil(err, "test GetByID() failed")
 	id := s.Apps[constant.ZeroInt].Identity()
-	asst.Equal("66", id, "test GetByID() failed")
+	asst.Equal("2", id, "test GetByID() failed")
 }
 
 func TestAppService_Create(t *testing.T) {
