@@ -286,8 +286,8 @@ github.com/romberli/dynamic-struct v1.2.1/go.mod h1:Jk2Z0Dm0diV7O4Lg1MfIyJ0kvOxf
 github.com/romberli/go-util v0.2.30 h1:Q00Z6vy/zNgLV3lZaWrtHx5fpkJksgIRX8a25LKAzAg=
 github.com/romberli/go-util v0.2.30/go.mod h1:INkr3YC4A6lyYFuFICdvhPNe8ZawIp3ftah5b/WigTs=
 github.com/romberli/log v1.0.11/go.mod h1:CYX9l+FfZo1JMk12wQLQbhKKzGXXxA6vuY+YyfbiujY=
-github.com/romberli/log v1.0.19 h1:6JKoV+kgHtTrHAHExY2yZx8axVTanFqcjTcBcM+wV1c=
-github.com/romberli/log v1.0.19/go.mod h1:FKhKFdWL5DLD+1LMO/RB4AcO4MUBl1th/pNFjhrmaGc=
+github.com/romberli/log v1.0.20 h1:bOlvkGfy6gHS+zGcJhjwq85t9prcXQUJQaLRANoCFVU=
+github.com/romberli/log v1.0.20/go.mod h1:FKhKFdWL5DLD+1LMO/RB4AcO4MUBl1th/pNFjhrmaGc=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/satori/go.uuid v1.2.0 h1:0uYX9dsZ2yD7q2RtLRtPSdGDWzjeM3TbMJP9utgA0ww=
