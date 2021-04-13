@@ -21,8 +21,9 @@ const (
 	middlewareClusterNameJSON  = "cluster_name"
 	middlewareClusterEnvIDJSON = "env_id"
 
-	middlewareClusterNameStruct  = "ClusterName"
-	middlewareClusterEnvIDStruct = "EnvID"
+	middlewareClusterNameStruct    = "ClusterName"
+	middlewareClusterOwnerIDStruct = "OwnerID"
+	middlewareClusterEnvIDStruct   = "EnvID"
 )
 
 // @Tags middleware cluster
@@ -275,10 +276,11 @@ func UpdateMiddlewareClusterByID(c *gin.Context) {
 		return
 	}
 	_, middlewareClusterNameExists := fields[middlewareClusterNameStruct]
+	_, middlewareClusterOwnerIDExists := fields[middlewareClusterOwnerIDStruct]
 	_, middlewareClusterEnvIDExists := fields[middlewareClusterEnvIDStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !middlewareClusterNameExists && !middlewareClusterEnvIDExists && !delFlagExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", middlewareClusterNameStruct, delFlagStruct))
+	if !middlewareClusterNameExists && !middlewareClusterEnvIDExists && !middlewareClusterOwnerIDExists && !delFlagExists {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s %s %s and %s", middlewareClusterNameStruct, middlewareClusterOwnerIDStruct, middlewareClusterEnvIDStruct, delFlagStruct))
 		return
 	}
 	// init service
