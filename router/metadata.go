@@ -12,7 +12,7 @@ func RegisterMetadata(group *gin.RouterGroup) {
 		// app
 		metadataGroup.GET("/app", metadata.GetApp)
 		metadataGroup.GET("/app/get/:id", metadata.GetAppByID)
-		metadataGroup.GET("/app/app-name/:name", metadata.GetAppByName)
+		metadataGroup.GET("/app/app-name/:app_name", metadata.GetAppByName)
 		metadataGroup.GET("/app/dbs/:id", metadata.GetDBIDList)
 		metadataGroup.POST("/app", metadata.AddApp)
 		metadataGroup.POST("/app/update/:id", metadata.UpdateAppByID)

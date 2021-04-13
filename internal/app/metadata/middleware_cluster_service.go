@@ -84,10 +84,9 @@ func (mcs *MiddlewareClusterService) GetMiddlewareServerIDList(clusterID int) ([
 func (mcs *MiddlewareClusterService) Create(fields map[string]interface{}) error {
 	// generate new map
 	_, clusterNameExists := fields[middlewareClusterNameStruct]
-	_, ownerIDExists := fields[middlewareClusterOwnerIDStruct]
 	_, envIDExists := fields[middlewareClusterEnvIDStruct]
-	if !clusterNameExists || !ownerIDExists || !envIDExists {
-		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s, %s and %s", middlewareClusterNameStruct, middlewareClusterOwnerIDStruct, middlewareClusterNameStruct))
+	if !clusterNameExists || !envIDExists {
+		return message.NewMessage(message.ErrFieldNotExists, fmt.Sprintf("%s and %s", middlewareClusterNameStruct, middlewareClusterNameStruct))
 	}
 	// create a new entity
 	middlewareClusterInfo, err := NewMiddlewareClusterInfoWithMapAndRandom(fields)

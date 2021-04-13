@@ -314,7 +314,7 @@ func DeleteMiddlewareServerByID(c *gin.Context) {
 		return
 	}
 	// init service
-	s := metadata.NewMiddlewareClusterServiceWithDefault()
+	s := metadata.NewMiddlewareServerServiceWithDefault()
 	// update entities
 	err = s.Delete(id)
 	if err != nil {

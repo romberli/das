@@ -315,11 +315,11 @@ func AddUser(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, departmentNameStruct)
 		return
 	}
-	_, ok = fields[employeeIDStruct]
-	if !ok {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, employeeIDStruct)
-		return
-	}
+	// _, ok = fields[employeeIDStruct]
+	// if !ok {
+	// 	resp.ResponseNOK(c, message.ErrFieldNotExists, employeeIDStruct)
+	// 	return
+	// }
 	_, ok = fields[accountNameStruct]
 	if !ok {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, accountNameStruct)
