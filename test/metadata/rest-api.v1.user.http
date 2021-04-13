@@ -1,19 +1,69 @@
-### get all users
+### GetUser
 GET http://{{baseURL}}/api/v1/metadata/user
 Accept: application/json
 
-### get user by id
-GET http://{{baseURL}}/api/v1/metadata/user/66
+### GetUserByName
+GET http://{{baseURL}}/api/v1/metadata/user/user-name/user_name
 Accept: application/json
 
-### add new user
+### GetUserByID
+GET http://{{baseURL}}/api/v1/metadata/user/get/5
+Accept: application/json
+
+### GetUserByEmployeeID
+GET http://{{baseURL}}/api/v1/metadata/user/employee-id/employee_id
+Accept: application/json
+
+### GetUserByAccountName
+GET http://{{baseURL}}/api/v1/metadata/user/account-name/account_name
+Accept: application/json
+
+### GetUserByEmail
+GET http://{{baseURL}}/api/v1/metadata/user/email/email
+Accept: application/json
+
+### GetUserByTelephone
+GET http://{{baseURL}}/api/v1/metadata/user/telephone/telephone
+Accept: application/json
+
+### GetUserByMobile
+GET http://{{baseURL}}/api/v1/metadata/user/mobile/mobile
+Accept: application/json
+
+### AddUser 
 POST http://{{baseURL}}/api/v1/metadata/user
 Content-Type: application/json
 
-{"user_name": "test123","department_name": "1","account_name": "121","employee_id":111232123, "account_name":"1","email":"1","telephone":"1","mobile":"1","role":1 ,"del_flag":0}
+ {"department_name": "department_name","employee_id": "employee_id21", "telephone": "telephone","role": 2,"del_flag": 0,"user_name": "user_name21","account_name": "account_na1me2","email": "emai12l","mobile": "mobile" }
 
-### get user by id
-POST http://{{baseURL}}/api/v1/metadata/user/1
+### UpdateUserByID
+POST http://{{baseURL}}/api/v1/metadata/user/update/3
 Content-Type: application/json
 
-{"user_name": "test","employee_id":1123, "account_name":"1","email":"1","telephone":"1","mobile":"1","role":1 ,"del_flag":0}
+  {"department_name": "department_name","employee_id": "employee_id2", "telephone": "telephone","role": 2,"del_flag": 0,"user_name": "user_name2","account_name": "account_name2","email": "emai2l","mobile": "mobile" }
+
+### DeleteUserByID
+POST http://{{baseURL}}/api/v1/metadata/user/delete/1
+Content-Type: application/json
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        	
+        
