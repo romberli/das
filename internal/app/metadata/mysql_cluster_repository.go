@@ -122,7 +122,7 @@ func (mcr *MySQLClusterRepo) GetByEnv(envID int) ([]metadata.MySQLCluster, error
 			return nil, err
 		}
 
-		mysqlClusterList = append(mysqlClusterList, mysqlCluster)
+		mysqlClusterList[row] = mysqlCluster
 	}
 
 	return mysqlClusterList, nil
