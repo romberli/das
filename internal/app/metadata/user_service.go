@@ -71,10 +71,10 @@ func (us *UserService) Create(fields map[string]interface{}) error {
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, departmentNameStruct)
 	}
-	_, ok = fields[employeeIDStruct]
-	if !ok {
-		return message.NewMessage(message.ErrFieldNotExists, employeeIDStruct)
-	}
+	// _, ok = fields[employeeIDStruct]
+	// if !ok {
+	// 	return message.NewMessage(message.ErrFieldNotExists, employeeIDStruct)
+	// }
 	_, ok = fields[accountNameStruct]
 	if !ok {
 		return message.NewMessage(message.ErrFieldNotExists, accountNameStruct)
