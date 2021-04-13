@@ -1,19 +1,44 @@
-### get all appsystems
-GET http://{{baseURL}}/api/v1/metadata/app-system
+### metadata.GetApp
+GET http://{{baseURL}}/api/v1/metadata/app 
 Accept: application/json
 
-### get appsystem by id
-GET http://{{baseURL}}/api/v1/metadata/app-system/66
+### metadata.GetAppByID
+GET http://{{baseURL}}/api/v1/metadata/app/get/1 
 Accept: application/json
-
-### add new appsystem
-POST http://{{baseURL}}/api/v1/metadata/app-system
-Content-Type: application/json
-
-{"system_name": "tes123t123123123","level":1,"owner_id":1,"owner_group":"k"}
-
-### get appsystem by id
-POST http://{{baseURL}}/api/v1/metadata/app-system/66
-Content-Type: application/json
 
 {"system_name": "1", "del_flag":0}
+
+### metadata.GetAppByName
+GET http://{{baseURL}}/api/v1/metadata/app/app-name/test 
+Accept: application/json
+
+### metadata.GetDBIDList !!!
+GET http://{{baseURL}}/api/v1/metadata/app/dbs/1
+Accept: application/json
+
+### metadata.AddApp
+POST http://{{baseURL}}/api/v1/metadata/app 
+Content-Type: application/json
+
+{"app_name": "tese","level":1,"owner_id":1,"id": 1}
+
+### metadata.UpdateAppByID
+POST http://{{baseURL}}/api/v1/metadata/app/update/6 
+Content-Type: application/json
+
+{"app_name": "tes13123","level":1,"owner_id":1}
+
+### metadata.DeleteAppByID
+POST http://{{baseURL}}/api/v1/metadata/app/delete/14 
+
+### metadata.AppAddDB
+POST http://{{baseURL}}/api/v1/metadata/app/add-db/17
+Content-Type: application/json
+
+{"db_id":1}
+
+### metadata.AppDeleteDB
+POST http://{{baseURL}}/api/v1/metadata/app/delete-db/17
+Content-Type: application/json
+
+{"db_id":1}

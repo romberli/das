@@ -146,6 +146,9 @@ func GetDBIDList(c *gin.Context) {
 		resp.ResponseNOK(c, msgmeta.ErrMetadataGetDBIDList, id, err.Error())
 		return
 	}
+
+	b := s.DBIDList
+	fmt.Println(b)
 	// marshal service
 	jsonBytes, err := s.MarshalWithFields(appDBIDListStruct)
 	if err != nil {
@@ -326,6 +329,7 @@ func AppAddDB(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrGetRawData, err.Error())
 		return
 	}
+
 	dataMap := make(map[string]int)
 	err = json.Unmarshal(data, &dataMap)
 	if err != nil {

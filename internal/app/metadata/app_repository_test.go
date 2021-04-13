@@ -16,7 +16,7 @@ const (
 	appDBName     = "db_test"
 	appDBUser     = "tester"
 	appDBPass     = "mysql.1234"
-	onlineAppName = "1"
+	onlineAppName = "test2"
 	newAppName    = "testApp"
 )
 
@@ -125,7 +125,7 @@ func TestAppRepo_GetAll(t *testing.T) {
 func TestAppRepo_GetByID(t *testing.T) {
 	asst := assert.New(t)
 
-	entity, err := appRepo.GetByID(66)
+	entity, err := appRepo.GetByID(2)
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	systemName := entity.GetAppName()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
