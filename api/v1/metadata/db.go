@@ -156,14 +156,15 @@ func GetAppIDList(c *gin.Context) {
 		return
 	}
 	// marshal service
-	b, err := json.Marshal(s.AppIDList)
+	jsonBytes, err := s.MarshalWithFields(dbAppIDListStruct)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
 		return
 	}
 	// response
-	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetAppIDList, string(b)).Error())
-	resp.ResponseOK(c, string(b), msgmeta.InfoMetadataGetAppIDList, id)
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetAppIDList, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetAppIDList, id)
 }
 
 // @Tags database
