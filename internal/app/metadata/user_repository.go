@@ -32,6 +32,7 @@ func NewUserRepoWithGlobal() *UserRepo {
 
 // Execute implements dependency.Repository interface,
 // it executes command with arguments on database
+// Execute executes given command and placeholders on the middleware
 func (ur *UserRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
 	conn, err := ur.Database.Get()
 	if err != nil {
@@ -47,7 +48,7 @@ func (ur *UserRepo) Execute(command string, args ...interface{}) (middleware.Res
 	return conn.Execute(command, args...)
 }
 
-// GetByName get userinfo by userName
+// GetByName gets users of given user name from the middleware
 func (ur *UserRepo) GetByName(userName string) ([]metadata.User, error) {
 	sql := `
 	select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
@@ -81,12 +82,12 @@ func (ur *UserRepo) GetByName(userName string) ([]metadata.User, error) {
 
 }
 
-// Transaction ..
+// Transaction returns a middleware.Transaction that could execute multiple commands as a transaction
 func (ur *UserRepo) Transaction() (middleware.Transaction, error) {
 	return ur.Database.Transaction()
 }
 
-// GetAll returns all available entities
+// GetAll gets all databases from the middleware
 func (ur *UserRepo) GetAll() ([]metadata.User, error) {
 	sql := `
 	select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
@@ -119,7 +120,7 @@ func (ur *UserRepo) GetAll() ([]metadata.User, error) {
 	return userList, nil
 }
 
-// GetByMobile get userinfo by mobile
+// GetByTelephone gets a user of given mobile from the middleware
 func (ur *UserRepo) GetByMobile(mobile string) (metadata.User, error) {
 	sql := `
 		select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
@@ -150,7 +151,7 @@ func (ur *UserRepo) GetByMobile(mobile string) (metadata.User, error) {
 	}
 }
 
-// GetByTelephone get userinfo by telephone
+// GetByTelephone gets a user of given telephone from the middleware
 func (ur *UserRepo) GetByTelephone(telephone string) (metadata.User, error) {
 	sql := `
 		select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
@@ -181,7 +182,7 @@ func (ur *UserRepo) GetByTelephone(telephone string) (metadata.User, error) {
 	}
 }
 
-// GetByID get userinfo by id
+// GetByID gets a user by the identity from the middleware
 func (ur *UserRepo) GetByID(id int) (metadata.User, error) {
 	sql := `
 		select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
@@ -212,7 +213,7 @@ func (ur *UserRepo) GetByID(id int) (metadata.User, error) {
 	}
 }
 
-// GetByAccountName get userinfo by accountname
+// GetByAccountName gets a user of given account name from the middleware
 func (ur *UserRepo) GetByAccountName(accountName string) (metadata.User, error) {
 	sql := `
 	select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
@@ -243,7 +244,7 @@ func (ur *UserRepo) GetByAccountName(accountName string) (metadata.User, error) 
 	}
 }
 
-// GetByEmail get userinfo by email
+// GetByEmail gets a user of given email from the middleware
 func (ur *UserRepo) GetByEmail(email string) (metadata.User, error) {
 	sql := `
 	select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
@@ -274,7 +275,7 @@ func (ur *UserRepo) GetByEmail(email string) (metadata.User, error) {
 	}
 }
 
-// GetID checks iduser of given accountName from the middleware
+// GetID gets the identity with given accountName from the middleware
 func (ur *UserRepo) GetID(accountName string) (int, error) {
 	sql := `select id from t_meta_user_info where del_flag = 0 and account_name = ?;`
 	log.Debugf("metadata UserRepo.GetID() select sql: %s", sql)
@@ -286,7 +287,7 @@ func (ur *UserRepo) GetID(accountName string) (int, error) {
 	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
-// GetByEmployeeID get userinfo by employeeID
+// GetByEmployeeID gets a user of given employee id from the middleware
 func (ur *UserRepo) GetByEmployeeID(employeeID string) (metadata.User, error) {
 	sql := `
 	select id, user_name, department_name, employee_id, account_name, email, telephone, mobile, role, del_flag, create_time, last_update_time
@@ -317,7 +318,7 @@ func (ur *UserRepo) GetByEmployeeID(employeeID string) (metadata.User, error) {
 	}
 }
 
-// Create creates data with given user in the middleware
+// Create creates a user in the middleware
 func (ur *UserRepo) Create(user metadata.User) (metadata.User, error) {
 	sql := `insert into t_meta_user_info(user_name, department_name, employee_id, account_name, email , telephone , mobile, role) values(?,?,?,?,?,?,?,?);`
 	log.Debugf("metadata UserRepo.Create() insert sql: %s", sql)
@@ -336,7 +337,7 @@ func (ur *UserRepo) Create(user metadata.User) (metadata.User, error) {
 	return ur.GetByID(id)
 }
 
-// Update updates data with given user in the middleware
+/// Update updates a user in the middleware
 func (ur *UserRepo) Update(user metadata.User) error {
 	sql := `update t_meta_user_info set user_name = ?, del_flag = ?, department_name = ?, employee_id = ?, account_name = ?, email = ?, telephone = ?, mobile = ?, role = ? where id = ?;`
 	log.Debugf("metadata UserRepo.Update() update sql: %s", sql)

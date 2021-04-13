@@ -72,7 +72,7 @@ func NewEnvInfoWithMapAndRandom(fields map[string]interface{}) (*EnvInfo, error)
 	return ei, nil
 }
 
-// Identity returns ID of entity
+// Identity returns the identity
 func (ei *EnvInfo) Identity() int {
 	return ei.ID
 }
@@ -82,12 +82,12 @@ func (ei *EnvInfo) Identity() int {
 // 	return ei.DelFlag != constant.ZeroInt
 // }
 
-// GetCreateTime returns created time of entity
+// GetCreateTime returns the create time
 func (ei *EnvInfo) GetCreateTime() time.Time {
 	return ei.CreateTime
 }
 
-// GetLastUpdateTime returns last updated time of entity
+// GetLastUpdateTime returns the last update time
 func (ei *EnvInfo) GetLastUpdateTime() time.Time {
 	return ei.LastUpdateTime
 }
@@ -119,17 +119,17 @@ func (ei *EnvInfo) Set(fields map[string]interface{}) error {
 	return nil
 }
 
-// Delete sets DelFlag to true, need to use Save to write to the middleware
+// Delete sets DelFlag to 1
 func (ei *EnvInfo) Delete() {
 	ei.DelFlag = 1
 }
 
-// MarshalJSON marshals entity to json string, it only marshals fields that has default tag
+// MarshalJSON marshals Env to json string
 func (ei *EnvInfo) MarshalJSON() ([]byte, error) {
 	return common.MarshalStructWithTag(ei, constant.DefaultMarshalTag)
 }
 
-// MarshalJSONWithFields marshals only with specified fields of entity to json string
+// MarshalJSONWithFields marshals only specified fields of Env to json string
 func (ei *EnvInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
 	return common.MarshalStructWithFields(ei, fields...)
 }
