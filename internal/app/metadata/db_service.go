@@ -1,7 +1,6 @@
 package metadata
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/romberli/go-util/common"
@@ -11,12 +10,14 @@ import (
 	"github.com/romberli/das/pkg/message"
 )
 
+const dbDBsStruct = "DBs"
+
 var _ metadata.DBService = (*DBService)(nil)
 
 type DBService struct {
 	metadata.DBRepo
-	DBs       []metadata.DB
-	AppIDList []int
+	DBs       []metadata.DB `json:"dbs"`
+	AppIDList []int         `json:"app_id_list"`
 }
 
 // NewDBService returns a new *DBService
@@ -147,19 +148,10 @@ func (ds *DBService) DeleteApp(dbID, appID int) error {
 
 // Marshal marshals DBService.DBs to json bytes
 func (ds *DBService) Marshal() ([]byte, error) {
-	return json.Marshal(ds.DBs)
+	return ds.MarshalWithFields(dbDBsStruct)
 }
 
 // MarshalWithFields marshals only specified fields of the DBService to json bytes
 func (ds *DBService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(ds.DBs))
-	for i := range interfaceList {
-		dbInfo, err := common.CopyStructWithFields(ds.DBs[i], fields...)
-		if err != nil {
-			return nil, err
-		}
-		interfaceList[i] = dbInfo
-	}
-
-	return json.Marshal(interfaceList)
+	return common.MarshalStructWithFields(ds, fields...)
 }

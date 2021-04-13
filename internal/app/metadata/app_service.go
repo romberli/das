@@ -1,8 +1,6 @@
 package metadata
 
 import (
-	"encoding/json"
-
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
@@ -10,12 +8,14 @@ import (
 	"github.com/romberli/das/pkg/message"
 )
 
+const appAppsStruct = "Apps"
+
 var _ metadata.AppService = (*AppService)(nil)
 
 type AppService struct {
 	metadata.AppRepo
-	Apps     []metadata.App
-	DBIDList []int
+	Apps     []metadata.App `json:"apps"`
+	DBIDList []int          `json:"db_id_list"`
 }
 
 // NewAppService returns a new *AppService
@@ -36,6 +36,7 @@ func (as *AppService) GetApps() []metadata.App {
 // GetAll gets all apps from the middleware
 func (as *AppService) GetAll() error {
 	var err error
+
 	as.Apps, err = as.AppRepo.GetAll()
 
 	return err
@@ -149,19 +150,10 @@ func (as *AppService) DeleteDB(appID, dbID int) error {
 
 // Marshal marshals AppService.Apps to json bytes
 func (as *AppService) Marshal() ([]byte, error) {
-	return json.Marshal(as.Apps)
+	return as.MarshalWithFields(appAppsStruct)
 }
 
 // MarshalWithFields marshals only specified fields of the AppService to json bytes
 func (as *AppService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(as.Apps))
-	for i := range interfaceList {
-		app, err := common.CopyStructWithFields(as.Apps[i], fields...)
-		if err != nil {
-			return nil, err
-		}
-		interfaceList[i] = app
-	}
-
-	return json.Marshal(interfaceList)
+	return common.MarshalStructWithFields(as, fields...)
 }
