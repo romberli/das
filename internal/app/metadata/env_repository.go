@@ -146,9 +146,9 @@ func (er *EnvRepo) Create(env metadata.Env) (metadata.Env, error) {
 
 // Update updates data with given entity in the middleware
 func (er *EnvRepo) Update(env metadata.Env) error {
-	sql := `update t_meta_env_info set env_name = ? where id = ?;`
+	sql := `update t_meta_env_info set env_name = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata EnvRepo.Update() update sql: %s", sql)
-	_, err := er.Execute(sql, env.GetEnvName(), env.Identity())
+	_, err := er.Execute(sql, env.GetEnvName(), env.GetDelFlag(), env.Identity())
 
 	return err
 }

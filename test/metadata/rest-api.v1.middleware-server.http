@@ -30,5 +30,3 @@ Content-Type: application/json
 ### delete middleware-server by id
 POST http://{{baseURL}}/api/v1/metadata/middleware-server/delete/31
 Content-Type: application/json
-
-###
