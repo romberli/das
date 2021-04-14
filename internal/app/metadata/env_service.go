@@ -1,8 +1,6 @@
 package metadata
 
 import (
-	"encoding/json"
-
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
@@ -10,11 +8,13 @@ import (
 	"github.com/romberli/das/pkg/message"
 )
 
+const envEnvsStruct = "Envs"
+
 var _ metadata.EnvService = (*EnvService)(nil)
 
 type EnvService struct {
 	metadata.EnvRepo
-	Envs []metadata.Env
+	Envs []metadata.Env `json:"Envs"`
 }
 
 // NewEnvService returns a new *EnvService
@@ -27,12 +27,12 @@ func NewEnvServiceWithDefault() *EnvService {
 	return NewEnvService(NewEnvRepoWithGlobal())
 }
 
-// GetEnvs returns envs of the service
+// GetEnvs returns environments of the service
 func (es *EnvService) GetEnvs() []metadata.Env {
 	return es.Envs
 }
 
-// GetAll gets all environment entities from the middleware
+// GetAll gets all environments from the middleware
 func (es *EnvService) GetAll() error {
 	var err error
 	es.Envs, err = es.EnvRepo.GetAll()
@@ -60,7 +60,7 @@ func (es *EnvService) GetID(fields map[string]interface{}) (int, error) {
 	return id, nil
 }
 
-// GetByID gets an environment entity that contains the given id from the middleware
+// GetByID gets an environment of the given id from the middleware
 func (es *EnvService) GetByID(id int) error {
 	entity, err := es.EnvRepo.GetByID(id)
 	if err != nil {
@@ -72,7 +72,7 @@ func (es *EnvService) GetByID(id int) error {
 	return err
 }
 
-// GetEnvByName gets Env from the middleware by name
+// GetEnvByName returns Env of given env name
 func (es *EnvService) GetEnvByName(envName string) error {
 	env, err := es.EnvRepo.GetEnvByName(envName)
 	if err != nil {
@@ -84,7 +84,7 @@ func (es *EnvService) GetEnvByName(envName string) error {
 	return nil
 }
 
-// Create creates a new environment entity and insert it into the middleware
+// Create creates an environment in the middleware
 func (es *EnvService) Create(fields map[string]interface{}) error {
 	// generate new map
 	_, ok := fields[envNameStruct]
@@ -107,8 +107,8 @@ func (es *EnvService) Create(fields map[string]interface{}) error {
 	return nil
 }
 
-// Update gets an environment entity that contains the given id from the middleware,
-// and then update its fields that was specified in fields argument,
+// Update gets the environment of the given id from the middleware,
+// and then updates its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
 func (es *EnvService) Update(id int, fields map[string]interface{}) error {
@@ -124,26 +124,17 @@ func (es *EnvService) Update(id int, fields map[string]interface{}) error {
 	return es.EnvRepo.Update(es.Envs[constant.ZeroInt])
 }
 
-// Delete deletes the environment entity that contains the given id in the middleware
+// Delete deletes the environment of given id in the middleware
 func (es *EnvService) Delete(id int) error {
 	return es.EnvRepo.Delete(id)
 }
 
-// Marshal marshals service.Envs
+// Marshal marshals EnvService.Envs to json bytes
 func (es *EnvService) Marshal() ([]byte, error) {
-	return json.Marshal(es.Envs)
+	return es.MarshalWithFields(envEnvsStruct)
 }
 
-// MarshalWithFields marshals service.Envs with given fields
+// MarshalWithFields marshals only specified fields of the EnvService to json bytes
 func (es *EnvService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(es.Envs))
-	for i := range interfaceList {
-		env, err := common.CopyStructWithFields(es.Envs[i], fields...)
-		if err != nil {
-			return nil, err
-		}
-		interfaceList[i] = env
-	}
-
-	return json.Marshal(interfaceList)
+	return common.MarshalStructWithFields(es, fields...)
 }
