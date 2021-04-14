@@ -1,7 +1,6 @@
 package metadata
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/romberli/go-util/common"
@@ -21,11 +20,13 @@ const (
 	monitorSystemEnvIDStruct       = "EnvID"
 )
 
+const monitorSystemsStruct = "MonitorSystems"
+
 var _ metadata.MonitorSystemService = (*MonitorSystemService)(nil)
 
 type MonitorSystemService struct {
 	metadata.MonitorSystemRepo
-	MonitorSystems []metadata.MonitorSystem
+	MonitorSystems []metadata.MonitorSystem `json:"monitorSystems"`
 }
 
 // NewMonitorSystemService returns a new *MonitorSystemService
@@ -138,21 +139,12 @@ func (mss *MonitorSystemService) Delete(id int) error {
 	return mss.MonitorSystemRepo.Delete(id)
 }
 
-// Marshal marshals service.Envs
+// Marshal marshals MonitorSystemService.MonitorSystems to json bytes
 func (mss *MonitorSystemService) Marshal() ([]byte, error) {
-	return json.Marshal(mss.MonitorSystems)
+	return mss.MarshalWithFields(monitorSystemsStruct)
 }
 
-// Marshal marshals service.Envs with given fields
+// MarshalWithFields marshals only specified fields of the MonitorSystemService to json bytes
 func (mss *MonitorSystemService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(mss.MonitorSystems))
-	for i := range interfaceList {
-		monitorSystemInfo, err := common.CopyStructWithFields(mss.MonitorSystems[i], fields...)
-		if err != nil {
-			return nil, err
-		}
-		interfaceList[i] = monitorSystemInfo
-	}
-
-	return json.Marshal(interfaceList)
+	return common.MarshalStructWithFields(mss, fields...)
 }
