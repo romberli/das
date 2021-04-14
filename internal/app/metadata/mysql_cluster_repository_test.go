@@ -184,9 +184,7 @@ func TestMySQLClusterRepo_GetID(t *testing.T) {
 
 func TestMySQLClusterRepo_GetMySQLServerIDList(t *testing.T) {
 	asst := assert.New(t)
-
-	mysqlCluster, err := mysqlClusterRepo.GetMySQLServerIDList(testInitClusterID)
-	mysqlServerIDList := mysqlCluster.GetMySQLServerIDList()
+	mysqlServerIDList, err := mysqlClusterRepo.GetMySQLServerIDList(testInitClusterID)
 	// mysqlServerIDList, err := mysqlClusterRepo.GetMySQLServerIDList(97)
 	asst.Nil(err, common.CombineMessageWithError("test GetMySQLServerIDList() failed", err))
 	for _, mysqlServerID := range mysqlServerIDList {

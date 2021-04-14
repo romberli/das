@@ -16,7 +16,7 @@ GET http://{{baseURL}}/api/v1/metadata/mysql-server/get/86
 Accept: application/json
 
 ### get mysql server by id
-GET http://{{baseURL}}/api/v1/metadata/mysql-server/host-info?host_ip=192.168.1.1&port_num=3306
+GET http://{{baseURL}}/api/v1/metadata/mysql-server/host-info?host_ip=192.168.1.2&port_num=3306
 Accept: application/json
 
 

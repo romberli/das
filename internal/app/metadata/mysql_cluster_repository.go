@@ -122,7 +122,7 @@ func (mcr *MySQLClusterRepo) GetByEnv(envID int) ([]metadata.MySQLCluster, error
 			return nil, err
 		}
 
-		mysqlClusterList = append(mysqlClusterList, mysqlCluster)
+		mysqlClusterList[row] = mysqlCluster
 	}
 
 	return mysqlClusterList, nil
@@ -202,7 +202,7 @@ func (mcr *MySQLClusterRepo) GetID(clusterName string) (int, error) {
 }
 
 // GetMySQLServerIDList gets the mysql server id list of given cluster id
-func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) (metadata.MySQLCluster, error) {
+func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) ([]int, error) {
 	sql := `
 		select id from t_meta_mysql_server_info where del_flag = 0 and cluster_id = ?;
 	`
@@ -224,17 +224,8 @@ func (mcr *MySQLClusterRepo) GetMySQLServerIDList(clusterID int) (metadata.MySQL
 
 		mysqlServerIDList[row] = mysqlServerID
 	}
-	log.Debugf(fmt.Sprint(mysqlServerIDList))
 
-	mysqlCluster, err := mcr.GetByID(clusterID)
-
-	fields := make(map[string]interface{})
-
-	fields["MySQLServerIDList"] = mysqlServerIDList
-
-	mysqlCluster.Set(fields)
-
-	return mysqlCluster, nil
+	return mysqlServerIDList, nil
 
 }
 
