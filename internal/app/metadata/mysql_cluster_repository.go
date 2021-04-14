@@ -246,7 +246,7 @@ func (mcr *MySQLClusterRepo) Create(mysqlCluster metadata.MySQLCluster) (metadat
 	if err != nil {
 		return nil, err
 	}
-	// getclusterID
+	// get cluster id
 	id, err := mcr.GetID(mysqlCluster.GetClusterName())
 	if err != nil {
 		return nil, err

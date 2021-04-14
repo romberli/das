@@ -20,7 +20,6 @@ const (
 	mcEnvIDJSON       = "env_id"
 	mcClusterNameJSON = "name"
 
-	mcIDStruct                  = "ID"
 	mcClusterNameStruct         = "ClusterName"
 	mcMiddlewareClusterIDStruct = "MiddlewareClusterID"
 	mcMonitorSystemIDStruct     = "MonitorSystemID"

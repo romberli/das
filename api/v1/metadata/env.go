@@ -25,8 +25,8 @@ const (
 
 // @Tags	environment
 // @Summary	get all environments
-// @Accept	envlication/json
-// @Produce envlication/json
+// @Accept	application/json
+// @Produce application/json
 // @Success	200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
 // @Router	/api/v1/metadata/env [get]
 func GetEnv(c *gin.Context) {
@@ -52,8 +52,8 @@ func GetEnv(c *gin.Context) {
 
 // @Tags	environment
 // @Summary get environment by id
-// @Accept	envlication/json
-// @Produce envlication/json
+// @Accept	application/json
+// @Produce application/json
 // @Param	id path int true "environment id"
 // @Success	200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
 // @Router	/api/v1/metadata/env/:id [get]
@@ -123,8 +123,8 @@ func GetEnvByName(c *gin.Context) {
 
 // @Tags	environment
 // @Summary add a new environment
-// @Accept	envlication/json
-// @Produce envlication/json
+// @Accept	application/json
+// @Produce application/json
 // @Param	env_name body string true "environment name"
 // @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
 // @Router	/api/v1/metadata/env [post]
@@ -170,8 +170,8 @@ func AddEnv(c *gin.Context) {
 
 // @Tags	environment
 // @Summary	update environment by id
-// @Accept	envlication/json
-// @Produce envlication/json
+// @Accept	application/json
+// @Produce application/json
 // @Param	id path int true "environment id"
 // @Success	200 {string} string "{"code": 200, "data": [{"id": 1, "env_name": "online", "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
 // @Router	/api/v1/metadata/env/update/:id [post]

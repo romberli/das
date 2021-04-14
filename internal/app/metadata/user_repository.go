@@ -337,7 +337,7 @@ func (ur *UserRepo) Create(user metadata.User) (metadata.User, error) {
 	return ur.GetByID(id)
 }
 
-/// Update updates a user in the middleware
+// Update updates a user in the middleware
 func (ur *UserRepo) Update(user metadata.User) error {
 	sql := `update t_meta_user_info set user_name = ?, del_flag = ?, department_name = ?, employee_id = ?, account_name = ?, email = ?, telephone = ?, mobile = ?, role = ? where id = ?;`
 	log.Debugf("metadata UserRepo.Update() update sql: %s", sql)

@@ -11,15 +11,13 @@ import (
 )
 
 const (
-	onlineUserName           = "online"
-	newUserName              = "nun"
-	newonlineID              = 2
-	OnlineUserAccountName    = "1"
-	OnlineUserDepartmentName = "1"
-	OnlineUserEmployeeID     = "1"
-	OnlineUserEmail          = "1"
-	OnlineUserTelephone      = "1"
-	OnlineUserMobile         = "1"
+	onlineUserName        = "online"
+	newUserName           = "nun"
+	OnlineUserAccountName = "1"
+	OnlineUserEmployeeID  = "1"
+	OnlineUserEmail       = "1"
+	OnlineUserTelephone   = "1"
+	OnlineUserMobile      = "1"
 )
 
 var userRepo = initUserRepo()
@@ -38,11 +36,8 @@ func createUser() (metadata.User, error) {
 	userInfo := NewUserInfoWithDefault(
 		defaultUserInfoUserName,
 		defaultUserInfoDepartmentName,
-		defaultUserInfoEmployeeID,
 		defaultUserInfoAccountName,
 		defaultUserInfoEmail,
-		defaultUserInfoTelephone,
-		defaultUserInfoMobile,
 		defaultUserInfoRole,
 	)
 	entity, err := userRepo.Create(userInfo)
@@ -156,7 +151,7 @@ func TestUserRepo_Execute(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
-	asst.Equal(1, int(r), "test Execute() failed")
+	asst.Equal(1, r, "test Execute() failed")
 }
 
 func TestUserRepo_Transaction(t *testing.T) {

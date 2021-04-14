@@ -69,7 +69,7 @@ func TestMonitorSystemRepo_Execute(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
-	asst.Equal(1, int(r), "test Execute() failed")
+	asst.Equal(1, r, "test Execute() failed")
 }
 
 func TestMonitorSystemRepo_Transaction(t *testing.T) {

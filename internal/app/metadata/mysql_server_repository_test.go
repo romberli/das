@@ -19,7 +19,6 @@ const (
 	testTransactionHostIP   = "host_ip_need_rollback"
 	testTransactionPortNum  = 3308
 	testInsertHostIP        = "host_ip_insert"
-	testInsertPortNum       = 3307
 	testUpdateHostIP        = "host_ip_update"
 	testUpdatePortNum       = 3309
 )
@@ -78,7 +77,7 @@ func TestMySQLServerRepo_Execute(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
-	asst.Equal(1, int(r), "test Execute() failed")
+	asst.Equal(1, r, "test Execute() failed")
 }
 
 func TestMySQLServerRepo_Transaction(t *testing.T) {
@@ -161,9 +160,9 @@ func TestMySQLServerRepo_GetAll(t *testing.T) {
 func TestMySQLServerRepo_GetByClusterID(t *testing.T) {
 	asst := assert.New(t)
 
-	entitys, err := mysqlServerRepo.GetByClusterID(testInitClusterID)
+	entities, err := mysqlServerRepo.GetByClusterID(testInitClusterID)
 
-	for _, entity := range entitys {
+	for _, entity := range entities {
 		asst.Nil(err, common.CombineMessageWithError("test GetByClusterID() failed", err))
 		hostIP := entity.GetHostIP()
 		asst.Equal(testInitHostIP, hostIP, "test GetByClusterID() failed")

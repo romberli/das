@@ -1,8 +1,9 @@
 package metadata
 
 import (
-	"github.com/romberli/das/internal/dependency/metadata"
 	"testing"
+
+	"github.com/romberli/das/internal/dependency/metadata"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
@@ -11,10 +12,10 @@ import (
 )
 
 const (
-	middlewareServerrAddr  = "localhost:3306"
+	middlewareServerAddr   = "localhost:3306"
 	middlewareServerDBName = "das"
 	middlewareServerDBUser = "root"
-	middlewareServerDBPass = "rootroot"
+	middlewareServerDBPass = "root"
 
 	newMiddlewareServerName    = "newTest"
 	onlineMiddlewareServerName = "test001"
@@ -24,7 +25,7 @@ const (
 var middlewareServerRepo = initMiddlewareServerRepo()
 
 func initMiddlewareServerRepo() *MiddlewareServerRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(middlewareServerrAddr, middlewareServerDBName, middlewareServerDBUser, middlewareServerDBPass)
+	pool, err := mysql.NewMySQLPoolWithDefault(middlewareServerAddr, middlewareServerDBName, middlewareServerDBUser, middlewareServerDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMiddlewareServerRepo() failed", err))
 		return nil
@@ -75,7 +76,7 @@ func TestMiddlewareServerRepo_Execute(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
-	asst.Equal(1, int(r), "test Execute() failed")
+	asst.Equal(1, r, "test Execute() failed")
 }
 
 func TestMiddlewareServerRepo_Transaction(t *testing.T) {

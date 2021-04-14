@@ -23,7 +23,6 @@ const (
 	defaultMySQLServerInfoCreateTimeString     = "2021-01-21 10:00:00.000000"
 	defaultMySQLServerInfoLastUpdateTimeString = "2021-01-21 13:00:00.000000"
 	hostIPJSON                                 = "host_ip"
-	portNumJSON                                = "port_num"
 )
 
 func initNewMySQLServerInfo() *MySQLServerInfo {

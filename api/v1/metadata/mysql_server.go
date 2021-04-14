@@ -55,9 +55,9 @@ func GetMySQLServer(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetMySQLServerAll)
 }
 
-// TODO: Modify Swagger commment
+// TODO: Modify Swagger comment
 // @Tags mysql server
-// @Summary get mysql servers by clutster id
+// @Summary get mysql servers by cluster id
 // @Produce  application/json
 // @Success
 // @Router /api/v1/metadata/mysql-server/cluster-id/:cluster_id [get]
@@ -322,7 +322,7 @@ func UpdateMySQLServerByID(c *gin.Context) {
 	resp.ResponseOK(c, jsonStr, msgmeta.DebugMetadataUpdateMySQLServer, fields[msServerNameStruct])
 }
 
-// TODO: Modify Swagger commment
+// TODO: Modify Swagger comment
 // @Tags mysql server
 // @Summary get mysql servers by host info
 // @Produce  application/json

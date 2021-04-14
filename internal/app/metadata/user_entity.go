@@ -9,8 +9,6 @@ import (
 	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-const ()
-
 var _ metadata.User = (*UserInfo)(nil)
 
 // UserInfo create userinfo struct
@@ -50,7 +48,7 @@ func NewUserInfo(repo metadata.UserRepo, id int, userName string, departmentName
 }
 
 // NewUserInfoWithGlobal returns a new UserInfo with default UserRepo
-func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfoWithGlobal(id int, userName string, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *UserInfo {
 	return &UserInfo{
 		NewUserRepoWithGlobal(),
 		id,
@@ -74,7 +72,7 @@ func NewEmptyUserInfoWithGlobal() *UserInfo {
 }
 
 // NewUserInfoWithDefault returns a new UserInfo with default UserRepo
-func NewUserInfoWithDefault(userName string, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfoWithDefault(userName string, departmentName string, accountName string, email string, role int) *UserInfo {
 	return &UserInfo{
 		UserRepo:       NewUserRepoWithGlobal(),
 		UserName:       userName,

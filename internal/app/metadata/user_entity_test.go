@@ -35,9 +35,6 @@ func initNewUserInfo() *UserInfo {
 	return NewUserInfoWithGlobal(
 		defaultUserInfoID,
 		defaultUserInfoUserName,
-		defaultUserInfoDelFlag,
-		createTime,
-		lastUpdateTime,
 		defaultUserInfoDepartmentName,
 		defaultUserInfoEmployeeID,
 		defaultUserInfoAccountName,
@@ -45,6 +42,9 @@ func initNewUserInfo() *UserInfo {
 		defaultUserInfoTelephone,
 		defaultUserInfoMobile,
 		defaultUserInfoRole,
+		defaultUserInfoDelFlag,
+		createTime,
+		lastUpdateTime,
 	)
 }
 
