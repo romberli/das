@@ -72,7 +72,7 @@ func TestMySQLClusterRepo_Execute(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
-	asst.Equal(1, int(r), "test Execute() failed")
+	asst.Equal(1, r, "test Execute() failed")
 }
 
 func TestMySQLClusterRepo_Transaction(t *testing.T) {
@@ -147,10 +147,10 @@ func TestMySQLClusterRepo_GetAll(t *testing.T) {
 func TestMySQLClusterRepo_GetByEnv(t *testing.T) {
 	asst := assert.New(t)
 
-	entitys, err := mysqlClusterRepo.GetByEnv(testInitClusterID)
+	entities, err := mysqlClusterRepo.GetByEnv(testInitClusterID)
 	asst.Nil(err, common.CombineMessageWithError("test GetByEnv() failed", err))
 
-	for _, entity := range entitys {
+	for _, entity := range entities {
 		clusterName := entity.GetClusterName()
 		asst.Equal(testInitClusterName, clusterName, "test GetByEnv() failed")
 	}
@@ -184,9 +184,7 @@ func TestMySQLClusterRepo_GetID(t *testing.T) {
 
 func TestMySQLClusterRepo_GetMySQLServerIDList(t *testing.T) {
 	asst := assert.New(t)
-
-	mysqlCluster, err := mysqlClusterRepo.GetMySQLServerIDList(testInitClusterID)
-	mysqlServerIDList := mysqlCluster.GetMySQLServerIDList()
+	mysqlServerIDList, err := mysqlClusterRepo.GetMySQLServerIDList(testInitClusterID)
 	// mysqlServerIDList, err := mysqlClusterRepo.GetMySQLServerIDList(97)
 	asst.Nil(err, common.CombineMessageWithError("test GetMySQLServerIDList() failed", err))
 	for _, mysqlServerID := range mysqlServerIDList {

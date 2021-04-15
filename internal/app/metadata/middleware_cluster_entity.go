@@ -1,8 +1,9 @@
 package metadata
 
 import (
-	"github.com/romberli/das/internal/dependency/metadata"
 	"time"
+
+	"github.com/romberli/das/internal/dependency/metadata"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
@@ -55,7 +56,7 @@ func NewMiddlewareClusterInfoWithGlobal(id int, middlewareClusterName string, ow
 	}
 }
 
-// NewEmptyMiddlewareClusterInfoWithGlobal retuen a new MiddlewareClusterInfo
+// NewEmptyMiddlewareClusterInfoWithGlobal return a new MiddlewareClusterInfo
 func NewEmptyMiddlewareClusterInfoWithGlobal() *MiddlewareClusterInfo {
 	return &MiddlewareClusterInfo{MiddlewareClusterRepo: NewMiddlewareClusterRepoWithGlobal()}
 }

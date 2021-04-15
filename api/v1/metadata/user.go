@@ -15,13 +15,12 @@ import (
 )
 
 const (
-	userNameJSON       = "user_name"
-	employeeIDJSON     = "employee_id"
-	accountNameJSON    = "account_name"
-	emailJSON          = "email"
-	telephoneJSON      = "telephone"
-	mobileJSON         = "mobile"
-	departmentNameJSON = "department_name"
+	userNameJSON    = "user_name"
+	employeeIDJSON  = "employee_id"
+	accountNameJSON = "account_name"
+	emailJSON       = "email"
+	telephoneJSON   = "telephone"
+	mobileJSON      = "mobile"
 
 	userNameStruct       = "UserName"
 	departmentNameStruct = "DepartmentName"

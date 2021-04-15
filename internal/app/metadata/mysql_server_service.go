@@ -1,7 +1,6 @@
 package metadata
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/romberli/go-util/common"
@@ -19,6 +18,8 @@ const (
 	deploymentTypeStruct = "DeploymentType"
 	versionStruct        = "Version"
 )
+
+const msMySQLServersStruct = "MySQLServers"
 
 var _ metadata.MySQLServerService = (*MySQLServerService)(nil)
 
@@ -153,19 +154,10 @@ func (mss *MySQLServerService) Delete(id int) error {
 
 // Marshal marshals service.Envs
 func (mss *MySQLServerService) Marshal() ([]byte, error) {
-	return json.Marshal(mss.MySQLServers)
+	return mss.MarshalWithFields(msMySQLServersStruct)
 }
 
 // MarshalWithFields marshals service.Envs with given fields
 func (mss *MySQLServerService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(mss.MySQLServers))
-	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(mss.MySQLServers[i], fields...)
-		if err != nil {
-			return nil, err
-		}
-		interfaceList[i] = entity
-	}
-
-	return json.Marshal(interfaceList)
+	return common.MarshalStructWithFields(mss, fields...)
 }

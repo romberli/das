@@ -1,7 +1,6 @@
 package metadata
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/romberli/go-util/common"
@@ -19,17 +18,20 @@ const (
 	envIDStruct               = "EnvID"
 )
 
+const mcMySQLClustersStruct = "MySQLClusters"
+
 var _ metadata.MySQLClusterService = (*MySQLClusterService)(nil)
 
 // MySQLClusterService implements Service interface
 type MySQLClusterService struct {
-	MySQLClusterRepo metadata.MySQLClusterRepo
-	MySQLClusters    []metadata.MySQLCluster
+	MySQLClusterRepo  metadata.MySQLClusterRepo
+	MySQLClusters     []metadata.MySQLCluster `json:"mysql_clusters"`
+	MySQLServerIDList []int                   `json:"mysql_server_id_list"`
 }
 
 // NewMySQLClusterService returns a new *MySQLClusterService
 func NewMySQLClusterService(repo metadata.MySQLClusterRepo) *MySQLClusterService {
-	return &MySQLClusterService{repo, []metadata.MySQLCluster{}}
+	return &MySQLClusterService{repo, []metadata.MySQLCluster{}, []int{}}
 }
 
 // NewMySQLClusterServiceWithDefault returns a new *MySQLClusterService with default repository
@@ -87,12 +89,12 @@ func (mcs *MySQLClusterService) GetByName(clusterName string) error {
 
 // GetMySQLServerIDList gets the mysql server id list of given cluster id
 func (mcs *MySQLClusterService) GetMySQLServerIDList(clusterID int) error {
-	mysqlCluster, err := mcs.MySQLClusterRepo.GetMySQLServerIDList(clusterID)
+	mysqlCluster, err := mcs.MySQLClusterRepo.GetByID(clusterID)
 	if err != nil {
 		return err
 	}
 
-	mcs.MySQLClusters = append(mcs.MySQLClusters, mysqlCluster)
+	mcs.MySQLServerIDList, err = mysqlCluster.GetMySQLServerIDList()
 
 	return err
 }
@@ -151,19 +153,10 @@ func (mcs *MySQLClusterService) Delete(id int) error {
 
 // Marshal marshals service.Envs
 func (mcs *MySQLClusterService) Marshal() ([]byte, error) {
-	return json.Marshal(mcs.MySQLClusters)
+	return mcs.MarshalWithFields(mcMySQLClustersStruct)
 }
 
 // MarshalWithFields marshals service.Envs with given fields
 func (mcs *MySQLClusterService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(mcs.MySQLClusters))
-	for i := range interfaceList {
-		mysqlCluster, err := common.CopyStructWithFields(mcs.MySQLClusters[i], fields...)
-		if err != nil {
-			return nil, err
-		}
-		interfaceList[i] = mysqlCluster
-	}
-
-	return json.Marshal(interfaceList)
+	return common.MarshalStructWithFields(mcs, fields...)
 }

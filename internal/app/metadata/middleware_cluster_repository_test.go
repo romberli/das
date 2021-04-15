@@ -1,8 +1,9 @@
 package metadata
 
 import (
-	"github.com/romberli/das/internal/dependency/metadata"
 	"testing"
+
+	"github.com/romberli/das/internal/dependency/metadata"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
@@ -14,7 +15,7 @@ const (
 	middlewareClusterAddr   = "localhost:3306"
 	middlewareClusterDBName = "das"
 	middlewareClusterDBUser = "root"
-	middlewareClusterDBPass = "rootroot"
+	middlewareClusterDBPass = "root"
 
 	newMiddlewareClusterName    = "ttt"
 	onlineMiddlewareClusterName = "test"
@@ -74,7 +75,7 @@ func TestMiddlewareClusterRepo_Execute(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
-	asst.Equal(1, int(r), "test Execute() failed")
+	asst.Equal(1, r, "test Execute() failed")
 }
 
 func TestMiddlewareClusterRepo_Transaction(t *testing.T) {

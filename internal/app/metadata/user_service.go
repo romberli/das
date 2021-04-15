@@ -1,8 +1,6 @@
 package metadata
 
 import (
-	"encoding/json"
-
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 
@@ -22,12 +20,13 @@ const (
 	telephoneStruct      = "Telephone"
 	mobileStruct         = "Mobile"
 	roleStruct           = "Role"
+	userUsersStruct      = "Users"
 )
 
 // UserService struct
 type UserService struct {
 	metadata.UserRepo
-	Users []metadata.User
+	Users []metadata.User `json:"users"`
 }
 
 // NewUserService returns a new *UserService
@@ -40,7 +39,7 @@ func NewUserServiceWithDefault() *UserService {
 	return NewUserService(NewUserRepoWithGlobal())
 }
 
-// GetAll gets all user entities from the middleware
+// GetAll gets all users
 func (us *UserService) GetAll() error {
 	var err error
 	us.Users, err = us.UserRepo.GetAll()
@@ -48,7 +47,7 @@ func (us *UserService) GetAll() error {
 	return err
 }
 
-// GetByID gets an user user that contains the given id from the middleware
+// GetByID gets a user by the identity
 func (us *UserService) GetByID(id int) error {
 	user, err := us.UserRepo.GetByID(id)
 	if err != nil {
@@ -60,7 +59,7 @@ func (us *UserService) GetByID(id int) error {
 	return err
 }
 
-// Create creates a new user user and insert it into the middleware
+// Create creates a user in the middleware
 func (us *UserService) Create(fields map[string]interface{}) error {
 	// generate new map
 	_, ok := fields[userNameStruct]
@@ -105,8 +104,8 @@ func (us *UserService) Create(fields map[string]interface{}) error {
 	return nil
 }
 
-// Update gets an user user that contains the given id from the middleware,
-// and then update its fields that was specified in fields argument,
+// Update gets a user of the given id from the middleware,
+// and then updates its fields that was specified in fields argument,
 // key is the filed name and value is the new field value,
 // it saves the changes to the middleware
 func (us *UserService) Update(id int, fields map[string]interface{}) error {
@@ -122,31 +121,22 @@ func (us *UserService) Update(id int, fields map[string]interface{}) error {
 	return us.UserRepo.Update(us.Users[constant.ZeroInt])
 }
 
-// Delete deletes the user user that contains the given id in the middleware
+// Delete deletes the user of given id in the middleware
 func (us *UserService) Delete(id int) error {
 	return us.UserRepo.Delete(id)
 }
 
-// Marshal marshals service.Users
+// Marshal marshals UserService.Users to json bytes
 func (us *UserService) Marshal() ([]byte, error) {
-	return json.Marshal(us.Users)
+	return us.MarshalWithFields(userUsersStruct)
 }
 
-// MarshalWithFields marshals service.Users with given fields
+// MarshalWithFields marshals only specified fields of the UserService to json bytes
 func (us *UserService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(us.Users))
-	for i := range interfaceList {
-		user, err := common.CopyStructWithFields(us.Users[i], fields...)
-		if err != nil {
-			return nil, err
-		}
-		interfaceList[i] = user
-	}
-
-	return json.Marshal(interfaceList)
+	return common.MarshalStructWithFields(us, fields...)
 }
 
-// GetByAccountName gets an userinfo that contains the given accountname from the middleware
+// GetByAccountName gets a user of given account name
 func (us *UserService) GetByAccountName(accountName string) error {
 	user, err := us.UserRepo.GetByAccountName(accountName)
 	if err != nil {
@@ -158,7 +148,7 @@ func (us *UserService) GetByAccountName(accountName string) error {
 	return err
 }
 
-// GetByEmail gets an userinfo that contains the given email from the middleware
+// GetByEmail gets a user of given email
 func (us *UserService) GetByEmail(email string) error {
 	user, err := us.UserRepo.GetByEmail(email)
 	if err != nil {
@@ -170,7 +160,7 @@ func (us *UserService) GetByEmail(email string) error {
 	return err
 }
 
-// GetByTelephone gets an userinfo that contains the given telephone from the middleware
+// GetByTelephone gets a user of given telephone
 func (us *UserService) GetByTelephone(telephone string) error {
 	user, err := us.UserRepo.GetByTelephone(telephone)
 	if err != nil {
@@ -182,7 +172,7 @@ func (us *UserService) GetByTelephone(telephone string) error {
 	return err
 }
 
-// GetByMobile gets an userinfo that contains the given mobile from the middleware
+// GetByTelephone gets a user of given mobile
 func (us *UserService) GetByMobile(mobile string) error {
 	user, err := us.UserRepo.GetByMobile(mobile)
 	if err != nil {
@@ -194,7 +184,7 @@ func (us *UserService) GetByMobile(mobile string) error {
 	return err
 }
 
-// GetByEmployeeID gets an userinfo that contains the given employeeID from the middleware
+// GetByEmployeeID gets a user of given employee id
 func (us *UserService) GetByEmployeeID(employeeID string) error {
 	user, err := us.UserRepo.GetByEmployeeID(employeeID)
 	if err != nil {
@@ -206,7 +196,7 @@ func (us *UserService) GetByEmployeeID(employeeID string) error {
 	return err
 }
 
-// GetByName gets an userinfo that contains the given userName from the middleware
+// GetByName gets users of given user name
 func (us *UserService) GetByName(userName string) error {
 	var err error
 	us.Users, err = us.UserRepo.GetByName(userName)
@@ -214,7 +204,7 @@ func (us *UserService) GetByName(userName string) error {
 	return err
 }
 
-// GetUsers() return users of the service
+// GetUsers returns users of the service
 func (us *UserService) GetUsers() []metadata.User {
 	return us.Users
 }

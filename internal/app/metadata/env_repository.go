@@ -29,8 +29,7 @@ func NewEnvRepoWithGlobal() *EnvRepo {
 	return NewEnvRepo(global.MySQLPool)
 }
 
-// Execute implements metadata.EnvRepo interface,
-// it executes command with arguments on database
+// Execute executes given command and placeholders on the middleware
 func (er *EnvRepo) Execute(command string, args ...interface{}) (middleware.Result, error) {
 	conn, err := er.Database.Get()
 	if err != nil {
@@ -46,12 +45,12 @@ func (er *EnvRepo) Execute(command string, args ...interface{}) (middleware.Resu
 	return conn.Execute(command, args...)
 }
 
-// Transaction implements metadata.EnvRepo interface
+// Transaction returns middleware.PoolConn, so it can run multiple statements in the same transaction
 func (er *EnvRepo) Transaction() (middleware.Transaction, error) {
 	return er.Database.Transaction()
 }
 
-// GetAll returns all available entities
+// GetAll gets all environments from the middleware
 func (er *EnvRepo) GetAll() ([]metadata.Env, error) {
 	sql := `
 		select id, env_name, del_flag, create_time, last_update_time
@@ -84,6 +83,7 @@ func (er *EnvRepo) GetAll() ([]metadata.Env, error) {
 	return entityList, nil
 }
 
+// GetByID gets an environment by the identity from the middleware
 func (er *EnvRepo) GetByID(id int) (metadata.Env, error) {
 	sql := `
 		select id, env_name, del_flag, create_time, last_update_time
@@ -114,7 +114,7 @@ func (er *EnvRepo) GetByID(id int) (metadata.Env, error) {
 	}
 }
 
-// GetID checks identity of given entity from the middleware
+// GetID gets the identity with given environment name from the middleware
 func (er *EnvRepo) GetID(envName string) (int, error) {
 	sql := `select id from t_meta_env_info where del_flag = 0 and env_name = ?;`
 	log.Debugf("metadata EnvRepo.GetID() select sql: %s", sql)
@@ -126,7 +126,7 @@ func (er *EnvRepo) GetID(envName string) (int, error) {
 	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
-// Create creates data with given entity in the middleware
+// Create creates an environment in the middleware
 func (er *EnvRepo) Create(env metadata.Env) (metadata.Env, error) {
 	sql := `insert into t_meta_env_info(env_name) values(?);`
 	log.Debugf("metadata EnvRepo.Create() insert sql: %s", sql)
@@ -144,7 +144,7 @@ func (er *EnvRepo) Create(env metadata.Env) (metadata.Env, error) {
 	return er.GetByID(id)
 }
 
-// Update updates data with given entity in the middleware
+// Update updates the environment in the middleware
 func (er *EnvRepo) Update(env metadata.Env) error {
 	sql := `update t_meta_env_info set env_name = ?, del_flag = ? where id = ?;`
 	log.Debugf("metadata EnvRepo.Update() update sql: %s", sql)
@@ -153,8 +153,7 @@ func (er *EnvRepo) Update(env metadata.Env) error {
 	return err
 }
 
-// Delete deletes data in the middleware, it is recommended to use soft deletion,
-// therefore use update instead of delete
+// Delete deletes the environment in the middleware
 func (er *EnvRepo) Delete(id int) error {
 	tx, err := er.Transaction()
 	if err != nil {
@@ -182,6 +181,7 @@ func (er *EnvRepo) Delete(id int) error {
 	return tx.Commit()
 }
 
+// GetEnvByName gets Env of given environment name
 func (er *EnvRepo) GetEnvByName(envName string) (metadata.Env, error) {
 	sql := `
 		select id, env_name, del_flag, create_time, last_update_time

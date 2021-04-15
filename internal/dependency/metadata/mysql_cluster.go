@@ -27,7 +27,7 @@ type MySQLCluster interface {
 	// GetLastUpdateTime returns the last update time
 	GetLastUpdateTime() time.Time
 	// GetMySQLServerIDList gets the mysql server id list of this cluster
-	GetMySQLServerIDList() []int
+	GetMySQLServerIDList() ([]int, error)
 	// Set sets MySQLCluster with given fields, key is the field name and value is the relevant value of the key
 	Set(fields map[string]interface{}) error
 	// Delete sets DelFlag to 1
@@ -55,7 +55,7 @@ type MySQLClusterRepo interface {
 	// GetID gets the identity with given cluster name from the middleware
 	GetID(clusterName string) (int, error)
 	// GetMySQLServerIDList gets the mysql server id list of given cluster id
-	GetMySQLServerIDList(clusterID int) (MySQLCluster, error)
+	GetMySQLServerIDList(clusterID int) ([]int, error)
 	// Create creates a mysql cluster in the middleware
 	Create(mc MySQLCluster) (MySQLCluster, error)
 	// Update updates the mysql cluster in the middleware

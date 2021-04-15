@@ -13,7 +13,7 @@ GET http://127.0.0.1:6090/api/v1/metadata/app/app-name/test
 Accept: application/json
 
 ### metadata.GetDBIDList !!!
-GET http://127.0.0.1:6090/api/v1/metadata/app/dbs/1
+GET http://127.0.0.1:6090/api/v1/metadata/app/dbs/17
 Accept: application/json
 
 ### metadata.AddApp
@@ -35,10 +35,10 @@ POST http://127.0.0.1:6090/api/v1/metadata/app/delete/14
 POST http://127.0.0.1:6090/api/v1/metadata/app/add-db/17
 Content-Type: application/json
 
-{"db_id":1}
+{"db_id":9}
 
 ### metadata.AppDeleteDB
 POST http://127.0.0.1:6090/api/v1/metadata/app/delete-db/17
 Content-Type: application/json
 
-{"db_id":1}
+{"db_id":9}

@@ -9,8 +9,6 @@ import (
 	"github.com/romberli/das/internal/dependency/metadata"
 )
 
-const ()
-
 var _ metadata.User = (*UserInfo)(nil)
 
 // UserInfo create userinfo struct
@@ -50,7 +48,7 @@ func NewUserInfo(repo metadata.UserRepo, id int, userName string, departmentName
 }
 
 // NewUserInfoWithGlobal returns a new UserInfo with default UserRepo
-func NewUserInfoWithGlobal(id int, userName string, delFlag int, createTime time.Time, lastUpdateTime time.Time, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfoWithGlobal(id int, userName string, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int, delFlag int, createTime time.Time, lastUpdateTime time.Time) *UserInfo {
 	return &UserInfo{
 		NewUserRepoWithGlobal(),
 		id,
@@ -74,7 +72,7 @@ func NewEmptyUserInfoWithGlobal() *UserInfo {
 }
 
 // NewUserInfoWithDefault returns a new UserInfo with default UserRepo
-func NewUserInfoWithDefault(userName string, departmentName string, employeeID string, accountName string, email string, telephone string, mobile string, role int) *UserInfo {
+func NewUserInfoWithDefault(userName string, departmentName string, accountName string, email string, role int) *UserInfo {
 	return &UserInfo{
 		UserRepo:       NewUserRepoWithGlobal(),
 		UserName:       userName,
@@ -99,7 +97,7 @@ func NewUserInfoWithMapAndRandom(fields map[string]interface{}) (*UserInfo, erro
 	return ui, nil
 }
 
-// Identity returns ID of entity
+// Identity returns the identity
 func (ui *UserInfo) Identity() int {
 	return ui.ID
 }
@@ -109,57 +107,57 @@ func (ui *UserInfo) Identity() int {
 // 	return ui.DelFlag != constant.ZeroInt
 // }
 
-// GetCreateTime returns created time of entity
+// GetCreateTime returns the create time
 func (ui *UserInfo) GetCreateTime() time.Time {
 	return ui.CreateTime
 }
 
-// GetLastUpdateTime returns last updated time of entity
+// GetLastUpdateTime returns the last update time
 func (ui *UserInfo) GetLastUpdateTime() time.Time {
 	return ui.LastUpdateTime
 }
 
-// GetDepartmentName returns last updated time of entity
+// GetDepartmentName returns the department name
 func (ui *UserInfo) GetDepartmentName() string {
 	return ui.DepartmentName
 }
 
-// GetMobile returns mobile of entity
+// GetMobile returns the mobile
 func (ui *UserInfo) GetMobile() string {
 	return ui.Mobile
 }
 
-// GetUserName returns username of entity
+// GetUserName returns the user name
 func (ui *UserInfo) GetUserName() string {
 	return ui.UserName
 }
 
-// GetEmployeeID returns last updated time of entity
+// GetEmployeeID returns the employee id
 func (ui *UserInfo) GetEmployeeID() string {
 	return ui.EmployeeID
 }
 
-// GetAccountName returns last updated time of entity
+// GetAccountName returns the account name
 func (ui *UserInfo) GetAccountName() string {
 	return ui.AccountName
 }
 
-// GetEmail returns last updated time of entity
+// GetEmail returns the email
 func (ui *UserInfo) GetEmail() string {
 	return ui.Email
 }
 
-// GetTelephone returns last updated time of entity
+// GetEmail returns the telephone
 func (ui *UserInfo) GetTelephone() string {
 	return ui.Telephone
 }
 
-// GetRole returns last updated time of entity
+// GetRole returns the role
 func (ui *UserInfo) GetRole() int {
 	return ui.Role
 }
 
-// GetDelFlag returns last updated time of entity
+// GetDelFlag returns the delete flag
 func (ui *UserInfo) GetDelFlag() int {
 	return ui.DelFlag
 }
@@ -181,17 +179,17 @@ func (ui *UserInfo) Set(fields map[string]interface{}) error {
 	return nil
 }
 
-// Delete sets DelFlag to true, need to use Save to write to the middleware
+// Delete sets DelFlag to 1
 func (ui *UserInfo) Delete() {
 	ui.DelFlag = 1
 }
 
-// MarshalJSON marshals entity to json string, it only marshals fields that has default tag
+// MarshalJSON marshals User to json string
 func (ui *UserInfo) MarshalJSON() ([]byte, error) {
 	return common.MarshalStructWithTag(ui, constant.DefaultMarshalTag)
 }
 
-// MarshalJSONWithFields marshals only with specified fields of entity to json string
+// MarshalJSONWithFields marshals only specified field of the User to json string
 func (ui *UserInfo) MarshalJSONWithFields(fields ...string) ([]byte, error) {
 	return common.MarshalStructWithFields(ui, fields...)
 }

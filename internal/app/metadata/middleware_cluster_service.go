@@ -1,8 +1,8 @@
 package metadata
 
 import (
-	"encoding/json"
 	"fmt"
+
 	"github.com/romberli/das/internal/dependency/metadata"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
@@ -10,12 +10,14 @@ import (
 	"github.com/romberli/das/pkg/message"
 )
 
+const middlewareClustersStruct = "MiddlewareClusters"
+
 var _ metadata.MiddlewareClusterService = (*MiddlewareClusterService)(nil)
 
 type MiddlewareClusterService struct {
 	metadata.MiddlewareClusterRepo
-	MiddlewareClusters   []metadata.MiddlewareCluster
-	MiddlewareServerList []int
+	MiddlewareClusters   []metadata.MiddlewareCluster `json:"middleware_clusters"`
+	MiddlewareServerList []int                        `json:"middleware_server_list"`
 }
 
 // NewMiddlewareClusterService returns a new *MiddlewareClusterService
@@ -126,19 +128,10 @@ func (mcs *MiddlewareClusterService) Delete(id int) error {
 
 // Marshal marshals service.Envs
 func (mcs *MiddlewareClusterService) Marshal() ([]byte, error) {
-	return json.Marshal(mcs.MiddlewareClusters)
+	return mcs.MarshalWithFields(middlewareClustersStruct)
 }
 
 // Marshal marshals service.Envs with given fields
 func (mcs *MiddlewareClusterService) MarshalWithFields(fields ...string) ([]byte, error) {
-	interfaceList := make([]interface{}, len(mcs.MiddlewareClusters))
-	for i := range interfaceList {
-		entity, err := common.CopyStructWithFields(mcs.MiddlewareClusters[i], fields...)
-		if err != nil {
-			return nil, err
-		}
-		interfaceList[i] = entity
-	}
-
-	return json.Marshal(interfaceList)
+	return common.MarshalStructWithFields(mcs, fields...)
 }

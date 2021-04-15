@@ -113,7 +113,7 @@ func TestEnvInfo_Delete(t *testing.T) {
 	envInfo := initNewEnvInfo()
 	envInfo.Delete()
 	DF := envInfo.GetDelFlag()
-	asst.True((DF != constant.ZeroInt), "test Delete() failed")
+	asst.True(DF != constant.ZeroInt, "test Delete() failed")
 }
 
 func TestEnvInfo_MarshalJSON(t *testing.T) {

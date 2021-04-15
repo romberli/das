@@ -185,7 +185,7 @@ func (msr *MySQLServerRepo) GetByHostInfo(hostIP string, portNum int) (metadata.
 	}
 }
 
-// GetID checks idmysqlServer of given mysqlServer from the middleware
+// GetID gets the identity with given host ip and port number from the mysql
 func (msr *MySQLServerRepo) GetID(hostIP string, portNum int) (int, error) {
 	sql := `select id from t_meta_mysql_server_info where del_flag = 0 and host_ip = ? and port_num = ?;`
 	log.Debugf("metadata MySQLServerRepo.GetID() select sql: %s", sql)
