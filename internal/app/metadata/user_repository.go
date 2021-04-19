@@ -347,10 +347,9 @@ func (ur *UserRepo) Update(user metadata.User) error {
 	return err
 }
 
-// Delete deletes data in the middleware, it is recommended to use soft deletion,
-// therefore use update instead of delete
+// Delete deletes the user of given id in the middleware
 func (ur *UserRepo) Delete(id int) error {
-	sql := `update t_meta_user_info set del_flag = 1 where id = ?;`
+	sql := `delete from t_meta_user_info where id = ?;`
 	log.Debugf("metadata UserRepo.Delete() update sql: %s", sql)
 
 	_, err := ur.Execute(sql, id)
