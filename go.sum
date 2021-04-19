@@ -283,8 +283,8 @@ github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6So
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/romberli/dynamic-struct v1.2.1 h1:vle/rxIUl7IgreLScMSg9RhYBjygY/5Hj/OQKliyY90=
 github.com/romberli/dynamic-struct v1.2.1/go.mod h1:Jk2Z0Dm0diV7O4Lg1MfIyJ0kvOxfN+imwZVO5SOUL94=
-github.com/romberli/go-util v0.2.31 h1:oFtr5VVP29BC/nOGTR7S47VtQ1Kfzsl6Aa7QJ9gKUV4=
-github.com/romberli/go-util v0.2.31/go.mod h1:z2jZc1ttFqauohbmjyijPeDydvFfR9V4ejrAAON+3QU=
+github.com/romberli/go-util v0.2.32 h1:5bm6MDrBbtxK5ItRogPn/WblRzrlzJYUIsNE/ulfmCc=
+github.com/romberli/go-util v0.2.32/go.mod h1:z2jZc1ttFqauohbmjyijPeDydvFfR9V4ejrAAON+3QU=
 github.com/romberli/log v1.0.20 h1:bOlvkGfy6gHS+zGcJhjwq85t9prcXQUJQaLRANoCFVU=
 github.com/romberli/log v1.0.20/go.mod h1:FKhKFdWL5DLD+1LMO/RB4AcO4MUBl1th/pNFjhrmaGc=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
