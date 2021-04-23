@@ -19,10 +19,10 @@ func InitMySQLPool() (err error) {
 	maxIdleTime := viper.GetInt("db.pool.maxIdleTime")
 	keepAliveInterval := viper.GetInt("db.pool.keepAliveInterval")
 
-	config := mysql.NewMySQLConfig(dbAddr, dbName, dbUser, dbPass)
+	config := mysql.NewConfig(dbAddr, dbName, dbUser, dbPass)
 	poolConfig := mysql.NewPoolConfigWithConfig(config, maxConnections, initConnections, maxIdleConnections, maxIdleTime, keepAliveInterval)
 	log.Debugf("pool config: %v", poolConfig)
-	MySQLPool, err = mysql.NewMySQLPoolWithPoolConfig(poolConfig)
+	MySQLPool, err = mysql.NewPoolWithPoolConfig(poolConfig)
 
 	return err
 }
