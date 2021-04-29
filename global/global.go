@@ -9,10 +9,10 @@ import (
 var MySQLPool *mysql.Pool
 
 func InitMySQLPool() (err error) {
-	dbAddr := viper.GetString("db.mysql.addr")
-	dbName := viper.GetString("db.mysql.name")
-	dbUser := viper.GetString("db.mysql.user")
-	dbPass := viper.GetString("db.mysql.pass")
+	dbAddr := viper.GetString("db.das.mysql.addr")
+	dbName := viper.GetString("db.das.mysql.name")
+	dbUser := viper.GetString("db.das.mysql.user")
+	dbPass := viper.GetString("db.das.mysql.pass")
 	maxConnections := viper.GetInt("db.pool.maxConnections")
 	initConnections := viper.GetInt("db.pool.initConnections")
 	maxIdleConnections := viper.GetInt("db.pool.maxIdleConnections")

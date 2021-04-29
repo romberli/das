@@ -74,25 +74,27 @@ server:
 
 # database configuration
 db:
-  # mysql configuration
-  mysql:
-    # description: database address, format: host:port
-    # type: string
-    # default: 127.0.0.1:3306
-    addr: "127.0.0.1:3306"
-    # description: database name
-    # type: string
-    # default: das
-    name: das
-    # description: database user name
-    # type: string
-    # default: root
-    user: root
-    # description: database password
-    # type: string
-    # default: root
-    pass: root
-  # pool configuration
+  # das configuration
+  das:
+    # mysql configuration
+    mysql:
+      # description: database address, format: host:port
+      # type: string
+      # default: 127.0.0.1:3306
+      addr: "127.0.0.1:3306"
+      # description: database name
+      # type: string
+      # default: das
+      name: das
+      # description: database user name
+      # type: string
+      # default: root
+      user: root
+      # description: database password
+      # type: string
+      # default: root
+      pass: root
+  # connection pool configuration
   pool:
     # description: connection pool could create up to this value of connections
     # type: int
@@ -117,3 +119,46 @@ db:
     # type: int
     # das.yaml: 300
     keepAliveInterval: 300
+  # application configuration
+  application:
+    # mysql configuration
+    mysql:
+      # description: mysql user name
+      # type: string
+      # default: root
+      user: root
+      # description: mysql password
+      # type: string
+      # default: root
+      pass: root
+  # monitor configuration
+  monitor:
+    # prometheus configuration
+    prometheus:
+      # description: prometheus user name
+      # type: string
+      # default: root
+      user: root
+      # description: prometheus password
+      # type: string
+      # default: root
+      pass: root
+    # clickhouse configuration
+    clickhouse:
+      # description: clickhouse user name
+      # type: string
+      # default: root
+      user: root
+      # description: clickhouse password
+      # type: string
+      # default: root
+      pass: root
+    mysql:
+      # description: mysql user name
+      # type: string
+      # default: root
+      user: root
+      # description: mysql password
+      # type: string
+      # default: root
+      pass: root

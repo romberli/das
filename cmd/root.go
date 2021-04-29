@@ -33,30 +33,43 @@ import (
 )
 
 var (
-	baseDir                  string
-	cfgFile                  string
-	daemon                   bool
-	daemonStr                string
-	logFileName              string
-	logLevel                 string
-	logFormat                string
-	logMaxSize               int
-	logMaxDays               int
-	logMaxBackups            int
-	serverAddr               string
-	serverPid                int
-	serverPidFile            string
-	serverReadTimeout        int
-	serverWriteTimeout       int
-	dbMySQLAddr              string
-	dbMySQLName              string
-	dbMySQLUser              string
-	dbMySQLPass              string
+	// config
+	baseDir string
+	cfgFile string
+	// daemon
+	daemon    bool
+	daemonStr string
+	// log
+	logFileName   string
+	logLevel      string
+	logFormat     string
+	logMaxSize    int
+	logMaxDays    int
+	logMaxBackups int
+	// server
+	serverAddr         string
+	serverPid          int
+	serverPidFile      string
+	serverReadTimeout  int
+	serverWriteTimeout int
+	// database
+	dbDASMySQLAddr           string
+	dbDASMySQLName           string
+	dbDASMySQLUser           string
+	dbDASMySQLPass           string
 	dbPoolMaxConnections     int
 	dbPoolInitConnections    int
 	dbPoolMaxIdleConnections int
 	dbPoolMaxIdleTime        int
 	dbPoolKeepAliveInterval  int
+	dbMonitorPrometheusUser  string
+	dbMonitorPrometheusPass  string
+	dbMonitorClickhouseUser  string
+	dbMonitorClickhousePass  string
+	dbMonitorMySQLUser       string
+	dbMonitorMySQLPass       string
+	dbApplicationMySQLUser   string
+	dbApplicationMySQLPass   string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -118,15 +131,26 @@ func init() {
 	rootCmd.PersistentFlags().IntVar(&serverReadTimeout, "server-read-timeout", constant.DefaultRandomInt, fmt.Sprintf("specify the read timeout in seconds of http request(default: %d)", config.DefaultServerReadTimeout))
 	rootCmd.PersistentFlags().IntVar(&serverWriteTimeout, "server-write-timeout", constant.DefaultRandomInt, fmt.Sprintf("specify the read timeout in seconds of http request(default: %d)", config.DefaultServerReadTimeout))
 	// database
-	rootCmd.PersistentFlags().StringVar(&dbMySQLAddr, "db-mysql-addr", constant.DefaultRandomString, fmt.Sprintf("specify database address(format: host:port)(default: %s)", fmt.Sprintf("%s:%d", constant.DefaultLocalHostIP, constant.DefaultMySQLPort)))
-	rootCmd.PersistentFlags().StringVar(&dbMySQLName, "db-mysql-name", constant.DefaultRandomString, fmt.Sprintf("specify database name(default: %s)", config.DefaultDBName))
-	rootCmd.PersistentFlags().StringVar(&dbMySQLUser, "db-mysql-user", constant.DefaultRandomString, fmt.Sprintf("specify database user name(default: %s)", config.DefaultDBUser))
-	rootCmd.PersistentFlags().StringVar(&dbMySQLPass, "db-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify database user password(default: %s)", config.DefaultDBPass))
+	rootCmd.PersistentFlags().StringVar(&dbDASMySQLAddr, "db-das-mysql-addr", constant.DefaultRandomString, fmt.Sprintf("specify das database address(format: host:port)(default: %s)", fmt.Sprintf("%s:%d", constant.DefaultLocalHostIP, constant.DefaultMySQLPort)))
+	rootCmd.PersistentFlags().StringVar(&dbDASMySQLName, "db-das-mysql-name", constant.DefaultRandomString, fmt.Sprintf("specify das database name(default: %s)", config.DefaultDBName))
+	rootCmd.PersistentFlags().StringVar(&dbDASMySQLUser, "db-das-mysql-user", constant.DefaultRandomString, fmt.Sprintf("specify das database user name(default: %s)", config.DefaultDBUser))
+	rootCmd.PersistentFlags().StringVar(&dbDASMySQLPass, "db-das-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify das database user password(default: %s)", config.DefaultDBPass))
 	rootCmd.PersistentFlags().IntVar(&dbPoolMaxConnections, "db-pool-max-connections", constant.DefaultRandomInt, fmt.Sprintf("specify max connections of the connection pool(default: %d)", mysql.DefaultMaxConnections))
 	rootCmd.PersistentFlags().IntVar(&dbPoolInitConnections, "db-pool-init-connections", constant.DefaultRandomInt, fmt.Sprintf("specify initial connections of the connection pool(default: %d)", mysql.DefaultMaxIdleConnections))
 	rootCmd.PersistentFlags().IntVar(&dbPoolMaxIdleConnections, "db-pool-max-idle-connections", constant.DefaultRandomInt, fmt.Sprintf("specify max idle connections of the connection pool(default: %d)", mysql.DefaultMaxIdleConnections))
 	rootCmd.PersistentFlags().IntVar(&dbPoolMaxIdleTime, "db-pool-max-idle-time", constant.DefaultRandomInt, fmt.Sprintf("specify max idle time of connections of the connection pool, (default: %d, unit: seconds)", mysql.DefaultMaxIdleTime))
 	rootCmd.PersistentFlags().IntVar(&dbPoolKeepAliveInterval, "db-pool-keep-alive-interval", constant.DefaultRandomInt, fmt.Sprintf("specify keep alive interval of connections of the connection pool(default: %d, unit: seconds)", mysql.DefaultKeepAliveInterval))
+	rootCmd.PersistentFlags().StringVar(&dbApplicationMySQLUser, "db-application-mysql-user", constant.DefaultRandomString, fmt.Sprintf("specify mysql user name of application(default: %s)", config.DefaultDBUser))
+	rootCmd.PersistentFlags().StringVar(&dbApplicationMySQLPass, "db-application-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of application(default: %s)", config.DefaultDBPass))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorPrometheusUser, "db-monitor-prometheus-user", constant.DefaultRandomString, fmt.Sprintf("specify prometheus user name of monitor system(default: %s)", config.DefaultDBUser))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorPrometheusPass, "db-monitor-prometheus-pass", constant.DefaultRandomString, fmt.Sprintf("specify prometheus user password of monitor system(default: %s)", config.DefaultDBPass))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorClickhouseUser, "db-monitor-clickhouse-user", constant.DefaultRandomString, fmt.Sprintf("specify clickhouse user name of monitor system(default: %s)", config.DefaultDBUser))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorClickhousePass, "db-monitor-clickhouse-pass", constant.DefaultRandomString, fmt.Sprintf("specify clickhouse user password of monitor system(default: %s)", config.DefaultDBPass))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLUser, "db-monitor-mysql-user", constant.DefaultRandomString, fmt.Sprintf("specify mysql user name of monitor system(default: %s)", config.DefaultDBUser))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
+	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -268,17 +292,17 @@ func OverrideConfig() (err error) {
 	}
 
 	// override database
-	if dbMySQLAddr != constant.DefaultRandomString {
-		viper.Set(config.DBMySQLAddrKey, dbMySQLAddr)
+	if dbDASMySQLAddr != constant.DefaultRandomString {
+		viper.Set(config.DBDASMySQLAddrKey, dbDASMySQLAddr)
 	}
-	if dbMySQLName != constant.DefaultRandomString {
-		viper.Set(config.DBMySQLNameKey, dbMySQLName)
+	if dbDASMySQLName != constant.DefaultRandomString {
+		viper.Set(config.DBDASMySQLNameKey, dbDASMySQLName)
 	}
-	if dbMySQLUser != constant.DefaultRandomString {
-		viper.Set(config.DBMySQLUserKey, dbMySQLUser)
+	if dbDASMySQLUser != constant.DefaultRandomString {
+		viper.Set(config.DBDASMySQLUserKey, dbDASMySQLUser)
 	}
-	if dbMySQLPass != constant.DefaultRandomString {
-		viper.Set(config.DBMySQLPassKey, dbMySQLPass)
+	if dbDASMySQLPass != constant.DefaultRandomString {
+		viper.Set(config.DBDASMySQLPassKey, dbDASMySQLPass)
 	}
 	if dbPoolMaxConnections != constant.DefaultRandomInt {
 		viper.Set(config.DBPoolMaxConnectionsKey, dbPoolMaxConnections)
