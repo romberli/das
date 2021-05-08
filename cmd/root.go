@@ -148,9 +148,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&dbMonitorClickhousePass, "db-monitor-clickhouse-pass", constant.DefaultRandomString, fmt.Sprintf("specify clickhouse user password of monitor system(default: %s)", config.DefaultDBPass))
 	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLUser, "db-monitor-mysql-user", constant.DefaultRandomString, fmt.Sprintf("specify mysql user name of monitor system(default: %s)", config.DefaultDBUser))
 	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
-	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
-	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
-	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

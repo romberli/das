@@ -206,7 +206,6 @@ func (r *Result) GetLastUpdateTime() time.Time {
 	return r.LastUpdateTime
 }
 
-// Set sets DB with given fields, key is the field name and value is the relevant value of the key
 func (r *Result) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {
 		err := common.SetValueOfStruct(r, fieldName, fieldValue)
@@ -222,7 +221,6 @@ func (r *Result) MarshalJSON() ([]byte, error) {
 	return common.MarshalStructWithTag(r, constant.DefaultMarshalTag)
 }
 
-// MarshalJSONWithFields marshals only specified field of the DB to json string
 func (r *Result) MarshalJSONWithFields(fields ...string) ([]byte, error) {
 	return common.MarshalStructWithFields(r, fields...)
 }
