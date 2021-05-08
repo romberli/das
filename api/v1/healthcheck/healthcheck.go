@@ -23,7 +23,7 @@ func Check(c *gin.Context) {
 }
 
 // @Tags healthcheck
-// @Summary check health of the database
+// @Summary check health of the database by host ip and port number
 // @Produce  application/json
 // @Success 200 {string} string "{"code": 200, "data": ""}"
 // @Router /api/v1/healthcheck/check/host-info [post]
