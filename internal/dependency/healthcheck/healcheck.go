@@ -23,26 +23,38 @@ type Result interface {
 	GetCPUUsageScore() int
 	// GetCPUUsageData returns the cpu usage data
 	GetCPUUsageData() string
+	// GetCPUUsageHigh returns the high cpu usage data
+	GetCPUUsageHigh() string
 	// GetIOUtilScore returns the io util score
 	GetIOUtilScore() int
 	// GetIOUtilData returns the io util data
 	GetIOUtilData() string
+	// GetIOUtilHigh returns the high io util data
+	GetIOUtilHigh() string
 	// GetDiskCapacityUsageScore returns the disk capacity usage score
 	GetDiskCapacityUsageScore() int
 	// GetDiskCapacityUsageData returns the disk capacity usage data
 	GetDiskCapacityUsageData() string
+	// GetDiskCapacityUsageHigh returns the high disk capacity usage data
+	GetDiskCapacityUsageHigh() string
 	// GetConnectionUsageScore returns the connection usage score
 	GetConnectionUsageScore() int
 	// GetConnectionUsageData returns the connection usage data
 	GetConnectionUsageData() string
+	// GetConnectionUsageHigh returns the high connection usage data
+	GetConnectionUsageHigh() string
 	// GetAverageActiveSessionNumScore returns the average active session number score
 	GetAverageActiveSessionNumScore() int
 	// GetAverageActiveSessionNumData returns the average active session number data
 	GetAverageActiveSessionNumData() string
-	// GetCacheHitRatioScore returns the cache hit ratio score
-	GetCacheHitRatioScore() int
-	// GetCacheHitRatioData returns the cache hit ratio data
-	GetCacheHitRatioData() string
+	// GetAverageActiveSessionNumHigh returns the high average active session number data
+	GetAverageActiveSessionNumHigh() string
+	// GetCacheHitRatioScore returns the cache miss ratio score
+	GetCacheMissRatioScore() int
+	// GetCacheHitRatioData returns the cache miss ratio data
+	GetCacheMissRatioData() string
+	// GetCacheMissRatioHigh returns the high cache miss ratio data
+	GetCacheMissRatioHigh() string
 	// GetSlowQueryScore returns the slow query score
 	GetSlowQueryScore() int
 	// GetSlowQueryData returns the slow query data
@@ -68,10 +80,16 @@ type Repository interface {
 	Execute(command string, args ...interface{}) (middleware.Result, error)
 	// Transaction returns a middleware.Transaction that could execute multiple commands as a transaction
 	Transaction() (middleware.Transaction, error)
-	// InitOperation initiates the operation
-	InitOperation(mysqlServerID int, startTime, endTime time.Time, step time.Duration) (int, error)
 	// GetResultByOperationID returns the result
 	GetResultByOperationID(operationID int) (Result, error)
+	// IsRunning returns if the healthcheck of given mysql server is still running
+	IsRunning(mysqlServerID int) (bool, error)
+	// InitOperation initiates the operation
+	InitOperation(mysqlServerID int, startTime, endTime time.Time, step time.Duration) (int, error)
+	// UpdateOperationStatus updates operation status
+	UpdateOperationStatus(operationID int, status int, message string) error
+	// SaveResult saves result into the middleware
+	SaveResult(result Result) error
 	// UpdateAccurateReviewByOperationID updates the accurate review
 	UpdateAccurateReviewByOperationID(operationID int, review int) error
 }

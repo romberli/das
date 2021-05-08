@@ -266,17 +266,17 @@ func ValidateDatabase() error {
 			merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbAddr))
 		}
 	}
-	// validate db.name
+	// validate db.das.name
 	_, err = cast.ToStringE(viper.Get(DBDASMySQLNameKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
-	// validate db.user
+	// validate db.das.user
 	_, err = cast.ToStringE(viper.Get(DBDASMySQLUserKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
-	// validate db.pass
+	// validate db.das.pass
 	_, err = cast.ToStringE(viper.Get(DBDASMySQLPassKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)

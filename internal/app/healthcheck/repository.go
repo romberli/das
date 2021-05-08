@@ -34,7 +34,7 @@ func (r *Repository) Execute(command string, args ...interface{}) (middleware.Re
 	defer func() {
 		err = conn.Close()
 		if err != nil {
-			log.Errorf("metadata DBRepo.Execute(): close database connection failed.\n%s", err.Error())
+			log.Errorf("healthcheck Repository.Execute(): close database connection failed.\n%s", err.Error())
 		}
 	}()
 
@@ -46,11 +46,23 @@ func (r *Repository) Transaction() (middleware.Transaction, error) {
 	return r.Database.Transaction()
 }
 
+func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result, error) {
+
+}
+
+func (r *Repository) IsRunning(mysqlServerID int) (bool, error) {
+
+}
+
 func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Time, step time.Duration) (int, error) {
 
 }
 
-func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result, error) {
+func (r *Repository) UpdateOperationStatus(operationID int, status int, message string) error {
+
+}
+
+func (r *Repository) SaveResult(result healthcheck.Result) error {
 
 }
 
