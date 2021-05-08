@@ -29,7 +29,8 @@ const (
 	defaultCacheMissRatioItemName          = "cache_miss_ratio"
 	defaultTableRowsItemName               = "table_rows"
 	defaultTableSizeItemName               = "table_size"
-	defaultSlowQueryItemName               = "slow_query"
+	defaultSlowQueryExecutionTimeItemName  = "slow_query_execution_time"
+	defaultSlowQueryRowsExaminedItemName   = "slow_query_rows_examined"
 )
 
 var _ healthcheck.Engine = (*DefaultEngine)(nil)
@@ -370,7 +371,8 @@ func (de *DefaultEngine) summarize() {
 		de.result.AverageActiveSessionNumScore*de.getItemConfig(defaultAverageActiveSessionNumItemName).ItemWeight +
 		de.result.CacheMissRatioScore*de.getItemConfig(defaultCacheMissRatioItemName).ItemWeight +
 		de.result.TableSizeScore*(de.getItemConfig(defaultTableRowsItemName).ItemWeight+de.getItemConfig(defaultTableSizeItemName).ItemWeight) +
-		de.result.SlowQueryScore*de.getItemConfig(defaultSlowQueryItemName).ItemWeight) / constant.MaxPercentage
+		de.result.SlowQueryScore*(de.getItemConfig(defaultSlowQueryExecutionTimeItemName).ItemWeight+de.getItemConfig(defaultSlowQueryRowsExaminedItemName).ItemWeight)) /
+		constant.MaxPercentage
 
 	if de.result.WeightedAverageScore < defaultMinScore {
 		de.result.WeightedAverageScore = defaultMinScore
