@@ -32,6 +32,9 @@ type Result struct {
 	CacheMissRatioScore          int       `middleware:"cache_miss_ratio_score" json:"cache_miss_ratio_score"`
 	CacheMissRatioData           string    `middleware:"cache_miss_ratio_data" json:"cache_miss_ratio_data"`
 	CacheMissRatioHigh           string    `middleware:"cache_miss_ratio_high" json:"cache_miss_ratio_high"`
+	TableSizeScore               int       `middleware:"table_size_score" json:"table_size_score"`
+	TableSizeData                string    `middleware:"table_size_data" json:"table_size_data"`
+	TableSizeHigh                string    `middleware:"table_size_high" json:"table_size_high"`
 	SlowQueryScore               int       `middleware:"slow_query_score" json:"slow_query_score"`
 	SlowQueryData                string    `middleware:"slow_query_data" json:"slow_query_data"`
 	SlowQueryAdvice              string    `middleware:"slow_query_advice" json:"slow_query_advice"`
@@ -47,6 +50,7 @@ func NewResult(operationID int, weightedAverageScore int, dbConfigScore int, dbC
 	connectionUsageScore int, connectionUsageData string, connectionUsageHigh string,
 	averageActiveSessionNumScore int, averageActiveSessionNumData string, averageActiveSessionNumHigh string,
 	cacheMissRatioScore int, cacheMissRatioData string, cacheMissRatioHigh string,
+	tableSizeScore int, tableSizeData string, tableSizeHigh string,
 	slowQueryScore int, slowQueryData string, slowQueryAdvice string) *Result {
 	return &Result{
 		OperationID:                  operationID,
@@ -72,6 +76,9 @@ func NewResult(operationID int, weightedAverageScore int, dbConfigScore int, dbC
 		CacheMissRatioScore:          cacheMissRatioScore,
 		CacheMissRatioData:           cacheMissRatioData,
 		CacheMissRatioHigh:           cacheMissRatioHigh,
+		TableSizeScore:               tableSizeScore,
+		TableSizeData:                tableSizeData,
+		TableSizeHigh:                tableSizeHigh,
 		SlowQueryScore:               slowQueryScore,
 		SlowQueryData:                slowQueryData,
 		SlowQueryAdvice:              slowQueryAdvice,
@@ -176,6 +183,18 @@ func (r *Result) GetCacheMissRatioData() string {
 
 func (r *Result) GetCacheMissRatioHigh() string {
 	return r.CacheMissRatioHigh
+}
+
+func (r *Result) GetTableSizeScore() int {
+	return r.TableSizeScore
+}
+
+func (r *Result) GetTableSizeData() string {
+	return r.TableSizeData
+}
+
+func (r *Result) GetTableSizeHigh() string {
+	return r.TableSizeHigh
 }
 
 func (r *Result) GetSlowQueryScore() int {

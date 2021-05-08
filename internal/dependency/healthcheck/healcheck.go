@@ -55,6 +55,12 @@ type Result interface {
 	GetCacheMissRatioData() string
 	// GetCacheMissRatioHigh returns the high cache miss ratio data
 	GetCacheMissRatioHigh() string
+	// GetTableSizeScore returns the table size score
+	GetTableSizeScore() int
+	// GetTableSizeData returns the table size data
+	GetTableSizeData() string
+	// GetTableSizeHigh returns the high table size data
+	GetTableSizeHigh() string
 	// GetSlowQueryScore returns the slow query score
 	GetSlowQueryScore() int
 	// GetSlowQueryData returns the slow query data

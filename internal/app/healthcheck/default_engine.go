@@ -18,6 +18,7 @@ import (
 
 const (
 	defaultDBConfigScore                   = 5
+	defaultMinScore                        = 0
 	defaultMaxScore                        = 100.0
 	defaultDBConfigItemName                = "db_config"
 	defaultCPUUsageItemName                = "cpu_usage"
@@ -26,24 +27,27 @@ const (
 	defaultConnectionUsageItemName         = "connection_usage"
 	defaultAverageActiveSessionNumItemName = "average_active_session_num"
 	defaultCacheMissRatioItemName          = "cache_miss_ratio"
+	defaultTableRowsItemName               = "table_rows"
+	defaultTableSizeItemName               = "table_size"
 	defaultSlowQueryItemName               = "slow_query"
 )
 
 var _ healthcheck.Engine = (*DefaultEngine)(nil)
 
 type DefaultItemConfig struct {
-	ID                      int       `middleware:"id" json:"id"`
-	ItemName                string    `middleware:"item_name" json:"item_name"`
-	ItemWeight              int       `middleware:"item_weight" json:"item_weight"`
-	LowWatermark            float64   `middleware:"low_watermark" json:"low_watermark"`
-	HighWatermark           float64   `middleware:"high_watermark" json:"high_watermark"`
-	MaxScoreDeductionHigh   float64   `middleware:"max_score_deduction_high" json:"max_score_deduction_high"`
-	MaxScoreDeductionMedium float64   `middleware:"max_score_deduction_medium" json:"max_score_deduction_medium"`
-	Unit                    float64   `middleware:"unit" json:"unit"`
-	ScorePerUnit            float64   `middleware:"score_per_unit" json:"score_per_unit"`
-	DelFlag                 int       `middleware:"del_flag" json:"del_flag"`
-	CreateTime              time.Time `middleware:"create_time" json:"create_time"`
-	LastUpdateTime          time.Time `middleware:"last_update_time" json:"last_update_time"`
+	ID                          int       `middleware:"id" json:"id"`
+	ItemName                    string    `middleware:"item_name" json:"item_name"`
+	ItemWeight                  int       `middleware:"item_weight" json:"item_weight"`
+	LowWatermark                float64   `middleware:"low_watermark" json:"low_watermark"`
+	HighWatermark               float64   `middleware:"high_watermark" json:"high_watermark"`
+	Unit                        float64   `middleware:"unit" json:"unit"`
+	ScoreDeductionPerUnitHigh   float64   `middleware:"score_deduction_per_unit_high" json:"score_deduction_per_unit_high"`
+	MaxScoreDeductionHigh       float64   `middleware:"max_score_deduction_high" json:"max_score_deduction_high"`
+	ScoreDeductionPerUnitMedium float64   `middleware:"score_deduction_per_unit_medium" json:"score_deduction_per_unit_medium"`
+	MaxScoreDeductionMedium     float64   `middleware:"max_score_deduction_medium" json:"max_score_deduction_medium"`
+	DelFlag                     int       `middleware:"del_flag" json:"del_flag"`
+	CreateTime                  time.Time `middleware:"create_time" json:"create_time"`
+	LastUpdateTime              time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
 // NewEmptyDefaultItemConfig returns a new *DefaultItemConfig
@@ -61,6 +65,11 @@ func NewEmptyDefaultEngineConfig() DefaultEngineConfig {
 // getItemConfig returns *DefaultItemConfig with given item name
 func (dec DefaultEngineConfig) getItemConfig(item string) *DefaultItemConfig {
 	return dec[item]
+}
+
+// Validate validates if engine configuration is valid
+func (dec DefaultEngineConfig) Validate() bool {
+	return true
 }
 
 type DefaultEngine struct {
@@ -176,11 +185,55 @@ func (de *DefaultEngine) preRun() error {
 
 // loadEngineConfig loads engine config
 func (de *DefaultEngine) loadEngineConfig() error {
+	// load config
+
+	// validate config
+
 	return nil
 }
 
 // checkDBConfig checks database configuration
 func (de *DefaultEngine) checkDBConfig() error {
+	// max_user_connection
+
+	// log_bin
+
+	// binlog_format
+
+	// binlog_row_image
+
+	// sync_binlog
+
+	// innodb_flush_log_at_trx_commit
+
+	// gtid_mode
+
+	// enforce_gtid_consistency
+
+	// slave-parallel-type
+
+	// slave-parallel-workers
+
+	// master_info_repository
+
+	// relay_log_info_repository
+
+	// report_host
+
+	// report_port
+
+	// innodb_buffer_pool_chunk_size
+
+	// innodb_flush_method
+
+	// innodb_monitor_enable
+
+	// innodb_print_all_deadlocks
+
+	// slow_query_log
+
+	// performance_schema
+
 	return nil
 }
 
@@ -250,17 +303,20 @@ func (de *DefaultEngine) checkCPUUsage() error {
 	de.result.CPUUsageData = string(jsonBytesHigh)
 
 	// cpu usage high score deduction
-	cpuUsageScoreDeductionHigh := (cpuUsageHighSum/float64(cpuUsageHighCount) - cpuUsageConfig.HighWatermark) / cpuUsageConfig.Unit * cpuUsageConfig.ScorePerUnit
+	cpuUsageScoreDeductionHigh := (cpuUsageHighSum/float64(cpuUsageHighCount) - cpuUsageConfig.HighWatermark) / cpuUsageConfig.Unit * cpuUsageConfig.ScoreDeductionPerUnitHigh
 	if cpuUsageScoreDeductionHigh > cpuUsageConfig.MaxScoreDeductionHigh {
 		cpuUsageScoreDeductionHigh = cpuUsageConfig.MaxScoreDeductionHigh
 	}
 	// cpu usage medium score deduction
-	cpuUsageScoreDeductionMedium := (cpuUsageMediumSum/float64(cpuUsageMediumCount) - cpuUsageConfig.LowWatermark) / cpuUsageConfig.Unit * cpuUsageConfig.ScorePerUnit
+	cpuUsageScoreDeductionMedium := (cpuUsageMediumSum/float64(cpuUsageMediumCount) - cpuUsageConfig.LowWatermark) / cpuUsageConfig.Unit * cpuUsageConfig.ScoreDeductionPerUnitMedium
 	if cpuUsageScoreDeductionMedium > cpuUsageConfig.MaxScoreDeductionMedium {
 		cpuUsageScoreDeductionMedium = cpuUsageConfig.MaxScoreDeductionMedium
 	}
 	// cpu usage score
 	de.result.CPUUsageScore = int(defaultMaxScore - cpuUsageScoreDeductionHigh - cpuUsageScoreDeductionMedium)
+	if de.result.CPUUsageScore < constant.ZeroInt {
+		de.result.CPUUsageScore = constant.ZeroInt
+	}
 
 	return nil
 }
@@ -290,6 +346,15 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	return nil
 }
 
+// checkTableSize checks table size
+func (de *DefaultEngine) checkTableSize() error {
+	// check table rows
+
+	// check table size
+
+	return nil
+}
+
 // checkSlowQuery checks slow query
 func (de *DefaultEngine) checkSlowQuery() error {
 	return nil
@@ -297,14 +362,19 @@ func (de *DefaultEngine) checkSlowQuery() error {
 
 // summarize summarizes all item scores with weight
 func (de *DefaultEngine) summarize() {
-	de.result.WeightedAverageScore = de.result.DBConfigScore*de.getItemConfig(defaultDBConfigItemName).ItemWeight +
+	de.result.WeightedAverageScore = (de.result.DBConfigScore*de.getItemConfig(defaultDBConfigItemName).ItemWeight +
 		de.result.CPUUsageScore*de.getItemConfig(defaultCPUUsageItemName).ItemWeight +
 		de.result.IOUtilScore*de.getItemConfig(defaultIOUtilItemName).ItemWeight +
-		de.result.DiskCapacityUsageScore*de.getItemConfig(defaultDBConfigItemName).ItemWeight +
+		de.result.DiskCapacityUsageScore*de.getItemConfig(defaultDiskCapacityUsageItemName).ItemWeight +
 		de.result.ConnectionUsageScore*de.getItemConfig(defaultConnectionUsageItemName).ItemWeight +
 		de.result.AverageActiveSessionNumScore*de.getItemConfig(defaultAverageActiveSessionNumItemName).ItemWeight +
 		de.result.CacheMissRatioScore*de.getItemConfig(defaultCacheMissRatioItemName).ItemWeight +
-		de.result.SlowQueryScore*de.getItemConfig(defaultSlowQueryItemName).ItemWeight
+		de.result.TableSizeScore*(de.getItemConfig(defaultTableRowsItemName).ItemWeight+de.getItemConfig(defaultTableSizeItemName).ItemWeight) +
+		de.result.SlowQueryScore*de.getItemConfig(defaultSlowQueryItemName).ItemWeight) / constant.MaxPercentage
+
+	if de.result.WeightedAverageScore < defaultMinScore {
+		de.result.WeightedAverageScore = defaultMinScore
+	}
 }
 
 // postRun performs post-run actions, for now, it ony saves healthcheck result to the middleware
