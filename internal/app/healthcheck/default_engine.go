@@ -18,7 +18,6 @@ import (
 
 const (
 	defaultDBConfigScore                   = 5
-	defaultMaxPercents                     = 100
 	defaultMaxScore                        = 100.0
 	defaultDBConfigItemName                = "db_config"
 	defaultCPUUsageItemName                = "cpu_usage"
@@ -177,12 +176,12 @@ func (de *DefaultEngine) preRun() error {
 
 // loadEngineConfig loads engine config
 func (de *DefaultEngine) loadEngineConfig() error {
-
+	return nil
 }
 
 // checkDBConfig checks database configuration
 func (de *DefaultEngine) checkDBConfig() error {
-
+	return nil
 }
 
 // checkCPUUsage checks cpu usage
@@ -268,27 +267,27 @@ func (de *DefaultEngine) checkCPUUsage() error {
 
 // checkIOUtil check io util
 func (de *DefaultEngine) checkIOUtil() error {
-
+	return nil
 }
 
 // checkDiskCapacityUsage checks disk capacity usage
 func (de *DefaultEngine) checkDiskCapacityUsage() error {
-
+	return nil
 }
 
 // checkConnectionUsage checks connection usage
 func (de *DefaultEngine) checkConnectionUsage() error {
-
+	return nil
 }
 
 // checkActiveSessionNum check active session number
 func (de *DefaultEngine) checkActiveSessionNum() error {
-
+	return nil
 }
 
 // checkCacheMissRatio checks cache miss ratio
 func (de *DefaultEngine) checkCacheMissRatio() error {
-
+	return nil
 }
 
 // checkSlowQuery checks slow query

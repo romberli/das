@@ -5,6 +5,7 @@ import (
 
 	"github.com/romberli/das/global"
 	"github.com/romberli/das/internal/dependency/healthcheck"
+	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware"
 	"github.com/romberli/log"
 )
@@ -47,25 +48,25 @@ func (r *Repository) Transaction() (middleware.Transaction, error) {
 }
 
 func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result, error) {
-
+	return nil, nil
 }
 
 func (r *Repository) IsRunning(mysqlServerID int) (bool, error) {
-
+	return false, nil
 }
 
 func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Time, step time.Duration) (int, error) {
-
+	return constant.ZeroInt, nil
 }
 
 func (r *Repository) UpdateOperationStatus(operationID int, status int, message string) error {
-
+	return nil
 }
 
 func (r *Repository) SaveResult(result healthcheck.Result) error {
-
+	return nil
 }
 
 func (r *Repository) UpdateAccurateReviewByOperationID(operationID int, review int) error {
-
+	return nil
 }
