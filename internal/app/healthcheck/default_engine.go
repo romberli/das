@@ -282,10 +282,10 @@ func (de *DefaultEngine) checkCPUUsage() error {
 		case cpuUsage >= cpuUsageConfig.HighWatermark:
 			cpuUsageHigh = append(cpuUsageHigh, rowData)
 
-			cpuUsageHighSum += rowData[constant.ZeroInt].(float64)
+			cpuUsageHighSum += cpuUsage
 			cpuUsageHighCount++
 		case cpuUsage >= cpuUsageConfig.LowWatermark:
-			cpuUsageMediumSum += rowData[constant.ZeroInt].(float64)
+			cpuUsageMediumSum += cpuUsage
 			cpuUsageMediumCount++
 		}
 	}
@@ -301,7 +301,7 @@ func (de *DefaultEngine) checkCPUUsage() error {
 	if err != nil {
 		return nil
 	}
-	de.result.CPUUsageData = string(jsonBytesHigh)
+	de.result.CPUUsageHigh = string(jsonBytesHigh)
 
 	// cpu usage high score deduction
 	cpuUsageScoreDeductionHigh := (cpuUsageHighSum/float64(cpuUsageHighCount) - cpuUsageConfig.HighWatermark) / cpuUsageConfig.Unit * cpuUsageConfig.ScoreDeductionPerUnitHigh
