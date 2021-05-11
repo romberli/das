@@ -56,10 +56,10 @@ func SetDefaultConfig(baseDir string) {
 	viper.SetDefault(ServerReadTimeoutKey, DefaultServerReadTimeout)
 	viper.SetDefault(ServerWriteTimeoutKey, DefaultServerWriteTimeout)
 	// database
-	viper.SetDefault(DBMySQLAddrKey, fmt.Sprintf("%s:%d", constant.DefaultLocalHostIP, constant.DefaultMySQLPort))
-	viper.SetDefault(DBMySQLNameKey, DefaultDBName)
-	viper.SetDefault(DBMySQLUserKey, DefaultDBUser)
-	viper.SetDefault(DBMySQLPassKey, DefaultDBPass)
+	viper.SetDefault(DBDASMySQLAddrKey, fmt.Sprintf("%s:%d", constant.DefaultLocalHostIP, constant.DefaultMySQLPort))
+	viper.SetDefault(DBDASMySQLNameKey, DefaultDBName)
+	viper.SetDefault(DBDASMySQLUserKey, DefaultDBUser)
+	viper.SetDefault(DBDASMySQLPassKey, DefaultDBPass)
 	viper.SetDefault(DBPoolMaxConnectionsKey, mysql.DefaultMaxConnections)
 	viper.SetDefault(DBPoolInitConnectionsKey, mysql.DefaultInitConnections)
 	viper.SetDefault(DBPoolMaxIdleConnectionsKey, mysql.DefaultMaxIdleConnections)
@@ -251,7 +251,7 @@ func ValidateDatabase() error {
 	merr := &multierror.Error{}
 
 	// validate db.addr
-	dbAddr, err := cast.ToStringE(viper.Get(DBMySQLAddrKey))
+	dbAddr, err := cast.ToStringE(viper.Get(DBDASMySQLAddrKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
@@ -266,18 +266,18 @@ func ValidateDatabase() error {
 			merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbAddr))
 		}
 	}
-	// validate db.name
-	_, err = cast.ToStringE(viper.Get(DBMySQLNameKey))
+	// validate db.das.name
+	_, err = cast.ToStringE(viper.Get(DBDASMySQLNameKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
-	// validate db.user
-	_, err = cast.ToStringE(viper.Get(DBMySQLUserKey))
+	// validate db.das.user
+	_, err = cast.ToStringE(viper.Get(DBDASMySQLUserKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
-	// validate db.pass
-	_, err = cast.ToStringE(viper.Get(DBMySQLPassKey))
+	// validate db.das.pass
+	_, err = cast.ToStringE(viper.Get(DBDASMySQLPassKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
