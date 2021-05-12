@@ -26,7 +26,7 @@ const (
 var mysqlServerRepo = initMySQLServerRepo()
 
 func initMySQLServerRepo() *MySQLServerRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
+	pool, err := mysql.NewPoolWithDefault(addr, dbName, dbUser, dbPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMySQLServerRepo() failed", err))
 		return nil

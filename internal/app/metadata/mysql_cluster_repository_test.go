@@ -23,7 +23,7 @@ const (
 var mysqlClusterRepo = initMySQLClusterRepo()
 
 func initMySQLClusterRepo() *MySQLClusterRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
+	pool, err := mysql.NewPoolWithDefault(addr, dbName, dbUser, dbPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMySQLClusterRepo() failed", err))
 		return nil

@@ -23,7 +23,7 @@ const (
 var userRepo = initUserRepo()
 
 func initUserRepo() *UserRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(addr, dbName, dbUser, dbPass)
+	pool, err := mysql.NewPoolWithDefault(addr, dbName, dbUser, dbPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initUserRepo() failed", err))
 		return nil
