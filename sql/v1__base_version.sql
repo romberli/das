@@ -204,8 +204,9 @@ CREATE TABLE `t_hc_result` (
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
-  KEY `idx01_operation_id_weighted_average_score` (`operation_id`, `weighted_average_score`),
-  KEY `idx02_weighted_average_score` (`weighted_average_score`)
+  UNIQUE KEY `idx01_operation_id` (`operation_id`),
+  KEY `idx02_operation_id_weighted_average_score` (`operation_id`, `weighted_average_score`),
+  KEY `idx03_weighted_average_score` (`weighted_average_score`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='健康检查结果表';
 
 CREATE TABLE `t_hc_operation_info` (
