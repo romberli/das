@@ -43,6 +43,8 @@ func (gr *GinRouter) Register() {
 	{
 		// metadata
 		RegisterMetadata(v1)
+		// healthcheck
+		RegisterHealthcheck(v1)
 	}
 }
 
