@@ -324,9 +324,6 @@ func (de *DefaultEngine) checkCPUUsage() error {
 
 // checkIOUtil check io util
 func (de *DefaultEngine) checkIOUtil() error {
-	// get data
-	serverName := de.operationInfo.MySQLServer.GetServerName()
-
 	return nil
 }
 
