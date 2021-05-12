@@ -23,7 +23,7 @@ const (
 var appRepo = initAppRepo()
 
 func initAppRepo() *AppRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(appAddr, appDBName, appDBUser, appDBPass)
+	pool, err := mysql.NewPoolWithDefault(appAddr, appDBName, appDBUser, appDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initAppRepo() failed", err))
 		return nil

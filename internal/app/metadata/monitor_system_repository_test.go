@@ -24,7 +24,7 @@ const (
 var monitorSystemRepo = initMonitorSystemRepo()
 
 func initMonitorSystemRepo() *MonitorSystemRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(monitorSystemAddr, monitorSystemDBName, monitorSystemDBUser, monitorSystemDBPass)
+	pool, err := mysql.NewPoolWithDefault(monitorSystemAddr, monitorSystemDBName, monitorSystemDBUser, monitorSystemDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMonitorSystemRepo() failed", err))
 		return nil
