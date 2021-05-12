@@ -25,7 +25,7 @@ const (
 var middlewareClusterRepo = initMiddlewareClusterRepo()
 
 func initMiddlewareClusterRepo() *MiddlewareClusterRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(middlewareClusterAddr, middlewareClusterDBName, middlewareClusterDBUser, middlewareClusterDBPass)
+	pool, err := mysql.NewPoolWithDefault(middlewareClusterAddr, middlewareClusterDBName, middlewareClusterDBUser, middlewareClusterDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMiddlewareClusterRepo() failed", err))
 		return nil

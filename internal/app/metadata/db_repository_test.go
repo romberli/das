@@ -23,7 +23,7 @@ const (
 var dbRepo = initDBRepo()
 
 func initDBRepo() *DBRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(dbAddr, dbDBName, dbDBUser, dbDBPass)
+	pool, err := mysql.NewPoolWithDefault(dbAddr, dbDBName, dbDBUser, dbDBPass)
 	log.Infof("pool: %v, error: %v", pool, err)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initDBRepo() failed", err))
