@@ -30,7 +30,7 @@ Accept: application/json
 GET http://{{baseURL}}/api/v1/metadata/user/mobile/mobile
 Accept: application/json
 
-### AddUser 
+### AddUser
 POST http://{{baseURL}}/api/v1/metadata/user
 Content-Type: application/json
 
@@ -45,25 +45,3 @@ Content-Type: application/json
 ### DeleteUserByID
 POST http://{{baseURL}}/api/v1/metadata/user/delete/1
 Content-Type: application/json
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        	
-        

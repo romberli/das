@@ -161,6 +161,10 @@ func (msi *MySQLServerInfo) GetLastUpdateTime() time.Time {
 	return msi.LastUpdateTime
 }
 
+func (msi *MySQLServerInfo) GetMonitorSystem() (metadata.MonitorSystem, error) {
+	return msi.MySQLServerRepo.GetMonitorSystem(msi.Identity())
+}
+
 // Set sets entity with given fields, key is the field name and value is the relevant value of the key
 func (msi *MySQLServerInfo) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {

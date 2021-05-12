@@ -25,7 +25,7 @@ const (
 var envRepo = initEnvRepo()
 
 func initEnvRepo() *EnvRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(envAddr, envDBName, envDBUser, envDBPass)
+	pool, err := mysql.NewPoolWithDefault(envAddr, envDBName, envDBUser, envDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initEnvRepo() failed", err))
 		return nil

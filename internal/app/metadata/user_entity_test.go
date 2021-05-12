@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultUserInfoID                   = 22
+	defaultUserInfoID                   = 1
 	defaultUserInfoUserName             = "nun"
 	defaultUserInfoDepartmentName       = "dn1"
 	defaultUserInfoEmployeeID           = "11"

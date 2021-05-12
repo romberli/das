@@ -28,6 +28,8 @@ type MySQLServer interface {
 	GetCreateTime() time.Time
 	// GetLastUpdateTime returns the last update time
 	GetLastUpdateTime() time.Time
+	// GetMonitorSystem gets monitor system from the mysql
+	GetMonitorSystem() (MonitorSystem, error)
 	// Set sets MySQLServer with given fields, key is the field name and value is the relevant value of the key
 	Set(fields map[string]interface{}) error
 	// Delete sets DelFlag to 1
@@ -54,6 +56,8 @@ type MySQLServerRepo interface {
 	GetByHostInfo(hostIP string, portNum int) (MySQLServer, error)
 	// GetID gets the identity with given host ip and port number from the mysql
 	GetID(hostIP string, portNum int) (int, error)
+	// GetMonitorSystem gets monitor system with given mysql server id from the mysql
+	GetMonitorSystem(id int) (MonitorSystem, error)
 	// Create creates a mysql server in the mysql
 	Create(ms MySQLServer) (MySQLServer, error)
 	// Update updates the mysql server in the mysql

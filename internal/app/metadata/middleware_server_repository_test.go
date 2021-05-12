@@ -25,7 +25,7 @@ const (
 var middlewareServerRepo = initMiddlewareServerRepo()
 
 func initMiddlewareServerRepo() *MiddlewareServerRepo {
-	pool, err := mysql.NewMySQLPoolWithDefault(middlewareServerAddr, middlewareServerDBName, middlewareServerDBUser, middlewareServerDBPass)
+	pool, err := mysql.NewPoolWithDefault(middlewareServerAddr, middlewareServerDBName, middlewareServerDBUser, middlewareServerDBPass)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initMiddlewareServerRepo() failed", err))
 		return nil

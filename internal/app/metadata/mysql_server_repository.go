@@ -197,6 +197,43 @@ func (msr *MySQLServerRepo) GetID(hostIP string, portNum int) (int, error) {
 	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
+// GetMonitorSystem gets monitor system with given mysql server id from the mysql
+func (msr *MySQLServerRepo) GetMonitorSystem(id int) (metadata.MonitorSystem, error) {
+	sql := `
+		select monsi.id,
+			   monsi.system_name,
+			   monsi.system_type,
+			   monsi.host_ip,
+			   monsi.port_num,
+			   monsi.port_num_slow,
+			   monsi.base_url,
+			   monsi.env_id,
+			   monsi.del_flag,
+			   monsi.create_time,
+			   monsi.last_update_time
+		from t_meta_mysql_server_info mysi
+				 inner join t_meta_mysql_cluster_info mci on mysi.cluster_id = mci.id
+				 inner join t_meta_monitor_system_info monsi on mci.monitor_system_id = monsi.id
+		where mysi.del_flag = 0
+		  and mci.del_flag = 0
+		  and monsi.del_flag = 0
+		  and mysi.id = ?;
+	`
+	log.Debugf("metadata MySQLServerRepo.GetMonitorSystem() select sql: %s", sql)
+	// execute
+	result, err := msr.Execute(sql, id)
+	if err != nil {
+		return nil, err
+	}
+	monitorSystemInfo := NewEmptyMonitorSystemInfoWithGlobal()
+	err = result.MapToStructByRowIndex(monitorSystemInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+	if err != nil {
+		return nil, err
+	}
+
+	return monitorSystemInfo, nil
+}
+
 // Create creates data with given mysqlServer in the middleware
 func (msr *MySQLServerRepo) Create(mysqlServer metadata.MySQLServer) (metadata.MySQLServer, error) {
 	sql := `

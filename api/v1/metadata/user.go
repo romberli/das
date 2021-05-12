@@ -309,6 +309,11 @@ func AddUser(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, userNameStruct)
 		return
 	}
+	_, ok = fields[emailStruct]
+	if !ok {
+		resp.ResponseNOK(c, message.ErrFieldNotExists, emailStruct)
+		return
+	}
 	_, ok = fields[departmentNameStruct]
 	if !ok {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, departmentNameStruct)
@@ -379,10 +384,11 @@ func UpdateUserByID(c *gin.Context) {
 	_, employeeIDExists := fields[employeeIDStruct]
 	_, accountNameExists := fields[accountNameStruct]
 	_, emailExists := fields[emailStruct]
+	_, mobileExists := fields[mobileStruct]
 	_, telephoneExists := fields[telephoneStruct]
 	_, roleExists := fields[roleStruct]
 	_, delFlagExists := fields[delFlagStruct]
-	if !userNameExists && !departmentNameExists && !employeeIDExists && !accountNameExists && !emailExists && !telephoneExists && !roleExists && !delFlagExists {
+	if !userNameExists && !departmentNameExists && !employeeIDExists && !accountNameExists && !emailExists && !telephoneExists && !roleExists && !delFlagExists && !mobileExists {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, fmt.Sprintf("%s and %s", userNameStruct, delFlagStruct))
 		return
 	}
