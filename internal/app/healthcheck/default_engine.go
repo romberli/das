@@ -31,6 +31,15 @@ const (
 	defaultTableSizeItemName               = "table_size"
 	defaultSlowQueryExecutionTimeItemName  = "slow_query_execution_time"
 	defaultSlowQueryRowsExaminedItemName   = "slow_query_rows_examined"
+
+	defaultItemWeight                  = "ItemWeight"
+	defaultLowWaterMark                = "LowWaterMark"
+	defaultHighWaterMark               = "HighWaterMark"
+	defaultUnit                        = "Unit"
+	defaultScoreDeductionPerUnitHigh   = "ScoreDeductionPerUnitHigh"
+	defaultMaxScoreDeductionHigh       = "MaxScoreDeductionHigh"
+	defaultScoreDeductionPerUnitMedium = "ScoreDeductionPerUnitMedium"
+	defaultMaxScoreDeductionMedium     = "MaxScoreDeductionMedium"
 )
 
 var _ healthcheck.Engine = (*DefaultEngine)(nil)
