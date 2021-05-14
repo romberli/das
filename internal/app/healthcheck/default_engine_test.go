@@ -2,7 +2,7 @@ package healthcheck
 
 const (
 	defaultEngineConfigID                          = 1
-	defaultEngineConfigItemName                    = "cpu_usage"
+	defaultEngineConfigItemName                    = "test_item"
 	defaultEngineConfigItemWeight                  = 5
 	defaultEngineConfigLowWatermark                = 50.00
 	defaultEngineConfigHighWatermark               = 70.00
@@ -15,7 +15,3 @@ const (
 	defaultEngineConfigCreateTimeString            = "2021-01-21 10:00:00.000000"
 	defaultEngineConfigLastUpdateTimeString        = "2021-01-21 13:00:00.000000"
 )
-
-func initDefaultEngineConfig() *DefaultEngineConfig {
-	return nil
-}

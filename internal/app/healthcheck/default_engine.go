@@ -108,6 +108,22 @@ func NewDefaultEngine(repo healthcheck.Repository, operationInfo *OperationInfo,
 	}
 }
 
+//
+func NewDefaultItemConfig(itemName string, itemWeight int, lowWatermark float64, highWatermark float64, unit float64,
+	scoreDeductionPerUnitHigh float64, maxScoreDeductionHigh float64, scoreDeductionPerUnitMedium float64, maxScoreDeductionMedium float64) *DefaultItemConfig {
+	return &DefaultItemConfig{
+		ItemName:                    itemName,
+		ItemWeight:                  itemWeight,
+		LowWatermark:                lowWatermark,
+		HighWatermark:               highWatermark,
+		Unit:                        unit,
+		ScoreDeductionPerUnitHigh:   scoreDeductionPerUnitHigh,
+		MaxScoreDeductionHigh:       maxScoreDeductionHigh,
+		ScoreDeductionPerUnitMedium: scoreDeductionPerUnitMedium,
+		MaxScoreDeductionMedium:     maxScoreDeductionMedium,
+	}
+}
+
 // getItemConfig returns *DefaultItemConfig with given item name
 func (de *DefaultEngine) getItemConfig(item string) *DefaultItemConfig {
 	return de.engineConfig.getItemConfig(item)
@@ -201,6 +217,11 @@ func (de *DefaultEngine) preRun() error {
 // loadEngineConfig loads engine config
 func (de *DefaultEngine) loadEngineConfig() error {
 	// load config
+	defaultEngineConfig, err := de.GetEngineConfig()
+	defaultEngineConfig.getItemConfig()
+	if err != nil {
+		return err
+	}
 
 	// validate config
 
@@ -503,14 +524,11 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 func (de *DefaultEngine) checkConnectionUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	// TODO
 	query := fmt.Sprintf(`
-		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
-		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or
-		(clamp_max(irate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[5m]),1)) ))*100 or
-		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
-		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
-	`, serverName, serverName, serverName, serverName)
+		clamp_max((avg by (service_name) (max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m]) or 
+		max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m])) / avg by (service_name) 
+		(mysql_global_variables_max_connections{service_name=~"%s"})),1)
+	`, serverName, serverName, serverName)
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -671,14 +689,14 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 func (de *DefaultEngine) checkCacheMissRatio() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	// TODO
 	query := fmt.Sprintf(`
-		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
-		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or
-		(clamp_max(irate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[5m]),1)) ))*100 or
-		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
-		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
-	`, serverName, serverName, serverName, serverName)
+		clamp_max((1 - avg by (service_name)(rate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]) or 
+		irate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]))/
+		avg by (service_name)((rate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]) or 
+		irate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]))+
+		(rate(mysql_global_status_table_open_cache_misses{service_name=~"%s"}[5m]) or 
+		irate(mysql_global_status_table_open_cache_misses{service_name=~"%s"}[5m])))),1)
+	`, serverName, serverName, serverName, serverName, serverName, serverName)
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -755,7 +773,8 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 func (de *DefaultEngine) checkTableSize() error {
 	// check table rows
 	// get data
-	serverName := de.operationInfo.MySQLServer.GetServerName()
+	dbName := de.monitorMysqlConn.GetDB()
+
 	// TODO
 	query := fmt.Sprintf(`
 		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
