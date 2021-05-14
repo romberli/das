@@ -75,12 +75,12 @@ func createHCResult() (healthcheck.Result, error) {
 	hcInfo := NewResultWithDefault(defaultResultOperationID, defaultResultWeightedAverageScore, defaultResultDBConfigScore,
 		defaultResultCPUUsageScore, defaultResultIOUtilScore, defaultResultDiskCapacityUsageScore, defaultResultConnectionUsageScore,
 		defaultResultAverageActiveSessionNumScore, defaultResultCacheMissRatioScore, defaultResultTableSizeScore, defaultResultSlowQueryScore, defaultResultAccurateReview)
-	result, err := repository.SaveResult(hcInfo)
+	err := repository.SaveResult(hcInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	return repository.GetResultByOperationID(defaultResultOperationID)
 }
 
 func deleteHCResultByID(id int) error {
@@ -165,8 +165,8 @@ func TestRepository_Transaction(t *testing.T) {
 func TestRepository_GetResultByOperationID(t *testing.T) {
 	asst := assert.New(t)
 
-	//t.Log(fmt.Sprintf("%v", repository))
-	//t.Log(fmt.Sprintf("%v", repository.Database))
+	// t.Log(fmt.Sprintf("%v", repository))
+	// t.Log(fmt.Sprintf("%v", repository.Database))
 	result, err := createHCResult()
 	asst.Nil(err, common.CombineMessageWithError("test GetResultByOperationID() failed", err))
 	hc, err := repository.GetResultByOperationID(result.GetOperationID())

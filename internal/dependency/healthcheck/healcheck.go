@@ -95,7 +95,7 @@ type Repository interface {
 	// UpdateOperationStatus updates operation status
 	UpdateOperationStatus(operationID int, status int, message string) error
 	// SaveResult saves result into the middleware
-	SaveResult(result Result) (Result, error)
+	SaveResult(result Result) error
 	// UpdateAccurateReviewByOperationID updates the accurate review
 	UpdateAccurateReviewByOperationID(operationID int, review int) error
 }
@@ -107,6 +107,8 @@ type Service interface {
 	GetResultByOperationID(id int) error
 	// Check checks the server health status
 	Check(mysqlServerID int, startTime, endTime time.Time, step time.Duration) error
+	// Check checks the server health status
+	CheckByHostInfo(hostIP string, portNum int, startTime, endTime time.Time, step time.Duration) error
 	// ReviewAccurate reviews the accurate of the check
 	ReviewAccurate(id, review int) error
 	// MarshalJSON marshals Service to json string

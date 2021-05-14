@@ -1,8 +1,9 @@
 package healthcheck
 
 import (
-	"github.com/romberli/das/internal/dependency/healthcheck"
 	"time"
+
+	"github.com/romberli/das/internal/dependency/healthcheck"
 
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
@@ -32,8 +33,8 @@ type Result struct {
 	AverageActiveSessionNumData  string    `middleware:"average_active_session_num_data" json:"average_active_session_num_data"`
 	AverageActiveSessionNumHigh  string    `middleware:"average_active_session_num_high" json:"average_active_session_num_high"`
 	CacheMissRatioScore          int       `middleware:"cache_miss_ratio_score" json:"cache_miss_ratio_score"`
-	CacheMissRatioData           float64    `middleware:"cache_miss_ratio_data" json:"cache_miss_ratio_data"`
-	CacheMissRatioHigh           float64    `middleware:"cache_miss_ratio_high" json:"cache_miss_ratio_high"`
+	CacheMissRatioData           float64   `middleware:"cache_miss_ratio_data" json:"cache_miss_ratio_data"`
+	CacheMissRatioHigh           float64   `middleware:"cache_miss_ratio_high" json:"cache_miss_ratio_high"`
 	TableSizeScore               int       `middleware:"table_size_score" json:"table_size_score"`
 	TableSizeData                string    `middleware:"table_size_data" json:"table_size_data"`
 	TableSizeHigh                string    `middleware:"table_size_high" json:"table_size_high"`
@@ -47,7 +48,7 @@ type Result struct {
 }
 
 // NewResult returns a new *Result
-func NewResult(repo *Repository, operationID int, weightedAverageScore int, dbConfigScore int, dbConfigData string, dbConfigAdvice string,
+func NewResult(repo healthcheck.Repository, operationID int, weightedAverageScore int, dbConfigScore int, dbConfigData string, dbConfigAdvice string,
 	cpuUsageScore int, cpuUsageData string, cpuUsageHigh string, ioUtilScore int, ioUtilData string, ioUtilHigh string,
 	diskCapacityUsageScore int, diskCapacityUsageData string, diskCapacityUsageHigh string,
 	connectionUsageScore int, connectionUsageData string, connectionUsageHigh string,
@@ -90,7 +91,7 @@ func NewResult(repo *Repository, operationID int, weightedAverageScore int, dbCo
 }
 
 // NewEmptyResultWithRepo return a new Result
-func NewEmptyResultWithRepo(repository *Repository) *Result {
+func NewEmptyResultWithRepo(repository healthcheck.Repository) *Result {
 	return &Result{Repository: repository}
 }
 
