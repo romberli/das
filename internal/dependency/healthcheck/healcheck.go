@@ -52,9 +52,9 @@ type Result interface {
 	// GetCacheHitRatioScore returns the cache miss ratio score
 	GetCacheMissRatioScore() int
 	// GetCacheHitRatioData returns the cache miss ratio data
-	GetCacheMissRatioData() string
+	GetCacheMissRatioData() float64
 	// GetCacheMissRatioHigh returns the high cache miss ratio data
-	GetCacheMissRatioHigh() string
+	GetCacheMissRatioHigh() float64
 	// GetTableSizeScore returns the table size score
 	GetTableSizeScore() int
 	// GetTableSizeData returns the table size data
@@ -95,7 +95,7 @@ type Repository interface {
 	// UpdateOperationStatus updates operation status
 	UpdateOperationStatus(operationID int, status int, message string) error
 	// SaveResult saves result into the middleware
-	SaveResult(result Result) error
+	SaveResult(result Result) (Result, error)
 	// UpdateAccurateReviewByOperationID updates the accurate review
 	UpdateAccurateReviewByOperationID(operationID int, review int) error
 }

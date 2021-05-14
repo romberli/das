@@ -1,6 +1,7 @@
 package healthcheck
 
 import (
+	"github.com/romberli/das/internal/dependency/healthcheck"
 	"time"
 
 	"github.com/romberli/go-util/common"
@@ -8,6 +9,7 @@ import (
 )
 
 type Result struct {
+	healthcheck.Repository
 	ID                           int       `middleware:"id" json:"id"`
 	OperationID                  int       `middleware:"operation_id" json:"operation_id"`
 	WeightedAverageScore         int       `middleware:"weighted_average_score" json:"weighted_average_score"`
@@ -30,8 +32,8 @@ type Result struct {
 	AverageActiveSessionNumData  string    `middleware:"average_active_session_num_data" json:"average_active_session_num_data"`
 	AverageActiveSessionNumHigh  string    `middleware:"average_active_session_num_high" json:"average_active_session_num_high"`
 	CacheMissRatioScore          int       `middleware:"cache_miss_ratio_score" json:"cache_miss_ratio_score"`
-	CacheMissRatioData           string    `middleware:"cache_miss_ratio_data" json:"cache_miss_ratio_data"`
-	CacheMissRatioHigh           string    `middleware:"cache_miss_ratio_high" json:"cache_miss_ratio_high"`
+	CacheMissRatioData           float64   `middleware:"cache_miss_ratio_data" json:"cache_miss_ratio_data"`
+	CacheMissRatioHigh           float64   `middleware:"cache_miss_ratio_high" json:"cache_miss_ratio_high"`
 	TableSizeScore               int       `middleware:"table_size_score" json:"table_size_score"`
 	TableSizeData                string    `middleware:"table_size_data" json:"table_size_data"`
 	TableSizeHigh                string    `middleware:"table_size_high" json:"table_size_high"`
@@ -44,15 +46,17 @@ type Result struct {
 	LastUpdateTime               time.Time `middleware:"last_update_time" json:"last_update_time"`
 }
 
-func NewResult(operationID int, weightedAverageScore int, dbConfigScore int, dbConfigData string, dbConfigAdvice string,
+// NewResult returns a new *Result
+func NewResult(repo *Repository, operationID int, weightedAverageScore int, dbConfigScore int, dbConfigData string, dbConfigAdvice string,
 	cpuUsageScore int, cpuUsageData string, cpuUsageHigh string, ioUtilScore int, ioUtilData string, ioUtilHigh string,
 	diskCapacityUsageScore int, diskCapacityUsageData string, diskCapacityUsageHigh string,
 	connectionUsageScore int, connectionUsageData string, connectionUsageHigh string,
 	averageActiveSessionNumScore int, averageActiveSessionNumData string, averageActiveSessionNumHigh string,
-	cacheMissRatioScore int, cacheMissRatioData string, cacheMissRatioHigh string,
+	cacheMissRatioScore int, cacheMissRatioData float64, cacheMissRatioHigh float64,
 	tableSizeScore int, tableSizeData string, tableSizeHigh string,
 	slowQueryScore int, slowQueryData string, slowQueryAdvice string) *Result {
 	return &Result{
+		Repository:                   repo,
 		OperationID:                  operationID,
 		WeightedAverageScore:         weightedAverageScore,
 		DBConfigScore:                dbConfigScore,
@@ -82,6 +86,55 @@ func NewResult(operationID int, weightedAverageScore int, dbConfigScore int, dbC
 		SlowQueryScore:               slowQueryScore,
 		SlowQueryData:                slowQueryData,
 		SlowQueryAdvice:              slowQueryAdvice,
+	}
+}
+
+// NewEmptyResultWithRepo return a new Result
+func NewEmptyResultWithRepo(repository *Repository) *Result {
+	return &Result{Repository: repository}
+}
+
+// NewEmptyResultWithGlobal return a new Result
+func NewEmptyResultWithGlobal() *Result {
+	return NewEmptyResultWithRepo(NewRepositoryWithGlobal())
+}
+
+// NewResultWithDefault returns a new *Result with default Repository
+func NewResultWithDefault(operationID int, weightedAverageScore int, dbConfigScore int,
+	cpuUsageScore int, ioUtilScore int, diskCapacityUsageScore int, connectionUsageScore int,
+	averageActiveSessionNumScore int, cacheMissRatioScore int, tableSizeScore int, slowQueryScore int, accurateReview int) *Result {
+	return &Result{
+		Repository:                   NewRepositoryWithGlobal(),
+		OperationID:                  operationID,
+		WeightedAverageScore:         weightedAverageScore,
+		DBConfigScore:                dbConfigScore,
+		DBConfigData:                 constant.DefaultRandomString,
+		DBConfigAdvice:               constant.DefaultRandomString,
+		CPUUsageScore:                cpuUsageScore,
+		CPUUsageData:                 constant.DefaultRandomString,
+		CPUUsageHigh:                 constant.DefaultRandomString,
+		IOUtilScore:                  ioUtilScore,
+		IOUtilData:                   constant.DefaultRandomString,
+		IOUtilHigh:                   constant.DefaultRandomString,
+		DiskCapacityUsageScore:       diskCapacityUsageScore,
+		DiskCapacityUsageData:        constant.DefaultRandomString,
+		DiskCapacityUsageHigh:        constant.DefaultRandomString,
+		ConnectionUsageScore:         connectionUsageScore,
+		ConnectionUsageData:          constant.DefaultRandomString,
+		ConnectionUsageHigh:          constant.DefaultRandomString,
+		AverageActiveSessionNumScore: averageActiveSessionNumScore,
+		AverageActiveSessionNumData:  constant.DefaultRandomString,
+		AverageActiveSessionNumHigh:  constant.DefaultRandomString,
+		CacheMissRatioScore:          cacheMissRatioScore,
+		CacheMissRatioData:           constant.DefaultRandomFloat,
+		CacheMissRatioHigh:           constant.DefaultRandomFloat,
+		TableSizeScore:               tableSizeScore,
+		TableSizeData:                constant.DefaultRandomString,
+		TableSizeHigh:                constant.DefaultRandomString,
+		SlowQueryScore:               slowQueryScore,
+		SlowQueryData:                constant.DefaultRandomString,
+		SlowQueryAdvice:              constant.DefaultRandomString,
+		AccurateReview:               accurateReview,
 	}
 }
 
@@ -177,11 +230,11 @@ func (r *Result) GetCacheMissRatioScore() int {
 	return r.CacheMissRatioScore
 }
 
-func (r *Result) GetCacheMissRatioData() string {
+func (r *Result) GetCacheMissRatioData() float64 {
 	return r.CacheMissRatioData
 }
 
-func (r *Result) GetCacheMissRatioHigh() string {
+func (r *Result) GetCacheMissRatioHigh() float64 {
 	return r.CacheMissRatioHigh
 }
 
