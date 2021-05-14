@@ -316,7 +316,30 @@ func OverrideConfig() (err error) {
 	if dbPoolKeepAliveInterval != constant.DefaultRandomInt {
 		viper.Set(config.DBPoolKeepAliveIntervalKey, dbPoolKeepAliveInterval)
 	}
-
+	if dbMonitorPrometheusUser != constant.DefaultRandomString {
+		viper.Set(config.DBMonitorPrometheusUserKey, dbMonitorPrometheusUser)
+	}
+	if dbMonitorPrometheusPass != constant.DefaultRandomString {
+		viper.Set(config.DBMonitorPrometheusPassKey, dbMonitorPrometheusPass)
+	}
+	if dbMonitorClickhouseUser != constant.DefaultRandomString {
+		viper.Set(config.DBMonitorClickhouseUserKey, dbMonitorClickhouseUser)
+	}
+	if dbMonitorClickhousePass != constant.DefaultRandomString {
+		viper.Set(config.DBMonitorClickhousePassKey, dbMonitorClickhousePass)
+	}
+	if dbMonitorMySQLUser != constant.DefaultRandomString {
+		viper.Set(config.DBMonitorMySQLUserKey, dbMonitorMySQLUser)
+	}
+	if dbMonitorMySQLPass != constant.DefaultRandomString {
+		viper.Set(config.DBMonitorMySQLPassKey, dbMonitorMySQLPass)
+	}
+	if dbApplicationMySQLUser != constant.DefaultRandomString {
+		viper.Set(config.DBApplicationMySQLUserKey, dbApplicationMySQLUser)
+	}
+	if dbApplicationMySQLPass != constant.DefaultRandomString {
+		viper.Set(config.DBApplicationMySQLPassKey, dbApplicationMySQLPass)
+	}
 	// validate configuration
 	err = config.ValidateConfig()
 	if err != nil {

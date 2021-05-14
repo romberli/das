@@ -34,7 +34,7 @@ Content-Type: application/json
 POST http://127.0.0.1:6090/api/v1/metadata/user
 Content-Type: application/json
 
- {"department_name": "department_name","employee_id": "employee_id21", "telephone": "telephone","role": 2,"del_flag": 0,"user_name": "user_name21","account_name": "account_na1me2","email": "emai12l","mobile": "mobile" }
+ {"department_name": "department_name","employee_id": "employee_id", "telephone": "telephone","role": 2,"del_flag": 0,"user_name": "user_name21","account_name": "account_na1me2","email": "emai12l","mobile": "mobile" }
 
 ### UpdateUserByID
 POST http://127.0.0.1:6090/api/v1/metadata/user/update/5
