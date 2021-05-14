@@ -53,6 +53,8 @@ const (
 	ErrGenerateNewMapWithTag            = 400045
 	ErrMarshalService                   = 400046
 	ErrTypeConversion                   = 400047
+	ErrNotValidTimeLayout               = 400048
+	ErrNotValidTimeDuration             = 400049
 )
 
 func initErrorMessage() {
@@ -104,4 +106,6 @@ func initErrorMessage() {
 	Messages[ErrGenerateNewMapWithTag] = config.NewErrMessage(DefaultMessageHeader, ErrGenerateNewMapWithTag, "generate new map with tag %s failed.\n%s")
 	Messages[ErrMarshalService] = config.NewErrMessage(DefaultMessageHeader, ErrMarshalService, "marshal service failed.\n%s")
 	Messages[ErrTypeConversion] = config.NewErrMessage(DefaultMessageHeader, ErrTypeConversion, "type conversion failed.\n%s")
+	Messages[ErrNotValidTimeLayout] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidTimeLayout, "time layout must be formatted as yyyy-MM-dd HH:mm:ss, %s is not valid")
+	Messages[ErrNotValidTimeDuration] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidTimeDuration, "time duration must be formatted, e.g. such as 300ms, -1.5h or 2h45m, %s is not valid")
 }

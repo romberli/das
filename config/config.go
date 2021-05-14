@@ -65,6 +65,14 @@ func SetDefaultConfig(baseDir string) {
 	viper.SetDefault(DBPoolMaxIdleConnectionsKey, mysql.DefaultMaxIdleConnections)
 	viper.SetDefault(DBPoolMaxIdleTimeKey, mysql.DefaultMaxIdleTime)
 	viper.SetDefault(DBPoolKeepAliveIntervalKey, mysql.DefaultKeepAliveInterval)
+	viper.SetDefault(DBMonitorPrometheusUserKey, DefaultDBMonitorPrometheusUser)
+	viper.SetDefault(DBMonitorPrometheusPassKey, DefaultDBMonitorPrometheusPass)
+	viper.SetDefault(DBMonitorClickhouseUserKey, DefaultDBMonitorClickhouseUser)
+	viper.SetDefault(DBMonitorClickhousePassKey, DefaultDBMonitorClickhousePass)
+	viper.SetDefault(DBMonitorMySQLUserKey, DefaultDBMonitorMySQLUser)
+	viper.SetDefault(DBMonitorMySQLPassKey, DefaultDBMonitorMySQLPass)
+	viper.SetDefault(DBApplicationMySQLUserKey, DefaultDBApplicationMySQLUser)
+	viper.SetDefault(DBApplicationMySQLPassKey, DefaultDBApplicationMySQLPass)
 }
 
 // ValidateConfig validates if the configuration is valid
@@ -321,8 +329,49 @@ func ValidateDatabase() error {
 	if keepAliveInterval < MinDBPoolKeepAliveInterval || keepAliveInterval > MaxDBPoolKeepAliveInterval {
 		merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBPoolKeepAliveInterval].Renew(MinDBPoolKeepAliveInterval, MaxDBPoolKeepAliveInterval, keepAliveInterval))
 	}
+	// validate db.application.mysql.user
+	_, err = cast.ToStringE(viper.Get(DBApplicationMySQLUserKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.application.mysql.pass
+	_, err = cast.ToStringE(viper.Get(DBApplicationMySQLPassKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.monitor.prometheus.user
+	_, err = cast.ToStringE(viper.Get(DBMonitorPrometheusUserKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.monitor.prometheus.pass
+	_, err = cast.ToStringE(viper.Get(DBMonitorPrometheusPassKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.monitor.clickhouse.user
+	_, err = cast.ToStringE(viper.Get(DBMonitorClickhouseUserKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.monitor.clickhouse.pass
+	_, err = cast.ToStringE(viper.Get(DBMonitorClickhousePassKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.monitor.mysql.user
+	_, err = cast.ToStringE(viper.Get(DBMonitorMySQLUserKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.monitor.mysql.pass
+	_, err = cast.ToStringE(viper.Get(DBMonitorMySQLPassKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
 
 	return merr
+
 }
 
 // TrimSpaceOfArg trims spaces of given argument
