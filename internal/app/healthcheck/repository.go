@@ -70,3 +70,26 @@ func (r *Repository) SaveResult(result healthcheck.Result) error {
 func (r *Repository) UpdateAccurateReviewByOperationID(operationID int, review int) error {
 	return nil
 }
+
+func (r *Repository) GetEngineConfig() (DefaultEngineConfig, error) {
+	sql := `
+		select id, item_name, item_weight, low_watermark, high_watermark, unit, score_deduction_per_unit_high, max_score_deduction_high, 
+		score_deduction_per_unit_medium, max_score_deduction_medium, del_flag, create_time, last_update_time
+		from t_hc_default_engine_config
+		where del_flag = 0;
+	`
+	log.Debugf("healthcheck Repository.GetEngineConfig() sql: \n%s", sql)
+
+	result, err := r.Execute(sql)
+	if err != nil {
+		return nil, err
+	}
+	// init DefaultEngineConfig
+	defaultEngineConfig := NewEmptyDefaultEngineConfig()
+	// map to struct
+	err = result.MapToStructSlice(defaultEngineConfig, constant.DefaultMiddlewareTag)
+	if err != nil {
+		return nil, err
+	}
+	return defaultEngineConfig, nil
+}

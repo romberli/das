@@ -3,6 +3,7 @@ package healthcheck
 import (
 	"time"
 
+	"github.com/romberli/das/internal/app/healthcheck"
 	"github.com/romberli/go-util/middleware"
 )
 
@@ -88,6 +89,8 @@ type Repository interface {
 	Transaction() (middleware.Transaction, error)
 	// GetResultByOperationID returns the result
 	GetResultByOperationID(operationID int) (Result, error)
+	// GetEngineConfig get engine config
+	GetEngineConfig() (healthcheck.DefaultEngineConfig, error)
 	// IsRunning returns if the healthcheck of given mysql server is still running
 	IsRunning(mysqlServerID int) (bool, error)
 	// InitOperation initiates the operation
