@@ -2,7 +2,6 @@ package healthcheck
 
 import (
 	"github.com/jinzhu/now"
-	"github.com/romberli/das/internal/dependency/healthcheck"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
@@ -70,16 +69,13 @@ func initRepository() *Repository {
 	return NewRepository(pool)
 }
 
-func createHCResult() (healthcheck.Result, error) {
+func createHCResult() error {
 	hcInfo := NewResultWithDefault(defaultResultOperationID, defaultResultWeightedAverageScore, defaultResultDBConfigScore,
 		defaultResultCPUUsageScore, defaultResultIOUtilScore, defaultResultDiskCapacityUsageScore, defaultResultConnectionUsageScore,
 		defaultResultAverageActiveSessionNumScore, defaultResultCacheMissRatioScore, defaultResultTableSizeScore, defaultResultSlowQueryScore, defaultResultAccurateReview)
-	result, err := repository.SaveResult(hcInfo)
-	if err != nil {
-		return nil, err
-	}
+	err := repository.SaveResult(hcInfo)
 
-	return result, nil
+	return err
 }
 
 func deleteHCResultByID(id int) error {
@@ -166,11 +162,11 @@ func TestRepository_GetResultByOperationID(t *testing.T) {
 
 	//t.Log(fmt.Sprintf("%v", repository))
 	//t.Log(fmt.Sprintf("%v", repository.Database))
-	result, err := createHCResult()
+	err := createHCResult()
 	asst.Nil(err, common.CombineMessageWithError("test GetResultByOperationID() failed", err))
-	hc, err := repository.GetResultByOperationID(result.GetOperationID())
+	result, err := repository.GetResultByOperationID(defaultResultOperationID)
 	asst.Nil(err, common.CombineMessageWithError("test GetResultByOperationID() failed", err))
-	operationID := hc.GetOperationID()
+	operationID := result.GetOperationID()
 	asst.Nil(err, common.CombineMessageWithError("test GetResultByOperationID() failed", err))
 	asst.Equal(defaultResultOperationID, operationID, "test GetResultByOperationID() failed")
 	// delete
@@ -239,7 +235,9 @@ func TestRepository_UpdateOperationStatus(t *testing.T) {
 func TestRepository_SaveResult(t *testing.T) {
 	asst := assert.New(t)
 
-	result, err := createHCResult()
+	err := createHCResult()
+	asst.Nil(err, common.CombineMessageWithError("test SaveResult() failed", err))
+	result, err := repository.GetResultByOperationID(defaultResultOperationID)
 	asst.Nil(err, common.CombineMessageWithError("test SaveResult() failed", err))
 	asst.Equal(defaultResultOperationID, result.GetOperationID(), "test SaveResult() failed")
 	// delete
@@ -250,11 +248,11 @@ func TestRepository_SaveResult(t *testing.T) {
 func TestRepository_UpdateAccurateReviewByOperationID(t *testing.T) {
 	asst := assert.New(t)
 
-	result, err := createHCResult()
+	err := createHCResult()
+	asst.Nil(err, common.CombineMessageWithError("test UpdateAccurateReviewByOperationID() failed", err))
+	result, err := repository.GetResultByOperationID(defaultResultOperationID)
 	asst.Nil(err, common.CombineMessageWithError("test UpdateAccurateReviewByOperationID() failed", err))
 	err = repository.UpdateAccurateReviewByOperationID(result.GetOperationID(), newResultAccurateReview)
-	asst.Nil(err, common.CombineMessageWithError("test UpdateAccurateReviewByOperationID() failed", err))
-	result, err = repository.GetResultByOperationID(result.GetOperationID())
 	asst.Nil(err, common.CombineMessageWithError("test UpdateAccurateReviewByOperationID() failed", err))
 	asst.Equal(newResultAccurateReview, result.GetAccurateReview(), "test UpdateAccurateReviewByOperationID() failed")
 	//delete

@@ -75,8 +75,7 @@ func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result
 	case 0:
 		return nil, errors.New(fmt.Sprintf("healthCheck Repository.GetResultByOperationID(): data does not exists, operation_id: %d", operationID))
 	case 1:
-		//hcInfo := NewEmptyResultWithRepo(r)
-		hcInfo := NewEmptyResultWithGlobal()
+		hcInfo := NewEmptyResultWithRepo(r)
 		// map to struct
 		err = result.MapToStructByRowIndex(hcInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
 		if err != nil {
@@ -140,7 +139,7 @@ func (r *Repository) UpdateOperationStatus(operationID int, status int, message 
 }
 
 // SaveResult saves the result in the middleware
-func (r *Repository) SaveResult(result healthcheck.Result) (healthcheck.Result, error) {
+func (r *Repository) SaveResult(result healthcheck.Result) error {
 	sql := `insert into t_hc_result(operation_id, weighted_average_score, db_config_score, db_config_data, 
 		db_config_advice, cpu_usage_score, cpu_usage_data, cpu_usage_high, io_util_score,
 		io_util_data, io_util_high, disk_capacity_usage_score, disk_capacity_usage_data, 
@@ -152,7 +151,7 @@ func (r *Repository) SaveResult(result healthcheck.Result) (healthcheck.Result, 
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`
 	log.Debugf("healthCheck Repository.SaveResult() insert sql: %s", sql)
-	fmt.Println(sql)
+
 	// execute
 	_, err := r.Execute(sql, result.GetOperationID(), result.GetWeightedAverageScore(), result.GetDBConfigScore(),
 		result.GetDBConfigData(), result.GetDBConfigAdvice(), result.GetCPUUsageScore(), result.GetCPUUsageData(),
@@ -163,11 +162,8 @@ func (r *Repository) SaveResult(result healthcheck.Result) (healthcheck.Result, 
 		result.GetCacheMissRatioScore(), result.GetCacheMissRatioData(), result.GetCacheMissRatioHigh(),
 		result.GetTableSizeScore(), result.GetTableSizeData(), result.GetTableSizeHigh(), result.GetSlowQueryScore(),
 		result.GetSlowQueryData(), result.GetSlowQueryAdvice(), result.GetAccurateReview())
-	if err != nil {
-		return nil, err
-	}
 
-	return r.GetResultByOperationID(result.GetOperationID())
+	return err
 }
 
 // UpdateAccurateReviewByOperationID updates the accurateReview by the operationID in the middleware

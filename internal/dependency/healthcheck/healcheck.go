@@ -95,7 +95,7 @@ type Repository interface {
 	// UpdateOperationStatus updates operation status
 	UpdateOperationStatus(operationID int, status int, message string) error
 	// SaveResult saves result into the middleware
-	SaveResult(result Result) (Result, error)
+	SaveResult(result Result) error
 	// UpdateAccurateReviewByOperationID updates the accurate review
 	UpdateAccurateReviewByOperationID(operationID int, review int) error
 }
