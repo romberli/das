@@ -2,7 +2,6 @@ package healthcheck
 
 import (
 	"github.com/romberli/das/internal/dependency/healthcheck"
-	//"github.com/romberli/das/internal/dependency/healthcheck"
 	"time"
 
 	"github.com/romberli/go-util/common"
