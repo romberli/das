@@ -1,6 +1,8 @@
 package healthcheck
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/romberli/das/global"
@@ -16,12 +18,12 @@ type Repository struct {
 	Database middleware.Pool
 }
 
-// NewDBRepo returns *DBRepo with given middleware.Pool
+// NewRepository returns *Repository with given middleware.Pool
 func NewRepository(db middleware.Pool) *Repository {
 	return &Repository{Database: db}
 }
 
-// NewDBRepo returns *DBRepo with global mysql pool
+// NewRepository returns *Repository with global mysql pool
 func NewRepositoryWithGlobal() *Repository {
 	return NewRepository(global.MySQLPool)
 }
@@ -47,28 +49,130 @@ func (r *Repository) Transaction() (middleware.Transaction, error) {
 	return r.Database.Transaction()
 }
 
+// GetResultByOperationID gets a Result by the operationID from the middleware
 func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result, error) {
-	return nil, nil
+	sql := `
+		select id, operation_id, weighted_average_score, db_config_score, db_config_data, 
+		db_config_advice, cpu_usage_score, cpu_usage_data, cpu_usage_high, io_util_score,
+		io_util_data, io_util_high, disk_capacity_usage_score, disk_capacity_usage_data, 
+		disk_capacity_usage_high, connection_usage_score, connection_usage_data, 
+		connection_usage_high, average_active_session_num_score, average_active_session_num_data,
+		average_active_session_num_high, cache_miss_ratio_score, cache_miss_ratio_data, 
+		cache_miss_ratio_high, table_size_score, table_size_data, table_size_high, slow_query_score,
+		slow_query_data, slow_query_advice, accurate_review, del_flag, create_time, last_update_time
+		from t_hc_result
+		where del_flag = 0
+		and operation_id = ? 
+		order by id;
+	`
+	log.Debugf("healthCheck Repository.GetResultByOperationID select sql: \n%s\nplaceholders: %s", sql, operationID)
+
+	result, err := r.Execute(sql, operationID)
+	if err != nil {
+		return nil, err
+	}
+	switch result.RowNumber() {
+	case 0:
+		return nil, errors.New(fmt.Sprintf("healthCheck Repository.GetResultByOperationID(): data does not exists, operation_id: %d", operationID))
+	case 1:
+		//hcInfo := NewEmptyResultWithRepo(r)
+		hcInfo := NewEmptyResultWithGlobal()
+		// map to struct
+		err = result.MapToStructByRowIndex(hcInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+		if err != nil {
+			return nil, err
+		}
+
+		return hcInfo, nil
+	default:
+		return nil, errors.New(fmt.Sprintf("healthCheck Repository.GetResultByOperationID(): duplicate key exists, operation_id: %d", operationID))
+	}
 }
 
+// IsRunning gets status by the mysqlServerID from the middleware
 func (r *Repository) IsRunning(mysqlServerID int) (bool, error) {
+	sql := `select status from t_hc_operation_info where del_flag = 0 and mysql_server_id = ? order by id desc limit 0,1;`
+	log.Debugf("healthCheck Repository.IsRunning() select sql: \n%s\nplaceholders: %s", sql, mysqlServerID)
+
+	result, err := r.Execute(sql, mysqlServerID)
+	if err != nil {
+		return true, err
+	}
+	resultStatus, _ := result.GetInt(constant.ZeroInt, constant.ZeroInt)
+	if resultStatus == 1 {
+		return true, err
+	}
+
 	return false, nil
 }
 
+// InitOperation creates a operationInfo in the middleware
 func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Time, step time.Duration) (int, error) {
-	return constant.ZeroInt, nil
+	sql := `insert into t_hc_operation_info(mysql_server_id, start_time, end_time, step) values(?, ?, ?, ?);`
+	log.Debugf("healthCheck Repository.InitOperation() insert sql: %s", sql)
+
+	_, err := r.Execute(sql, mysqlServerID, startTime, endTime, step)
+	if err != nil {
+		return constant.ZeroInt, err
+	}
+
+	sql = `
+		select id from t_hc_operation_info where del_flag = 0 and 
+		mysql_server_id = ? and start_time = ? and end_time = ? and step = ?;
+	`
+	log.Debugf("healthCheck Repository.InitOperation() select sql: %s", sql)
+
+	result, err := r.Execute(sql, mysqlServerID, startTime, endTime, step)
+	if err != nil {
+		return constant.ZeroInt, err
+	}
+
+	return result.GetInt(constant.ZeroInt, constant.ZeroInt)
 }
 
+// UpdateOperationStatus updates the status and message by the operationID in the middleware
 func (r *Repository) UpdateOperationStatus(operationID int, status int, message string) error {
-	return nil
+	sql := `update t_hc_operation_info set status = ?, message = ? where id = ?;`
+	log.Debugf("healthCheck Repository.UpdateOperationStatus() update sql: \n%s\nplaceholders: %s", sql, operationID)
+	_, err := r.Execute(sql, status, message, operationID)
+
+	return err
 }
 
+// SaveResult saves the result in the middleware
 func (r *Repository) SaveResult(result healthcheck.Result) error {
-	return nil
+	sql := `insert into t_hc_result(operation_id, weighted_average_score, db_config_score, db_config_data, 
+		db_config_advice, cpu_usage_score, cpu_usage_data, cpu_usage_high, io_util_score,
+		io_util_data, io_util_high, disk_capacity_usage_score, disk_capacity_usage_data, 
+		disk_capacity_usage_high, connection_usage_score, connection_usage_data, 
+		connection_usage_high, average_active_session_num_score, average_active_session_num_data,
+		average_active_session_num_high, cache_miss_ratio_score, cache_miss_ratio_data, 
+		cache_miss_ratio_high, table_size_score, table_size_data, table_size_high, slow_query_score,
+		slow_query_data, slow_query_advice, accurate_review) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+		?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	`
+	log.Debugf("healthCheck Repository.SaveResult() insert sql: %s", sql)
+	fmt.Println(sql)
+	// execute
+	_, err := r.Execute(sql, result.GetOperationID(), result.GetWeightedAverageScore(), result.GetDBConfigScore(),
+		result.GetDBConfigData(), result.GetDBConfigAdvice(), result.GetCPUUsageScore(), result.GetCPUUsageData(),
+		result.GetCPUUsageHigh(), result.GetIOUtilScore(), result.GetIOUtilData(), result.GetIOUtilHigh(),
+		result.GetDiskCapacityUsageScore(), result.GetDiskCapacityUsageData(), result.GetDiskCapacityUsageHigh(),
+		result.GetConnectionUsageScore(), result.GetConnectionUsageData(), result.GetConnectionUsageHigh(),
+		result.GetAverageActiveSessionNumScore(), result.GetAverageActiveSessionNumData(), result.GetAverageActiveSessionNumHigh(),
+		result.GetCacheMissRatioScore(), result.GetCacheMissRatioData(), result.GetCacheMissRatioHigh(),
+		result.GetTableSizeScore(), result.GetTableSizeData(), result.GetTableSizeHigh(), result.GetSlowQueryScore(),
+		result.GetSlowQueryData(), result.GetSlowQueryAdvice(), result.GetAccurateReview())
+
+	return err
 }
 
+// UpdateAccurateReviewByOperationID updates the accurateReview by the operationID in the middleware
 func (r *Repository) UpdateAccurateReviewByOperationID(operationID int, review int) error {
-	return nil
+	sql := `update t_hc_result set review = ? where operation_id = ?;`
+	log.Debugf("healthCheck Repository.UpdateAccurateReviewByOperationID() update sql: \n%s\nplaceholders: %s", sql, operationID)
+	_, err := r.Execute(sql, review, operationID)
+	return err
 }
 
 func (r *Repository) GetEngineConfig() (DefaultEngineConfig, error) {

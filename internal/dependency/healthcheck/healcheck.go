@@ -52,9 +52,9 @@ type Result interface {
 	// GetCacheHitRatioScore returns the cache miss ratio score
 	GetCacheMissRatioScore() int
 	// GetCacheHitRatioData returns the cache miss ratio data
-	GetCacheMissRatioData() string
+	GetCacheMissRatioData() float64
 	// GetCacheMissRatioHigh returns the high cache miss ratio data
-	GetCacheMissRatioHigh() string
+	GetCacheMissRatioHigh() float64
 	// GetTableSizeScore returns the table size score
 	GetTableSizeScore() int
 	// GetTableSizeData returns the table size data
@@ -109,6 +109,8 @@ type Service interface {
 	GetResultByOperationID(id int) error
 	// Check checks the server health status
 	Check(mysqlServerID int, startTime, endTime time.Time, step time.Duration) error
+	// Check checks the server health status
+	CheckByHostInfo(hostIP string, portNum int, startTime, endTime time.Time, step time.Duration) error
 	// ReviewAccurate reviews the accurate of the check
 	ReviewAccurate(id, review int) error
 	// MarshalJSON marshals Service to json string

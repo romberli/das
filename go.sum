@@ -441,10 +441,12 @@ github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqn
 github.com/remyoudompheng/bigfft v0.0.0-20170806203942-52369c62f446/go.mod h1:uYEyJGbgTkfkS4+E/PavXkNJcbFIpEtjt2B0KDQ5+9M=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
+github.com/romberli/clickhouse-go v1.4.4-0.20210422094559-b05fc8c4dbe9 h1:UK2Nm3/rBA3vljp+gh+vtMAlCKHx/dqlb5mvWZXmSc4=
+github.com/romberli/clickhouse-go v1.4.4-0.20210422094559-b05fc8c4dbe9/go.mod h1:EaI/sW7Azgz9UATzd5ZdZHRUhHgv5+JMS9NSr2smCJI=
 github.com/romberli/dynamic-struct v1.2.1 h1:vle/rxIUl7IgreLScMSg9RhYBjygY/5Hj/OQKliyY90=
 github.com/romberli/dynamic-struct v1.2.1/go.mod h1:Jk2Z0Dm0diV7O4Lg1MfIyJ0kvOxfN+imwZVO5SOUL94=
-github.com/romberli/go-util v0.3.3-0.20210512090209-260f09262b4a h1:KgpLtMpnGoNyullGhIKCjszl0lFfuo2uUFyvVQmvv4I=
-github.com/romberli/go-util v0.3.3-0.20210512090209-260f09262b4a/go.mod h1:Wxr2DU+yS51YPNk4g0KWvV9v0/U+xmWBTFQoV/6vMCI=
+github.com/romberli/go-util v0.3.3-0.20210514060037-7ffcd2cbd472 h1:kJ48zqwAtdtPjgOhyy0ASxbVTBWONImr45t0qdNzYYE=
+github.com/romberli/go-util v0.3.3-0.20210514060037-7ffcd2cbd472/go.mod h1:Wxr2DU+yS51YPNk4g0KWvV9v0/U+xmWBTFQoV/6vMCI=
 github.com/romberli/log v1.0.20 h1:bOlvkGfy6gHS+zGcJhjwq85t9prcXQUJQaLRANoCFVU=
 github.com/romberli/log v1.0.20/go.mod h1:FKhKFdWL5DLD+1LMO/RB4AcO4MUBl1th/pNFjhrmaGc=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=

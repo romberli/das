@@ -198,7 +198,7 @@ CREATE TABLE `t_hc_result` (
   `table_size_high` mediumtext DEFAULT NULL COMMENT '大表数据',
   `slow_query_score` int(11) NOT NULL COMMENT '慢查询评分',
   `slow_query_data` mediumtext DEFAULT NULL COMMENT '慢查询数据',
-  `slow_query_top_sql` mediumtext DEFAULT NULL COMMENT 'top慢查询',
+  `slow_query_advice` mediumtext DEFAULT NULL COMMENT 'top慢查询',
   `accurate_review` tinyint(4) NOT NULL DEFAULT '0' COMMENT '准确性评价: 0-未评价, 1-准确, 2-不准确',
   `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
