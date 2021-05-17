@@ -15,7 +15,7 @@ const (
 	middlewareServerAddr   = "localhost:3306"
 	middlewareServerDBName = "das"
 	middlewareServerDBUser = "root"
-	middlewareServerDBPass = "root"
+	middlewareServerDBPass = "rootroot"
 
 	newMiddlewareServerName    = "newTest"
 	onlineMiddlewareServerName = "test001"

@@ -2,8 +2,11 @@ package healthcheck
 
 import (
 	"database/sql/driver"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"github.com/pingcap/errors"
+	"math"
 	"time"
 
 	"github.com/romberli/das/internal/dependency/healthcheck"
@@ -32,15 +35,21 @@ const (
 	defaultSlowQueryExecutionTimeItemName  = "slow_query_execution_time"
 	defaultSlowQueryRowsExaminedItemName   = "slow_query_rows_examined"
 
-	defaultItemWeight                  = "ItemWeight"
-	defaultLowWaterMark                = "LowWaterMark"
-	defaultHighWaterMark               = "HighWaterMark"
-	defaultUnit                        = "Unit"
-	defaultScoreDeductionPerUnitHigh   = "ScoreDeductionPerUnitHigh"
-	defaultMaxScoreDeductionHigh       = "MaxScoreDeductionHigh"
-	defaultScoreDeductionPerUnitMedium = "ScoreDeductionPerUnitMedium"
-	defaultMaxScoreDeductionMedium     = "MaxScoreDeductionMedium"
+	defaultItemWeight                  = "item_weight"
+	defaultLowWaterMark                = "low_watermark"
+	defaultHighWaterMark               = "high_watermark"
+	defaultUnit                        = "unit"
+	defaultScoreDeductionPerUnitHigh   = "score_deduction_per_unit_high"
+	defaultMaxScoreDeductionHigh       = "max_score_deduction_high"
+	defaultScoreDeductionPerUnitMedium = "score_deduction_per_unit_medium"
+	defaultMaxScoreDeductionMedium     = "max_score_deduction_medium"
 )
+
+func ByteToFloat64(bytes []byte) float64 {
+	bits := binary.LittleEndian.Uint64(bytes)
+
+	return math.Float64frombits(bits)
+}
 
 var _ healthcheck.Engine = (*DefaultEngine)(nil)
 
@@ -79,6 +88,60 @@ func (dec DefaultEngineConfig) getItemConfig(item string) *DefaultItemConfig {
 
 // Validate validates if engine configuration is valid
 func (dec DefaultEngineConfig) Validate() bool {
+	itemWeightCount := constant.ZeroInt
+	// validate defaultEngineConfig exits items
+	if len(dec) == constant.ZeroInt {
+		log.Errorf("default engine config doesn't have content.")
+		return false
+	}
+	for itemName, defaultItemConfig := range dec {
+		// validate item weight
+		if defaultItemConfig.ItemWeight > 100 || defaultItemConfig.ItemWeight < 0 {
+			log.Errorf("item name: %s item weight is invalid.", itemName)
+			return false
+		}
+		// validate low watermark
+		if defaultItemConfig.LowWatermark < 0 {
+			log.Errorf("item name: %s low watermark is invalid.", itemName)
+			return false
+		}
+		// validate high watermark
+		if defaultItemConfig.HighWatermark <= defaultItemConfig.LowWatermark {
+			log.Errorf("item name: %s high watermark is invalid.", itemName)
+			return false
+		}
+		// validate unit
+		if defaultItemConfig.Unit < 0 {
+			log.Errorf("item name: %s unit is invalid.", itemName)
+			return false
+		}
+		// validate score deduction per unit high
+		if defaultItemConfig.ScoreDeductionPerUnitHigh > 100 || defaultItemConfig.ScoreDeductionPerUnitHigh < 0 || defaultItemConfig.ScoreDeductionPerUnitHigh > defaultItemConfig.MaxScoreDeductionHigh {
+			log.Errorf("item name: %s score deduction per unit high is invalid.", itemName)
+			return false
+		}
+		// validate max score deduction high
+		if defaultItemConfig.MaxScoreDeductionHigh > 100 || defaultItemConfig.MaxScoreDeductionHigh < 0 {
+			log.Errorf("item name: %s max score deduction high is invalid.", itemName)
+			return false
+		}
+		// validate score deduction per unit medium
+		if defaultItemConfig.ScoreDeductionPerUnitMedium > 100 || defaultItemConfig.ScoreDeductionPerUnitMedium < 0 || defaultItemConfig.ScoreDeductionPerUnitMedium > defaultItemConfig.MaxScoreDeductionMedium {
+			log.Errorf("item name: %s score deduction per unit medium is invalid.", itemName)
+			return false
+		}
+		// validate max score deduction medium
+		if defaultItemConfig.MaxScoreDeductionMedium > 100 || defaultItemConfig.MaxScoreDeductionMedium < 0 {
+			log.Errorf("item name: %s max score deduction medium is invalid.", itemName)
+			return false
+		}
+		itemWeightCount += defaultItemConfig.ItemWeight
+	}
+	// validate item weigh count is 100
+	if itemWeightCount != 100 {
+		log.Errorf("all items weight weight count is not 100.")
+		return false
+	}
 	return true
 }
 
@@ -217,19 +280,43 @@ func (de *DefaultEngine) preRun() error {
 // loadEngineConfig loads engine config
 func (de *DefaultEngine) loadEngineConfig() error {
 	// load config
-	defaultEngineConfig, err := de.GetEngineConfig()
-	defaultEngineConfig.getItemConfig()
+	sql := `
+		select id, item_name, item_weight, low_watermark, high_watermark, unit, score_deduction_per_unit_high, max_score_deduction_high,
+		score_deduction_per_unit_medium, max_score_deduction_medium, del_flag, create_time, last_update_time
+		from t_hc_default_engine_config
+		where del_flag = 0;
+	`
+	log.Debugf("healcheck Repository.loadEngineConfig() sql: \n%s\nplaceholders: %s", sql)
+	result, err := de.Repository.Execute(sql)
+	if err != nil {
+		return nil
+	}
+	// init []*DefaultItemConfig
+	defaultEngineConfigList := make([]*DefaultItemConfig, result.RowNumber())
+	for i := range defaultEngineConfigList {
+		defaultEngineConfigList[i] = NewEmptyDefaultItemConfig()
+	}
+	// map to struct
+	err = result.MapToStructSlice(defaultEngineConfigList, constant.DefaultMiddlewareTag)
 	if err != nil {
 		return err
 	}
-
+	entityList := NewEmptyDefaultEngineConfig()
+	for i := range defaultEngineConfigList {
+		itemName := defaultEngineConfigList[i].ItemName
+		entityList[itemName] = defaultEngineConfigList[i]
+	}
 	// validate config
-
+	validate := entityList.Validate()
+	if validate == false {
+		return errors.New("default engine config formant is invalid.")
+	}
 	return nil
 }
 
 // checkDBConfig checks database configuration
 func (de *DefaultEngine) checkDBConfig() error {
+
 	// max_user_connection
 
 	// log_bin
@@ -580,7 +667,7 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioHigh = string(jsonBytesHigh)
+	de.result.CacheMissRatioHigh = ByteToFloat64(jsonBytesHigh)
 
 	// connection usage high score deduction
 	connectionUsageScoreDeductionHigh := (connectionUsageHighSum/float64(connectionUsageHighCount) - connectionUsageConfig.HighWatermark) / connectionUsageConfig.Unit * connectionUsageConfig.ScoreDeductionPerUnitHigh
@@ -742,13 +829,13 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioData = string(jsonBytesTotal)
+	de.result.CacheMissRatioData = ByteToFloat64(jsonBytesTotal)
 	// cache miss ratio high
 	jsonBytesHigh, err := json.Marshal(cacheMissRatioHigh)
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioHigh = string(jsonBytesHigh)
+	de.result.CacheMissRatioHigh = ByteToFloat64(jsonBytesHigh)
 
 	// cache miss ratio high score deduction
 	cacheMissRatioScoreDeductionHigh := (cacheMissRatioHighSum/float64(cacheMissRatioHighCount) - cacheMissRatioConfig.HighWatermark) / cacheMissRatioConfig.Unit * cacheMissRatioConfig.ScoreDeductionPerUnitHigh
@@ -773,17 +860,15 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 func (de *DefaultEngine) checkTableSize() error {
 	// check table rows
 	// get data
-	dbName := de.monitorMysqlConn.GetDB()
-
+	//dbName := de.monitorMysqlConn.GetDB()
+	serverName := de.operationInfo.MySQLServer.GetServerName()
 	// TODO
 	query := fmt.Sprintf(`
-		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
-		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or
-		(clamp_max(irate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[5m]),1)) ))*100 or
-		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
-		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
-	`, serverName, serverName, serverName, serverName)
-	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
+		select TABLE_SCHEMA,TABLE_NAME,TABLE_ROWS,(DATA_LENGTH+INDEX_LENGTH)/1024/1024/1024
+		as TABLE_SIZE from TABLES
+		where TABLE_TYPE='BASE TABLE';
+	`)
+	result, err := de.monitorMysqlConn.Execute(query)
 	if err != nil {
 		return err
 	}
@@ -856,7 +941,7 @@ func (de *DefaultEngine) checkTableSize() error {
 		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
 		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
 	`, serverName, serverName, serverName, serverName)
-	result, err = de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
+	// result, err = de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
 	}

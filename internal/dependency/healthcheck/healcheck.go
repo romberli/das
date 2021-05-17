@@ -1,7 +1,6 @@
 package healthcheck
 
 import (
-	"github.com/romberli/das/internal/app/healthcheck"
 	"github.com/romberli/go-util/middleware"
 	"time"
 )
@@ -98,8 +97,6 @@ type Repository interface {
 	SaveResult(result Result) error
 	// UpdateAccurateReviewByOperationID updates the accurate review
 	UpdateAccurateReviewByOperationID(operationID int, review int) error
-	// GetEngineConfig get engine config
-	GetEngineConfig() (healthcheck.DefaultEngineConfig, error)
 }
 
 type Service interface {

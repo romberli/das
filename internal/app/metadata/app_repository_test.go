@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	appAddr       = "192.168.171.159:3306"
-	appDBName     = "db_test"
-	appDBUser     = "tester"
-	appDBPass     = "mysql.1234"
+	appAddr       = "127.0.0.1:3306"
+	appDBName     = "das"
+	appDBUser     = "root"
+	appDBPass     = "rootroot"
 	onlineAppName = "test2"
 	newAppName    = "testApp"
 )
