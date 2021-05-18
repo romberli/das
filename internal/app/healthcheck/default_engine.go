@@ -1,11 +1,13 @@
 package healthcheck
 
 import (
+	"context"
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/pingcap/errors"
@@ -36,14 +38,45 @@ const (
 	defaultSlowQueryExecutionTimeItemName  = "slow_query_execution_time"
 	defaultSlowQueryRowsExaminedItemName   = "slow_query_rows_examined"
 
-	defaultItemWeight                  = "item_weight"
-	defaultLowWaterMark                = "low_watermark"
-	defaultHighWaterMark               = "high_watermark"
-	defaultUnit                        = "unit"
-	defaultScoreDeductionPerUnitHigh   = "score_deduction_per_unit_high"
-	defaultMaxScoreDeductionHigh       = "max_score_deduction_high"
-	defaultScoreDeductionPerUnitMedium = "score_deduction_per_unit_medium"
-	defaultMaxScoreDeductionMedium     = "max_score_deduction_medium"
+	dbConfigMaxUserConnection         = "max_user_connection"
+	dbConfigLogBin                    = "log_bin"
+	dbConfigBinlogFormat              = "binglog_format"
+	dbConfigBinlogRowImage            = "binlog_row_image"
+	dbConfigSyncBinlog                = "sync_binlog"
+	dbConfigInnodbFlushLogAtTrxCommit = "innodb_flush_log_at_trx_commit"
+	dbConfigGtidMode                  = "gtid_mode"
+	dbConfigEnforceGtidConsistency    = "enforce_gtid_consistency"
+	dbConfigSlaveParallelType         = "slave_parallel_type"
+	dbConfigSlaveParallelWorkers      = "slave_parallel_workers"
+	dbConfigMasterInfoRepository      = "master_info_repository"
+	dbConfigRelayLogInfoRepository    = "relay_log_info_repository"
+	dbConfigReportHost                = "report_host"
+	dbConfigReportPort                = "report_port"
+	dbConfigInnodbBufferPoolSize      = "innodb_buffer_pool_size"
+	dbConfigInnodbBufferPoolChunkSize = "innodb_buffer_pool_chunk_size"
+	dbConfigInnodbFlushMethod         = "innodb_flush_method"
+	dbConfigInnodbMonitorEnable       = "innodb_monitor_enable"
+	dbConfigInnodbPrintAllDeadlocks   = "innodb_print_all_deadlocks"
+	dbConfigSlowQueryLog              = "slow_query_log"
+	dbConfigPerformanceSchema         = "performance_schema"
+
+	dbConfigMaxUserConnectionValid         = "2000"
+	dbConfigLogBinValid                    = "ON"
+	dbConfigBinlogFormatValid              = "ROW"
+	dbConfigBinlogRowImageValid            = "FULL"
+	dbConfigSyncBinlogValid                = "1"
+	dbConfigInnodbFlushLogAtTrxCommitValid = "1"
+	dbConfigGtidModeValid                  = "ON"
+	dbConfigEnforceGtidConsistencyValid    = "ON"
+	dbConfigSlaveParallelTypeValid         = "LOGICAL_CLOCK"
+	dbConfigSlaveParallelWorkersValid      = "16"
+	dbConfigMasterInfoRepositoryValid      = "TABLE"
+	dbConfigRelayLogInfoRepositoryValid    = "TABLE"
+	dbConfigInnodbFlushMethodValid         = "O_DIRECT"
+	dbConfigInnodbMonitorEnableValid       = "all"
+	dbConfigInnodbPrintAllDeadlocksValid   = "ON"
+	dbConfigSlowQueryLogValid              = "ON"
+	dbConfigPerformanceSchemaValid         = "ON"
 )
 
 func ByteToFloat64(bytes []byte) float64 {
@@ -53,6 +86,16 @@ func ByteToFloat64(bytes []byte) float64 {
 }
 
 var _ healthcheck.Engine = (*DefaultEngine)(nil)
+
+type GlobalVariables struct {
+	VariableName  string `middleware:"variable_name" json:"variable_name"`
+	VariableValue string `middleware:"variable_value" json:"variable_value"`
+}
+
+// NewEmptyGlobalVariables returns a new *GlobalVariables
+func NewEmptyGlobalVariables() *GlobalVariables {
+	return &GlobalVariables{}
+}
 
 type DefaultItemConfig struct {
 	ID                          int       `middleware:"id" json:"id"`
@@ -193,6 +236,18 @@ func (de *DefaultEngine) getItemConfig(item string) *DefaultItemConfig {
 	return de.engineConfig.getItemConfig(item)
 }
 
+func (de *DefaultEngine) getPrometheusVersion() (int, error) {
+	prometheusInfo, err := de.monitorPrometheusConn.API.Buildinfo(context.Background())
+	if err != nil {
+		return 0, err
+	}
+	prometheusVersion, err := strconv.Atoi(prometheusInfo.Version[0:1])
+	if err != nil {
+		return 0, err
+	}
+	return prometheusVersion, nil
+}
+
 // Run runs healthcheck
 func (de *DefaultEngine) Run() {
 	// run
@@ -317,47 +372,280 @@ func (de *DefaultEngine) loadEngineConfig() error {
 
 // checkDBConfig checks database configuration
 func (de *DefaultEngine) checkDBConfig() error {
+	// load database config
+	sql := `select variable_name, variable_value
+		from global_variables;`
+	result, err := de.result.Execute(sql)
+	if err != nil {
+		return err
+	}
+	variableList := make([]*GlobalVariables, result.RowNumber())
+	for i := range variableList {
+		variableList[i] = NewEmptyGlobalVariables()
+	}
+	// map to struct
+	err = result.MapToStructSlice(variableList, constant.DefaultMiddlewareTag)
+	if err != nil {
+		return err
+	}
+	// init entity
+	variableMap := make(map[string]string, result.RowNumber())
+	for i := range variableList {
+		variableName := variableList[i].VariableName
+		variableMap[variableName] = variableList[i].VariableValue
+	}
 
+	dbConfigConfig := de.getItemConfig(defaultDBConfigItemName)
+
+	var (
+		dbConfigCount   int
+		dbConfigInvalid []GlobalVariables
+		dbConfigAdvice  []string
+		advice          string
+	)
 	// max_user_connection
-
+	if variableMap[dbConfigMaxUserConnection] != dbConfigMaxUserConnectionValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigMaxUserConnection,
+			variableMap[dbConfigMaxUserConnection],
+		})
+		advice = "It is recommended that " + dbConfigMaxUserConnection + " be set to " + dbConfigMaxUserConnectionValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// log_bin
-
+	if variableMap[dbConfigLogBin] != dbConfigLogBinValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigLogBin,
+			variableMap[dbConfigLogBin],
+		})
+		advice = "It is recommended that " + dbConfigLogBin + " be set to " + dbConfigLogBinValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// binlog_format
-
+	if variableMap[dbConfigBinlogFormat] != dbConfigBinlogFormatValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigBinlogFormat,
+			variableMap[dbConfigBinlogFormat],
+		})
+		advice = "It is recommended that " + dbConfigBinlogFormat + " be set to " + dbConfigBinlogFormatValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// binlog_row_image
-
+	if variableMap[dbConfigBinlogRowImage] != dbConfigBinlogRowImageValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigBinlogRowImage,
+			variableMap[dbConfigBinlogRowImage],
+		})
+		advice = "It is recommended that " + dbConfigBinlogRowImage + " be set to " + dbConfigBinlogRowImageValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// sync_binlog
-
+	if variableMap[dbConfigSyncBinlog] != dbConfigSyncBinlogValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigSyncBinlog,
+			variableMap[dbConfigSyncBinlog],
+		})
+		advice = "It is recommended that " + dbConfigSyncBinlog + " be set to " + dbConfigSyncBinlogValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// innodb_flush_log_at_trx_commit
-
+	if variableMap[dbConfigInnodbFlushLogAtTrxCommit] != dbConfigInnodbFlushLogAtTrxCommitValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigInnodbFlushLogAtTrxCommit,
+			variableMap[dbConfigInnodbFlushLogAtTrxCommit],
+		})
+		advice = "It is recommended that " + dbConfigInnodbFlushLogAtTrxCommit + " be set to " + dbConfigInnodbFlushLogAtTrxCommitValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// gtid_mode
-
+	if variableMap[dbConfigGtidMode] != dbConfigGtidModeValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigGtidMode,
+			variableMap[dbConfigGtidMode],
+		})
+		advice = "It is recommended that " + dbConfigGtidMode + " be set to " + dbConfigGtidModeValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// enforce_gtid_consistency
-
+	if variableMap[dbConfigEnforceGtidConsistency] != dbConfigEnforceGtidConsistencyValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigEnforceGtidConsistency,
+			variableMap[dbConfigEnforceGtidConsistency],
+		})
+		advice = "It is recommended that " + dbConfigEnforceGtidConsistency + " be set to " + dbConfigEnforceGtidConsistencyValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// slave-parallel-type
-
+	if variableMap[dbConfigSlaveParallelType] != dbConfigSlaveParallelTypeValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigSlaveParallelType,
+			variableMap[dbConfigSlaveParallelType],
+		})
+		advice = "It is recommended that " + dbConfigSlaveParallelType + " be set to " + dbConfigSlaveParallelTypeValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// slave-parallel-workers
-
+	if variableMap[dbConfigSlaveParallelWorkers] != dbConfigSlaveParallelWorkersValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigSlaveParallelWorkers,
+			variableMap[dbConfigSlaveParallelWorkers],
+		})
+		advice = "It is recommended that " + dbConfigSlaveParallelWorkers + " be set to " + dbConfigSlaveParallelWorkersValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// master_info_repository
-
+	if variableMap[dbConfigMasterInfoRepository] != dbConfigMasterInfoRepositoryValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigMasterInfoRepository,
+			variableMap[dbConfigMasterInfoRepository],
+		})
+		advice = "It is recommended that " + dbConfigMasterInfoRepository + " be set to " + dbConfigMasterInfoRepositoryValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// relay_log_info_repository
-
+	if variableMap[dbConfigRelayLogInfoRepository] != dbConfigRelayLogInfoRepositoryValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigRelayLogInfoRepository,
+			variableMap[dbConfigRelayLogInfoRepository],
+		})
+		advice = "It is recommended that " + dbConfigRelayLogInfoRepository + " be set to " + dbConfigRelayLogInfoRepositoryValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// report_host
-
+	serverName := de.operationInfo.MySQLServer.GetServerName()
+	if variableMap[dbConfigReportHost] != serverName {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigReportHost,
+			variableMap[dbConfigReportHost],
+		})
+		advice = "It is recommended that " + dbConfigReportHost + " be set to " + serverName + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// report_port
-
+	portNum := de.operationInfo.MySQLServer.GetPortNum()
+	if variableMap[dbConfigReportPort] != string(portNum) {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigReportPort,
+			variableMap[dbConfigReportPort],
+		})
+		advice = "It is recommended that " + dbConfigReportPort + " be set to " + string(portNum) + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// innodb_buffer_pool_chunk_size
+	innodbBufferPoolSize, _ := strconv.Atoi(variableMap[dbConfigInnodbBufferPoolSize])
+	innodbBufferPoolChunkSize, _ := strconv.Atoi(variableMap[dbConfigInnodbBufferPoolChunkSize])
+	innodbBufferPoolSize = innodbBufferPoolSize / 1024 / 1024
+	flag := 0
+	innodbBufferPoolChunkSizeValid := 0
+	if innodbBufferPoolChunkSize%1048576 != 0 {
+		flag = 1
+		advice = "Integer times " + dbConfigInnodbBufferPoolChunkSize + " advice is set to 128 MB.\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
+	if innodbBufferPoolSize <= 120 {
+		innodbBufferPoolChunkSizeValid = 128 * 1024 * 1024
+	} else if innodbBufferPoolSize > 120 {
+		innodbBufferPoolChunkSizeValid = 256 * 1024 * 1024
+	}
+	if innodbBufferPoolSize != innodbBufferPoolChunkSizeValid {
+		flag = 1
+		advice = "It is recommended that " + dbConfigInnodbBufferPoolChunkSize + " be set to " + string(innodbBufferPoolChunkSizeValid) + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
+	if flag == 1 {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigInnodbBufferPoolChunkSize,
+			variableMap[dbConfigInnodbBufferPoolChunkSize],
+		})
+	}
 
 	// innodb_flush_method
-
+	if variableMap[dbConfigInnodbFlushMethod] != dbConfigInnodbFlushMethodValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigInnodbFlushMethod,
+			variableMap[dbConfigInnodbFlushMethod],
+		})
+		advice = "It is recommended that " + dbConfigInnodbFlushMethod + " be set to " + dbConfigInnodbFlushMethodValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// innodb_monitor_enable
-
+	if variableMap[dbConfigInnodbMonitorEnable] != dbConfigInnodbMonitorEnableValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigInnodbMonitorEnable,
+			variableMap[dbConfigInnodbMonitorEnable],
+		})
+		advice = "It is recommended that " + dbConfigInnodbMonitorEnable + " be set to " + dbConfigInnodbMonitorEnableValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// innodb_print_all_deadlocks
-
+	if variableMap[dbConfigInnodbPrintAllDeadlocks] != dbConfigInnodbPrintAllDeadlocksValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigInnodbPrintAllDeadlocks,
+			variableMap[dbConfigInnodbPrintAllDeadlocks],
+		})
+		advice = "It is recommended that " + dbConfigInnodbPrintAllDeadlocks + " be set to " + dbConfigInnodbPrintAllDeadlocksValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// slow_query_log
-
+	if variableMap[dbConfigSlowQueryLog] != dbConfigSlowQueryLogValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigSlowQueryLog,
+			variableMap[dbConfigSlowQueryLog],
+		})
+		advice = "It is recommended that " + dbConfigSlowQueryLog + " be set to " + dbConfigSlowQueryLogValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
 	// performance_schema
+	if variableMap[dbConfigPerformanceSchema] != dbConfigPerformanceSchemaValid {
+		dbConfigCount++
+		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+			dbConfigPerformanceSchema,
+			variableMap[dbConfigPerformanceSchema],
+		})
+		advice = "It is recommended that " + dbConfigPerformanceSchema + " be set to " + dbConfigPerformanceSchemaValid + "." + "\n"
+		dbConfigAdvice = append(dbConfigAdvice, advice)
+	}
+	// database config data
+	jsonBytesTotal, err := json.Marshal(dbConfigInvalid)
+	if err != nil {
+		return nil
+	}
+	de.result.DBConfigData = string(jsonBytesTotal)
+	// database config advice
+	jsonBytesAdvice, err := json.Marshal(dbConfigAdvice)
+	if err != nil {
+		return nil
+	}
+	de.result.DBConfigAdvice = string(jsonBytesAdvice)
 
+	// database config score deduction
+	dbConfigScoreDeduction := float64(dbConfigCount) * dbConfigConfig.ScoreDeductionPerUnitHigh
+	if dbConfigScoreDeduction > dbConfigConfig.MaxScoreDeductionHigh {
+		dbConfigScoreDeduction = dbConfigConfig.MaxScoreDeductionHigh
+	}
+	de.result.DBConfigScore = int(defaultMaxScore - dbConfigScoreDeduction)
+	if de.result.DBConfigScore < constant.ZeroInt {
+		de.result.DBConfigScore = constant.ZeroInt
+	}
 	return nil
 }
 
@@ -365,13 +653,23 @@ func (de *DefaultEngine) checkDBConfig() error {
 func (de *DefaultEngine) checkCPUUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	query := fmt.Sprintf(`
+	// get prometheus version
+	prometheusVersion, err := de.getPrometheusVersion()
+	if err != nil {
+		return err
+	}
+	var query string
+	switch prometheusVersion {
+	case 1:
+	case 2:
+		query = fmt.Sprintf(`
 		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
 		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or
 		(clamp_max(irate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[5m]),1)) ))*100 or
 		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
 		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
 	`, serverName, serverName, serverName, serverName)
+	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -448,12 +746,22 @@ func (de *DefaultEngine) checkCPUUsage() error {
 func (de *DefaultEngine) checkIOUtil() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	query := fmt.Sprintf(`
+	// get prometheus version
+	prometheusVersion, err := de.getPrometheusVersion()
+	if err != nil {
+		return err
+	}
+	var query string
+	switch prometheusVersion {
+	case 1:
+	case 2:
+		query = fmt.Sprintf(`
 		sum by (node_name) (rate(node_disk_io_time_seconds_total{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]) or 
 		irate(node_disk_io_time_seconds_total{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]) or
 		(max_over_time(rdsosmetrics_diskIO_util{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]) or 
 		max_over_time(rdsosmetrics_diskIO_util{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]))/100)
 	`, serverName, serverName, serverName, serverName)
+	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -530,12 +838,22 @@ func (de *DefaultEngine) checkIOUtil() error {
 func (de *DefaultEngine) checkDiskCapacityUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	query := fmt.Sprintf(`
+	// get prometheus version
+	prometheusVersion, err := de.getPrometheusVersion()
+	if err != nil {
+		return err
+	}
+	var query string
+	switch prometheusVersion {
+	case 1:
+	case 2:
+		query = fmt.Sprintf(`
 		sum(avg by (node_name,mountpoint) (1 - (max_over_time(node_filesystem_free_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]) or 
 		max_over_time(node_filesystem_free_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]))  
 		(max_over_time(node_filesystem_size_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]) or 
 		max_over_time(node_filesystem_size_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]))))
 	`, serverName, serverName, serverName, serverName)
+	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -612,11 +930,21 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 func (de *DefaultEngine) checkConnectionUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	query := fmt.Sprintf(`
+	// get prometheus version
+	prometheusVersion, err := de.getPrometheusVersion()
+	if err != nil {
+		return err
+	}
+	var query string
+	switch prometheusVersion {
+	case 1:
+	case 2:
+		query = fmt.Sprintf(`
 		clamp_max((avg by (service_name) (max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m]) or 
 		max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m])) / avg by (service_name) 
 		(mysql_global_variables_max_connections{service_name=~"%s"})),1)
 	`, serverName, serverName, serverName)
+	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -693,14 +1021,20 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 func (de *DefaultEngine) checkActiveSessionNum() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	// TODO
-	query := fmt.Sprintf(`
-		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
-		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or
-		(clamp_max(irate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[5m]),1)) ))*100 or
-		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
-		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
-	`, serverName, serverName, serverName, serverName)
+	// get prometheus version
+	prometheusVersion, err := de.getPrometheusVersion()
+	if err != nil {
+		return err
+	}
+	var query string
+	switch prometheusVersion {
+	case 1:
+	case 2:
+		query = fmt.Sprintf(`
+		avg by (service_name) (avg_over_time(mysql_global_status_threads_running{service_name=~"%s"}[5m]) or 
+		avg_over_time(mysql_global_status_threads_running{service_name=~"%s"}[5m]))
+	`, serverName, serverName)
+	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -777,7 +1111,16 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 func (de *DefaultEngine) checkCacheMissRatio() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	query := fmt.Sprintf(`
+	// get prometheus version
+	prometheusVersion, err := de.getPrometheusVersion()
+	if err != nil {
+		return err
+	}
+	var query string
+	switch prometheusVersion {
+	case 1:
+	case 2:
+		query = fmt.Sprintf(`
 		clamp_max((1 - avg by (service_name)(rate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]) or 
 		irate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]))/
 		avg by (service_name)((rate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]) or 
@@ -785,6 +1128,7 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 		(rate(mysql_global_status_table_open_cache_misses{service_name=~"%s"}[5m]) or 
 		irate(mysql_global_status_table_open_cache_misses{service_name=~"%s"}[5m])))),1)
 	`, serverName, serverName, serverName, serverName, serverName, serverName)
+	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -861,12 +1205,12 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 func (de *DefaultEngine) checkTableSize() error {
 	// check table rows
 	// get data
-	query := `
+	sql := `
 		select TABLE_SCHEMA,TABLE_NAME,TABLE_ROWS,(DATA_LENGTH+INDEX_LENGTH)/1024/1024/1024
 		as TABLE_SIZE from TABLES
 		where TABLE_TYPE='BASE TABLE';
 	`
-	result, err := de.monitorMysqlConn.Execute(query)
+	result, err := de.monitorMysqlConn.Execute(sql)
 	if err != nil {
 		return err
 	}
@@ -939,11 +1283,11 @@ func (de *DefaultEngine) checkTableSize() error {
 }
 
 // checkSlowQuery checks slow query
+// TODO
 func (de *DefaultEngine) checkSlowQuery() error {
 	// check slow query execution time
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
-	// TODO
 	query := fmt.Sprintf(`
 		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
 		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or

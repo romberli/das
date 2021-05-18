@@ -2,6 +2,7 @@ package healthcheck
 
 import (
 	"github.com/romberli/go-util/common"
+	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
@@ -47,7 +48,19 @@ func TestMiddlewareClusterRepo_Execute(t *testing.T) {
 	sql := `select variable_name, variable_value
 		from global_variables;`
 	result, err := defaultEngineConfigRepo.Execute(sql)
-	vlist := make(map[string]string, result.RowNumber())
+	vlist := make([]*GlobalVariables, result.RowNumber())
+	for i := range vlist {
+		vlist[i] = NewEmptyGlobalVariables()
+	}
+	// map to struct
+	err = result.MapToStructSlice(vlist, constant.DefaultMiddlewareTag)
+	// init entity
+	elist := make(map[string]string, result.RowNumber())
+	for i := range vlist {
+		variableName := vlist[i].VariableName
+		elist[variableName] = vlist[i].VariableValue
+	}
+
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
 	r, err := result.GetInt(0, 0)
 	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
