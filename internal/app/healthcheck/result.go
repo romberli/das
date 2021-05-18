@@ -138,146 +138,182 @@ func NewResultWithDefault(operationID int, weightedAverageScore int, dbConfigSco
 	}
 }
 
+// NewEmptyDBInfoWithRepo return a new DBInfo
 func NewEmptyResult() *Result {
 	return &Result{}
 }
 
+// Identity returns the identity
 func (r *Result) Identity() int {
 	return r.ID
 }
 
+// GetOperationID returns the operationID
 func (r *Result) GetOperationID() int {
 	return r.OperationID
 }
 
+// GetWeightedAverageScore returns the weightedAverageScore
 func (r *Result) GetWeightedAverageScore() int {
 	return r.WeightedAverageScore
 }
 
+// GetDBConfigScore returns the dbConfigScore
 func (r *Result) GetDBConfigScore() int {
 	return r.DBConfigScore
 }
 
+// GetDBConfigData returns the dbConfigData
 func (r *Result) GetDBConfigData() string {
 	return r.DBConfigData
 }
 
+// GetDBConfigAdvice returns the dbConfigAdvice
 func (r *Result) GetDBConfigAdvice() string {
 	return r.DBConfigAdvice
 }
 
+// GetCPUUsageScore returns the cpuUsageScore
 func (r *Result) GetCPUUsageScore() int {
 	return r.CPUUsageScore
 }
 
+// GetCPUUsageData returns the cpuUsageData
 func (r *Result) GetCPUUsageData() string {
 	return r.CPUUsageData
 }
 
+// GetCPUUsageHigh returns the cpuUsageHigh
 func (r *Result) GetCPUUsageHigh() string {
 	return r.CPUUsageHigh
 }
 
+// GetIOUtilScore returns the ioUtilScore
 func (r *Result) GetIOUtilScore() int {
 	return r.IOUtilScore
 }
 
+// GetIOUtilData returns the ioUtilData
 func (r *Result) GetIOUtilData() string {
 	return r.IOUtilData
 }
 
+// GetIOUtilHigh returns the ioUtilHigh
 func (r *Result) GetIOUtilHigh() string {
 	return r.IOUtilHigh
 }
 
+// GetDiskCapacityUsageScore returns the diskCapacityUsageScore
 func (r *Result) GetDiskCapacityUsageScore() int {
 	return r.DiskCapacityUsageScore
 }
 
+// GetDiskCapacityUsageData returns the diskCapacityUsageData
 func (r *Result) GetDiskCapacityUsageData() string {
 	return r.DiskCapacityUsageData
 }
 
+// GetDiskCapacityUsageHigh returns the diskCapacityUsageHigh
 func (r *Result) GetDiskCapacityUsageHigh() string {
 	return r.DiskCapacityUsageHigh
 }
 
+// GetConnectionUsageScore returns the connectionUsageScore
 func (r *Result) GetConnectionUsageScore() int {
 	return r.ConnectionUsageScore
 }
 
+// GetConnectionUsageData returns the connectionUsageData
 func (r *Result) GetConnectionUsageData() string {
 	return r.ConnectionUsageData
 }
 
+// GetConnectionUsageHigh returns the connectionUsageHigh
 func (r *Result) GetConnectionUsageHigh() string {
 	return r.ConnectionUsageHigh
 }
 
+// GetAverageActiveSessionNumScore returns the averageActiveSessionNumScore
 func (r *Result) GetAverageActiveSessionNumScore() int {
 	return r.AverageActiveSessionNumScore
 }
 
+// GetAverageActiveSessionNumData returns the averageActiveSessionNumData
 func (r *Result) GetAverageActiveSessionNumData() string {
 	return r.AverageActiveSessionNumData
 }
 
+// GetAverageActiveSessionNumHigh returns the averageActiveSessionNumHigh
 func (r *Result) GetAverageActiveSessionNumHigh() string {
 	return r.AverageActiveSessionNumHigh
 }
 
+// GetCacheMissRatioScore returns the cacheMissRatioScore
 func (r *Result) GetCacheMissRatioScore() int {
 	return r.CacheMissRatioScore
 }
 
+// GetCacheMissRatioData returns the cacheMissRatioData
 func (r *Result) GetCacheMissRatioData() float64 {
 	return r.CacheMissRatioData
 }
 
+// GetCacheMissRatioHigh returns the cacheMissRatioHigh
 func (r *Result) GetCacheMissRatioHigh() float64 {
 	return r.CacheMissRatioHigh
 }
 
+// GetTableSizeScore returns the tableSizeScore
 func (r *Result) GetTableSizeScore() int {
 	return r.TableSizeScore
 }
 
+// GetTableSizeData returns the tableSizeData
 func (r *Result) GetTableSizeData() string {
 	return r.TableSizeData
 }
 
+// GetTableSizeHigh returns the tableSizeHigh
 func (r *Result) GetTableSizeHigh() string {
 	return r.TableSizeHigh
 }
 
+// GetSlowQueryScore returns the slowQueryScore
 func (r *Result) GetSlowQueryScore() int {
 	return r.SlowQueryScore
 }
 
+// GetSlowQueryData returns the slowQueryData
 func (r *Result) GetSlowQueryData() string {
 	return r.SlowQueryData
 }
 
+// GetSlowQueryAdvice returns the slowQueryAdvice
 func (r *Result) GetSlowQueryAdvice() string {
 	return r.SlowQueryAdvice
 }
 
+// GetAccurateReview returns the accurateReview
 func (r *Result) GetAccurateReview() int {
 	return r.AccurateReview
 }
 
+// GetDelFlag returns the delete flag
 func (r *Result) GetDelFlag() int {
 	return r.DelFlag
 }
 
+// GetCreateTime returns the create time
 func (r *Result) GetCreateTime() time.Time {
 	return r.CreateTime
 }
 
+// GetLastUpdateTime returns the last update time
 func (r *Result) GetLastUpdateTime() time.Time {
 	return r.LastUpdateTime
 }
 
+// Set sets health check with given fields, key is the field name and value is the relevant value of the key
 func (r *Result) Set(fields map[string]interface{}) error {
 	for fieldName, fieldValue := range fields {
 		err := common.SetValueOfStruct(r, fieldName, fieldValue)
@@ -289,10 +325,12 @@ func (r *Result) Set(fields map[string]interface{}) error {
 	return nil
 }
 
+// MarshalJSON marshals health check to json string
 func (r *Result) MarshalJSON() ([]byte, error) {
 	return common.MarshalStructWithTag(r, constant.DefaultMarshalTag)
 }
 
+// MarshalJSONWithFields marshals only specified field of the health check to json string
 func (r *Result) MarshalJSONWithFields(fields ...string) ([]byte, error) {
 	return common.MarshalStructWithFields(r, fields...)
 }
