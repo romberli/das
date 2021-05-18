@@ -78,7 +78,7 @@ func (mss *MySQLServerService) GetByID(id int) error {
 
 	mss.MySQLServers = append(mss.MySQLServers, entity)
 
-	return err
+	return nil
 }
 
 // GetByHostInfo gets a mysql server with given host ip and port number
