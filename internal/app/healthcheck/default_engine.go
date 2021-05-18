@@ -5,9 +5,10 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"github.com/pingcap/errors"
 	"math"
 	"time"
+
+	"github.com/pingcap/errors"
 
 	"github.com/romberli/das/internal/dependency/healthcheck"
 	"github.com/romberli/das/pkg/message"
@@ -856,18 +857,15 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	return nil
 }
 
-// checkTableSize checks table size
+// checkTableSize checks table size by checking rows
 func (de *DefaultEngine) checkTableSize() error {
 	// check table rows
 	// get data
-	//dbName := de.monitorMysqlConn.GetDB()
-	serverName := de.operationInfo.MySQLServer.GetServerName()
-	// TODO
-	query := fmt.Sprintf(`
+	query := `
 		select TABLE_SCHEMA,TABLE_NAME,TABLE_ROWS,(DATA_LENGTH+INDEX_LENGTH)/1024/1024/1024
 		as TABLE_SIZE from TABLES
 		where TABLE_TYPE='BASE TABLE';
-	`)
+	`
 	result, err := de.monitorMysqlConn.Execute(query)
 	if err != nil {
 		return err
@@ -931,82 +929,8 @@ func (de *DefaultEngine) checkTableSize() error {
 	if tableRowsScoreDeductionMedium > tableRowsConfig.MaxScoreDeductionMedium {
 		tableRowsScoreDeductionMedium = tableRowsConfig.MaxScoreDeductionMedium
 	}
-
-	// check table size
-	// TODO
-	query = fmt.Sprintf(`
-		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
-		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or
-		(clamp_max(irate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[5m]),1)) ))*100 or
-		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
-		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
-	`, serverName, serverName, serverName, serverName)
-	// result, err = de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
-	if err != nil {
-		return err
-	}
-
-	// analyze result
-	length = result.RowNumber()
-	if length == constant.ZeroInt {
-		return nil
-	}
-
-	tableSizeConfig := de.getItemConfig(defaultTableSizeItemName)
-
-	var (
-		tableSize            float64
-		tableSizeHighSum     float64
-		tableSizeHighCount   int
-		tableSizeMediumSum   float64
-		tableSizeMediumCount int
-
-		tableSizeHigh [][]driver.Value
-	)
-
-	for i, rowData := range result.Rows.Values {
-		tableSize, err = result.GetFloat(i, constant.ZeroInt)
-		if err != nil {
-			return err
-		}
-
-		switch {
-		case tableSize >= tableSizeConfig.HighWatermark:
-			tableSizeHigh = append(tableSizeHigh, rowData)
-			tableSizeHighSum += tableSize
-			tableSizeHighCount++
-		case tableSize >= tableSizeConfig.LowWatermark:
-			tableSizeMediumSum += tableSize
-			tableSizeMediumCount++
-		}
-	}
-
-	// table size data
-	jsonBytesTotal, err = json.Marshal(result.Rows.Values)
-	if err != nil {
-		return nil
-	}
-	de.result.TableSizeData = string(jsonBytesTotal)
-	// table rows high
-	jsonBytesHigh, err = json.Marshal(tableSizeHigh)
-	if err != nil {
-		return nil
-	}
-	de.result.TableSizeHigh = string(jsonBytesHigh)
-
-	// table size high score deduction
-	tableSizeScoreDeductionHigh := (tableSizeHighSum/float64(tableSizeHighCount) - tableSizeConfig.HighWatermark) / tableSizeConfig.Unit * tableSizeConfig.ScoreDeductionPerUnitHigh
-	if tableSizeScoreDeductionHigh > tableSizeConfig.MaxScoreDeductionHigh {
-		tableSizeScoreDeductionHigh = tableSizeConfig.MaxScoreDeductionHigh
-	}
-	// table size medium score deduction
-	tableSizeScoreDeductionMedium := (tableSizeMediumSum/float64(tableSizeMediumCount) - tableSizeConfig.LowWatermark) / tableSizeConfig.Unit * tableSizeConfig.ScoreDeductionPerUnitMedium
-	if tableSizeScoreDeductionMedium > tableSizeConfig.MaxScoreDeductionMedium {
-		tableSizeScoreDeductionMedium = tableSizeConfig.MaxScoreDeductionMedium
-	}
-
-	// table size score
-	de.result.TableSizeScore = int(defaultMaxScore - tableRowsScoreDeductionHigh - tableRowsScoreDeductionMedium - tableSizeScoreDeductionHigh - tableSizeScoreDeductionMedium)
+	// table rows score
+	de.result.TableSizeScore = int(defaultMaxScore - tableRowsScoreDeductionHigh - tableRowsScoreDeductionMedium)
 	if de.result.TableSizeScore < constant.ZeroInt {
 		de.result.TableSizeScore = constant.ZeroInt
 	}
