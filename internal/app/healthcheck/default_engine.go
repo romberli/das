@@ -653,6 +653,8 @@ func (de *DefaultEngine) checkDBConfig() error {
 func (de *DefaultEngine) checkCPUUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
+	portNum := de.operationInfo.MySQLServer.GetPortNum()
+	host := serverName + string(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -661,6 +663,12 @@ func (de *DefaultEngine) checkCPUUsage() error {
 	var query string
 	switch prometheusVersion {
 	case 1:
+		query = fmt.Sprintf(`
+		sum(((avg by (mode) ( (clamp_max(rate(node_cpu{instance=~"%s",mode!="idle"}[$interval]),1)) 
+		or (clamp_max(irate(node_cpu{instance=~"%s",mode!="idle"}[5m]),1)) ))*100 or 
+		(avg_over_time(node_cpu_average{instance=~"%s", mode!="total", mode!="idle"}[$interval]) or 
+		avg_over_time(node_cpu_average{instance=~"%s", mode!="total", mode!="idle"}[5m]))))
+	`, host, host, host, host)
 	case 2:
 		query = fmt.Sprintf(`
 		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
@@ -746,6 +754,8 @@ func (de *DefaultEngine) checkCPUUsage() error {
 func (de *DefaultEngine) checkIOUtil() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
+	portNum := de.operationInfo.MySQLServer.GetPortNum()
+	host := serverName + string(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -754,6 +764,10 @@ func (de *DefaultEngine) checkIOUtil() error {
 	var query string
 	switch prometheusVersion {
 	case 1:
+		query = fmt.Sprintf(`
+		rate(node_disk_io_time_ms{device=~"(sda|sdb|sdc|sr0)", instance=~"%s"}[$interval])/1000 or 
+		irate(node_disk_io_time_ms{device=~"(sda|sdb|sdc|sr0)", instance=~"%s"}[5m])/1000
+	`, host, host)
 	case 2:
 		query = fmt.Sprintf(`
 		sum by (node_name) (rate(node_disk_io_time_seconds_total{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]) or 
@@ -838,6 +852,8 @@ func (de *DefaultEngine) checkIOUtil() error {
 func (de *DefaultEngine) checkDiskCapacityUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
+	portNum := de.operationInfo.MySQLServer.GetPortNum()
+	host := serverName + string(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -846,6 +862,10 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 	var query string
 	switch prometheusVersion {
 	case 1:
+		query = fmt.Sprintf(`
+		node_filesystem_size{instance=~"%s",mountpoint="/", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"} 
+		- node_filesystem_free{instance=~"%s",mountpoint="/", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}
+	`, host, host)
 	case 2:
 		query = fmt.Sprintf(`
 		sum(avg by (node_name,mountpoint) (1 - (max_over_time(node_filesystem_free_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]) or 
@@ -930,6 +950,8 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 func (de *DefaultEngine) checkConnectionUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
+	portNum := de.operationInfo.MySQLServer.GetPortNum()
+	host := serverName + string(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -938,6 +960,10 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 	var query string
 	switch prometheusVersion {
 	case 1:
+		query = fmt.Sprintf(`
+		max(max_over_time(mysql_global_status_threads_connected{instance=~"%s"}[$interval]) or 
+		mysql_global_status_threads_connected{instance=~"%s"} )
+	`, host, host)
 	case 2:
 		query = fmt.Sprintf(`
 		clamp_max((avg by (service_name) (max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m]) or 
@@ -1021,6 +1047,8 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 func (de *DefaultEngine) checkActiveSessionNum() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
+	portNum := de.operationInfo.MySQLServer.GetPortNum()
+	host := serverName + string(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -1029,6 +1057,10 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 	var query string
 	switch prometheusVersion {
 	case 1:
+		query = fmt.Sprintf(`
+		avg_over_time(mysql_global_status_threads_running{instance=~"%s"}[$interval]) or 
+		avg_over_time(mysql_global_status_threads_running{instance=~"%s"}[5m])
+	`, host, host)
 	case 2:
 		query = fmt.Sprintf(`
 		avg by (service_name) (avg_over_time(mysql_global_status_threads_running{service_name=~"%s"}[5m]) or 
@@ -1111,6 +1143,8 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 func (de *DefaultEngine) checkCacheMissRatio() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
+	portNum := de.operationInfo.MySQLServer.GetPortNum()
+	host := serverName + string(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -1119,6 +1153,14 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	var query string
 	switch prometheusVersion {
 	case 1:
+		query = fmt.Sprintf(`
+		1- (rate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[$interval]) or 
+		irate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[5m]))/
+		((rate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[$interval]) or 
+		irate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[5m]))+
+		(rate(mysql_global_status_table_open_cache_misses{instance=~"%s"}[$interval]) or 
+		irate(mysql_global_status_table_open_cache_misses{instance=~"%s"}[5m])))
+	`, host, host, host, host, host, host)
 	case 2:
 		query = fmt.Sprintf(`
 		clamp_max((1 - avg by (service_name)(rate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]) or 
