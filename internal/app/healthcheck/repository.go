@@ -1,7 +1,6 @@
 package healthcheck
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -73,7 +72,7 @@ func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, errors.New(fmt.Sprintf("healthCheck Repository.GetResultByOperationID(): data does not exists, operation_id: %d", operationID))
+		return nil, fmt.Errorf("healthCheck Repository.GetResultByOperationID(): data does not exists, operation_id: %d", operationID)
 	case 1:
 		//hcInfo := NewEmptyResultWithRepo(r)
 		hcInfo := NewEmptyResultWithGlobal()
@@ -85,7 +84,7 @@ func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result
 
 		return hcInfo, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("healthCheck Repository.GetResultByOperationID(): duplicate key exists, operation_id: %d", operationID))
+		return nil, fmt.Errorf("healthCheck Repository.GetResultByOperationID(): duplicate key exists, operation_id: %d", operationID)
 	}
 }
 
@@ -111,7 +110,11 @@ func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Ti
 	sql := `insert into t_hc_operation_info(mysql_server_id, start_time, end_time, step) values(?, ?, ?, ?);`
 	log.Debugf("healthCheck Repository.InitOperation() insert sql: %s", sql)
 
-	_, err := r.Execute(sql, mysqlServerID, startTime, endTime, step)
+	strStartTime := startTime.Format("2006-01-02 15:04:05")
+	strEndTime := endTime.Format("2006-01-02 15:04:05")
+	numStep := step.Seconds()
+
+	_, err := r.Execute(sql, mysqlServerID, strStartTime, strEndTime, numStep)
 	if err != nil {
 		return constant.ZeroInt, err
 	}
@@ -122,7 +125,7 @@ func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Ti
 	`
 	log.Debugf("healthCheck Repository.InitOperation() select sql: %s", sql)
 
-	result, err := r.Execute(sql, mysqlServerID, startTime, endTime, step)
+	result, err := r.Execute(sql, mysqlServerID, strStartTime, strEndTime, numStep)
 	if err != nil {
 		return constant.ZeroInt, err
 	}
@@ -140,7 +143,7 @@ func (r *Repository) UpdateOperationStatus(operationID int, status int, message 
 }
 
 // SaveResult saves the result in the middleware
-func (r *Repository) SaveResult(result healthcheck.Result) (healthcheck.Result, error) {
+func (r *Repository) SaveResult(result healthcheck.Result) error {
 	sql := `insert into t_hc_result(operation_id, weighted_average_score, db_config_score, db_config_data, 
 		db_config_advice, cpu_usage_score, cpu_usage_data, cpu_usage_high, io_util_score,
 		io_util_data, io_util_high, disk_capacity_usage_score, disk_capacity_usage_data, 
@@ -152,7 +155,7 @@ func (r *Repository) SaveResult(result healthcheck.Result) (healthcheck.Result, 
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`
 	log.Debugf("healthCheck Repository.SaveResult() insert sql: %s", sql)
-	fmt.Println(sql)
+	// fmt.Println(sql)
 	// execute
 	_, err := r.Execute(sql, result.GetOperationID(), result.GetWeightedAverageScore(), result.GetDBConfigScore(),
 		result.GetDBConfigData(), result.GetDBConfigAdvice(), result.GetCPUUsageScore(), result.GetCPUUsageData(),
@@ -163,17 +166,14 @@ func (r *Repository) SaveResult(result healthcheck.Result) (healthcheck.Result, 
 		result.GetCacheMissRatioScore(), result.GetCacheMissRatioData(), result.GetCacheMissRatioHigh(),
 		result.GetTableSizeScore(), result.GetTableSizeData(), result.GetTableSizeHigh(), result.GetSlowQueryScore(),
 		result.GetSlowQueryData(), result.GetSlowQueryAdvice(), result.GetAccurateReview())
-	if err != nil {
-		return nil, err
-	}
 
-	return r.GetResultByOperationID(result.GetOperationID())
+	return err
 }
 
 // UpdateAccurateReviewByOperationID updates the accurateReview by the operationID in the middleware
-func (r *Repository) UpdateAccurateReviewByOperationID(operationID int, review int) error {
-	sql := `update t_hc_result set review = ? where operation_id = ?;`
+func (r *Repository) UpdateAccurateReviewByOperationID(operationID int, accurate_review int) error {
+	sql := `update t_hc_result set accurate_review = ? where operation_id = ?;`
 	log.Debugf("healthCheck Repository.UpdateAccurateReviewByOperationID() update sql: \n%s\nplaceholders: %s", sql, operationID)
-	_, err := r.Execute(sql, review, operationID)
+	_, err := r.Execute(sql, accurate_review, operationID)
 	return err
 }

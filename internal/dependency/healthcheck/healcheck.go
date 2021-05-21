@@ -1,9 +1,8 @@
 package healthcheck
 
 import (
-	"time"
-
 	"github.com/romberli/go-util/middleware"
+	"time"
 )
 
 type Result interface {
@@ -75,6 +74,8 @@ type Result interface {
 	GetCreateTime() time.Time
 	// GetLastUpdateTime returns the last update time
 	GetLastUpdateTime() time.Time
+	// Set the value of the filed of result
+	Set(fields map[string]interface{}) error
 	// MarshalJSON marshals Result to json string
 	MarshalJSON() ([]byte, error)
 	// MarshalJSON marshals only specified field of the Result to json string
@@ -95,7 +96,7 @@ type Repository interface {
 	// UpdateOperationStatus updates operation status
 	UpdateOperationStatus(operationID int, status int, message string) error
 	// SaveResult saves result into the middleware
-	SaveResult(result Result) (Result, error)
+	SaveResult(result Result) error
 	// UpdateAccurateReviewByOperationID updates the accurate review
 	UpdateAccurateReviewByOperationID(operationID int, review int) error
 }
@@ -107,8 +108,9 @@ type Service interface {
 	GetResultByOperationID(id int) error
 	// Check checks the server health status
 	Check(mysqlServerID int, startTime, endTime time.Time, step time.Duration) error
-	// CheckByHostInfo checks the server health status
+	// Check checks the server health status
 	CheckByHostInfo(hostIP string, portNum int, startTime, endTime time.Time, step time.Duration) error
+	// ReviewAccurate reviews the accurate of the check
 	ReviewAccurate(id, review int) error
 	// MarshalJSON marshals Service to json string
 	MarshalJSON() ([]byte, error)
