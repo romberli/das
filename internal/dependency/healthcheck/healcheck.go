@@ -107,7 +107,8 @@ type Service interface {
 	GetResultByOperationID(id int) error
 	// Check checks the server health status
 	Check(mysqlServerID int, startTime, endTime time.Time, step time.Duration) error
-	// ReviewAccurate reviews the accurate of the check
+	// CheckByHostInfo checks the server health status
+	CheckByHostInfo(hostIP string, portNum int, startTime, endTime time.Time, step time.Duration) error
 	ReviewAccurate(id, review int) error
 	// MarshalJSON marshals Service to json string
 	MarshalJSON() ([]byte, error)
