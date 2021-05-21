@@ -416,8 +416,8 @@ github.com/romberli/dynamic-struct v1.2.1 h1:vle/rxIUl7IgreLScMSg9RhYBjygY/5Hj/O
 github.com/romberli/dynamic-struct v1.2.1/go.mod h1:Jk2Z0Dm0diV7O4Lg1MfIyJ0kvOxfN+imwZVO5SOUL94=
 github.com/romberli/go-mysql v1.1.3-0.20210425112236-f28342fcf6bc h1:WLRju71PsImGP3g6Gu+qFIMYO2XwAlyGgSrfI7Xq6Qs=
 github.com/romberli/go-mysql v1.1.3-0.20210425112236-f28342fcf6bc/go.mod h1:3lFZKf7l95Qo70+3XB2WpiSf9wu2s3na3geLMaIIrqQ=
-github.com/romberli/go-util v0.3.3-0.20210517073900-91715049288a h1:OSyVfdp/B7PyDabAkmmSsalW8qvnqqDbNlK6BjUfHGk=
-github.com/romberli/go-util v0.3.3-0.20210517073900-91715049288a/go.mod h1:Wxr2DU+yS51YPNk4g0KWvV9v0/U+xmWBTFQoV/6vMCI=
+github.com/romberli/go-util v0.3.3-0.20210517082903-922ea75e3a92 h1:ErHsdu4sWazXv/Npw2ILl1uRtUg3KL5UhcEPMGJPcWo=
+github.com/romberli/go-util v0.3.3-0.20210517082903-922ea75e3a92/go.mod h1:Wxr2DU+yS51YPNk4g0KWvV9v0/U+xmWBTFQoV/6vMCI=
 github.com/romberli/log v1.0.20 h1:bOlvkGfy6gHS+zGcJhjwq85t9prcXQUJQaLRANoCFVU=
 github.com/romberli/log v1.0.20/go.mod h1:FKhKFdWL5DLD+1LMO/RB4AcO4MUBl1th/pNFjhrmaGc=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
