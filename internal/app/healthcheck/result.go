@@ -47,7 +47,7 @@ type Result struct {
 }
 
 // NewResult returns a new *Result
-func NewResult(repo *Repository, operationID int, weightedAverageScore int, dbConfigScore int, dbConfigData string, dbConfigAdvice string,
+func NewResult(repo healthcheck.Repository, operationID int, weightedAverageScore int, dbConfigScore int, dbConfigData string, dbConfigAdvice string,
 	cpuUsageScore int, cpuUsageData string, cpuUsageHigh string, ioUtilScore int, ioUtilData string, ioUtilHigh string,
 	diskCapacityUsageScore int, diskCapacityUsageData string, diskCapacityUsageHigh string,
 	connectionUsageScore int, connectionUsageData string, connectionUsageHigh string,
@@ -90,7 +90,7 @@ func NewResult(repo *Repository, operationID int, weightedAverageScore int, dbCo
 }
 
 // NewEmptyResultWithRepo return a new Result
-func NewEmptyResultWithRepo(repository *Repository) *Result {
+func NewEmptyResultWithRepo(repository healthcheck.Repository) *Result {
 	return &Result{Repository: repository}
 }
 
