@@ -14,6 +14,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/jinzhu/now v1.1.2
+	github.com/pingcap/errors v0.11.5-0.20201126102027-b0a155152ca3
 	github.com/romberli/go-util v0.3.3-0.20210517082903-922ea75e3a92
 	github.com/romberli/log v1.0.20
 	github.com/spf13/cast v1.3.1
