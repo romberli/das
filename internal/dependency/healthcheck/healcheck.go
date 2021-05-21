@@ -1,8 +1,9 @@
 package healthcheck
 
 import (
-	"github.com/romberli/go-util/middleware"
 	"time"
+
+	"github.com/romberli/go-util/middleware"
 )
 
 type Result interface {
@@ -74,7 +75,7 @@ type Result interface {
 	GetCreateTime() time.Time
 	// GetLastUpdateTime returns the last update time
 	GetLastUpdateTime() time.Time
-	// Set the value of the filed of result
+	// Set sets health check with given fields, key is the field name and value is the relevant value of the key
 	Set(fields map[string]interface{}) error
 	// MarshalJSON marshals Result to json string
 	MarshalJSON() ([]byte, error)
