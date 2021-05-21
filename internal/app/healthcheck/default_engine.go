@@ -536,13 +536,13 @@ func (de *DefaultEngine) checkDBConfig() error {
 	}
 	// report_port
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
-	if variableMap[dbConfigReportPort] != string(portNum) {
+	if variableMap[dbConfigReportPort] != strconv.Itoa(portNum) {
 		dbConfigCount++
 		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
 			dbConfigReportPort,
 			variableMap[dbConfigReportPort],
 		})
-		advice = "It is recommended that " + dbConfigReportPort + " be set to " + string(portNum) + "." + "\n"
+		advice = "It is recommended that " + dbConfigReportPort + " be set to " + strconv.Itoa(portNum) + "." + "\n"
 		dbConfigAdvice = append(dbConfigAdvice, advice)
 	}
 	// innodb_buffer_pool_chunk_size
@@ -563,7 +563,7 @@ func (de *DefaultEngine) checkDBConfig() error {
 	}
 	if innodbBufferPoolSize != innodbBufferPoolChunkSizeValid {
 		flag = 1
-		advice = "It is recommended that " + dbConfigInnodbBufferPoolChunkSize + " be set to " + string(innodbBufferPoolChunkSizeValid) + "." + "\n"
+		advice = "It is recommended that " + dbConfigInnodbBufferPoolChunkSize + " be set to " + strconv.Itoa(innodbBufferPoolChunkSizeValid) + "." + "\n"
 		dbConfigAdvice = append(dbConfigAdvice, advice)
 	}
 	if flag == 1 {
@@ -654,7 +654,7 @@ func (de *DefaultEngine) checkCPUUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
-	host := serverName + string(portNum)
+	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -755,7 +755,7 @@ func (de *DefaultEngine) checkIOUtil() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
-	host := serverName + string(portNum)
+	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -853,7 +853,7 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
-	host := serverName + string(portNum)
+	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -951,7 +951,7 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
-	host := serverName + string(portNum)
+	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -1048,7 +1048,7 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
-	host := serverName + string(portNum)
+	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
@@ -1144,7 +1144,7 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	// get data
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
-	host := serverName + string(portNum)
+	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
 	prometheusVersion, err := de.getPrometheusVersion()
 	if err != nil {
