@@ -1,7 +1,6 @@
 package healthcheck
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -118,7 +117,7 @@ func (s *Service) CheckByHostInfo(hostIP string, portNum int, startTime, endTime
 	return s.check(mysqlServerID, startTime, endTime, step)
 }
 
-// CheckByHostInfo
+// check
 
 func (s *Service) check(mysqlServerID int, startTime, endTime time.Time, step time.Duration) error {
 	// init
@@ -140,12 +139,9 @@ func (s *Service) check(mysqlServerID int, startTime, endTime time.Time, step ti
 // init initiates healthcheck operation and engine
 func (s *Service) init(mysqlServerID int, startTime, endTime time.Time, step time.Duration) error {
 	// check if operation with the same mysql server id is still running
-	isRunning, err := s.Repository.IsRunning(mysqlServerID)
+	_, err := s.Repository.IsRunning(mysqlServerID)
 	if err != nil {
 		return err
-	}
-	if isRunning {
-
 	}
 	// insert operation message
 	id, err := s.Repository.InitOperation(mysqlServerID, startTime, endTime, step)
@@ -210,7 +206,7 @@ func (s *Service) init(mysqlServerID int, startTime, endTime time.Time, step tim
 			return err
 		}
 	default:
-		return errors.New(fmt.Sprintf("healthcheck: monitor system type should be either 1 or 2, %d is not valid", monitorSystemType))
+		return fmt.Errorf("healthcheck: monitor system type should be either 1 or 2, %d is not valid", monitorSystemType)
 	}
 
 	s.OperationInfo = NewOperationInfo(id, mysqlServer, startTime, endTime, step)
@@ -271,5 +267,5 @@ func (s *Service) MarshalJSON() ([]byte, error) {
 
 // MarshalWithFields marshals only specified fields of the Service to json bytes
 func (s *Service) MarshalJSONWithFields(fields ...string) ([]byte, error) {
-	return common.MarshalStructWithFields(s, fields...)
+	return common.MarshalStructWithFields(s.Result, fields...)
 }

@@ -74,6 +74,8 @@ type Result interface {
 	GetCreateTime() time.Time
 	// GetLastUpdateTime returns the last update time
 	GetLastUpdateTime() time.Time
+	// Set the value of the filed of result
+	Set(fields map[string]interface{}) error
 	// MarshalJSON marshals Result to json string
 	MarshalJSON() ([]byte, error)
 	// MarshalJSON marshals only specified field of the Result to json string
