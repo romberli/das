@@ -94,7 +94,7 @@ func Check(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, hStartTimeJSON)
 		return
 	}
-	startTime, err := time.Parse(constant.TimeLayoutSecond, startTimeStr)
+	startTime, err := time.ParseInLocation(constant.TimeLayoutSecond, startTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, startTimeStr)
 	}
@@ -103,7 +103,7 @@ func Check(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, hEndTimeJSON)
 		return
 	}
-	endTime, err := time.Parse(constant.TimeLayoutSecond, endTimeStr)
+	endTime, err := time.ParseInLocation(constant.TimeLayoutSecond, endTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, endTimeStr)
 	}
@@ -167,7 +167,7 @@ func CheckByHostInfo(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, hStartTimeJSON)
 		return
 	}
-	startTime, err := time.Parse(constant.TimeLayoutSecond, startTimeStr)
+	startTime, err := time.ParseInLocation(constant.TimeLayoutSecond, startTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, startTimeStr)
 	}
@@ -176,7 +176,7 @@ func CheckByHostInfo(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrFieldNotExists, hEndTimeJSON)
 		return
 	}
-	endTime, err := time.Parse(constant.TimeLayoutSecond, endTimeStr)
+	endTime, err := time.ParseInLocation(constant.TimeLayoutSecond, endTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, endTimeStr)
 	}
