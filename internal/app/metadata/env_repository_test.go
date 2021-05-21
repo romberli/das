@@ -13,10 +13,10 @@ import (
 
 const (
 	// modify these connection information
-	envAddr       = "192.168.171.159:3306"
-	envDBName     = "db_test"
-	envDBUser     = "tester"
-	envDBPass     = "mysql.1234"
+	envAddr       = "127.0.0.1:3306"
+	envDBName     = "das"
+	envDBUser     = "root"
+	envDBPass     = "rootroot"
 	newEnvName    = "newTest"
 	onlineEnvName = "rel"
 	onlineID      = 2

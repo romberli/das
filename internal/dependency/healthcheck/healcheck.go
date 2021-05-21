@@ -1,9 +1,8 @@
 package healthcheck
 
 import (
-	"time"
-
 	"github.com/romberli/go-util/middleware"
+	"time"
 )
 
 type Result interface {

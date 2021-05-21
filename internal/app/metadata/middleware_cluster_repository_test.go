@@ -15,7 +15,7 @@ const (
 	middlewareClusterAddr   = "localhost:3306"
 	middlewareClusterDBName = "das"
 	middlewareClusterDBUser = "root"
-	middlewareClusterDBPass = "root"
+	middlewareClusterDBPass = "rootroot"
 
 	newMiddlewareClusterName    = "ttt"
 	onlineMiddlewareClusterName = "test"

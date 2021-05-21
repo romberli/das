@@ -16,7 +16,7 @@ const (
 	monitorSystemAddr   = "127.0.0.1:3306"
 	monitorSystemDBName = "das"
 	monitorSystemDBUser = "root"
-	monitorSystemDBPass = "mysql123"
+	monitorSystemDBPass = "rootroot"
 
 	newMonitorSystemName = "newTest"
 )
