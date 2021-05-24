@@ -1,19 +1,19 @@
 package healthcheck
 
 import (
+	"fmt"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 const (
-	defaultEngineConfigAddr   = "192.168.10.210:3306"
-	defaultEngineConfigDBName = "performance_schema"
+	defaultEngineConfigAddr   = "localhost:3306"
+	defaultEngineConfigDBName = "das"
 	defaultEngineConfigDBUser = "root"
-	defaultEngineConfigDBPass = "root"
+	defaultEngineConfigDBPass = "rootroot"
 
 	defaultEngineConfigID                          = 1
 	defaultEngineConfigItemName                    = "test_item"
@@ -43,26 +43,23 @@ func initDefaultEngineConfigRepo() *Repository {
 }
 
 func TestMiddlewareClusterRepo_Execute(t *testing.T) {
-	asst := assert.New(t)
+	sql := `
+		select id, item_name, item_weight, low_watermark, high_watermark, unit, score_deduction_per_unit_high, max_score_deduction_high,
+		score_deduction_per_unit_medium, max_score_deduction_medium, del_flag, create_time, last_update_time
+		from t_hc_default_engine_config
+		where del_flag = 0;
+	`
+	log.Debugf("healcheck Repository.loadEngineConfig() sql: \n%s\nplaceholders: %s", sql)
+	result, _ := defaultEngineConfigRepo.Execute(sql)
 
-	sql := `select variable_name, variable_value
-		from global_variables;`
-	result, err := defaultEngineConfigRepo.Execute(sql)
-	vlist := make([]*GlobalVariables, result.RowNumber())
-	for i := range vlist {
-		vlist[i] = NewEmptyGlobalVariables()
+	// init []*DefaultItemConfig
+	defaultEngineConfigList := make([]*DefaultItemConfig, result.RowNumber())
+	for i := range defaultEngineConfigList {
+		defaultEngineConfigList[i] = NewEmptyDefaultItemConfig()
 	}
 	// map to struct
-	err = result.MapToStructSlice(vlist, constant.DefaultMiddlewareTag)
-	// init entity
-	elist := make(map[string]string, result.RowNumber())
-	for i := range vlist {
-		variableName := vlist[i].VariableName
-		elist[variableName] = vlist[i].VariableValue
+	result.MapToStructSlice(defaultEngineConfigList, constant.DefaultMiddlewareTag)
+	for i := range defaultEngineConfigList {
+		fmt.Println(defaultEngineConfigList[i])
 	}
-
-	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
-	r, err := result.GetInt(0, 0)
-	asst.Nil(err, common.CombineMessageWithError("test Execute() failed", err))
-	asst.Equal(1, r, "test Execute() failed")
 }

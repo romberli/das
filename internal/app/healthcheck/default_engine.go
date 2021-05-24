@@ -131,62 +131,62 @@ func (dec DefaultEngineConfig) getItemConfig(item string) *DefaultItemConfig {
 }
 
 // Validate validates if engine configuration is valid
-func (dec DefaultEngineConfig) Validate() bool {
+func (dec DefaultEngineConfig) Validate() error {
 	itemWeightCount := constant.ZeroInt
 	// validate defaultEngineConfig exits items
 	if len(dec) == constant.ZeroInt {
 		log.Errorf("default engine config doesn't have content.")
-		return false
+		return nil
 	}
 	for itemName, defaultItemConfig := range dec {
 		// validate item weight
 		if defaultItemConfig.ItemWeight > 100 || defaultItemConfig.ItemWeight < 0 {
 			log.Errorf("item name: %s item weight is invalid.", itemName)
-			return false
+			return nil
 		}
 		// validate low watermark
 		if defaultItemConfig.LowWatermark < 0 {
 			log.Errorf("item name: %s low watermark is invalid.", itemName)
-			return false
+			return nil
 		}
 		// validate high watermark
 		if defaultItemConfig.HighWatermark <= defaultItemConfig.LowWatermark {
 			log.Errorf("item name: %s high watermark is invalid.", itemName)
-			return false
+			return nil
 		}
 		// validate unit
 		if defaultItemConfig.Unit < 0 {
 			log.Errorf("item name: %s unit is invalid.", itemName)
-			return false
+			return nil
 		}
 		// validate score deduction per unit high
 		if defaultItemConfig.ScoreDeductionPerUnitHigh > 100 || defaultItemConfig.ScoreDeductionPerUnitHigh < 0 || defaultItemConfig.ScoreDeductionPerUnitHigh > defaultItemConfig.MaxScoreDeductionHigh {
 			log.Errorf("item name: %s score deduction per unit high is invalid.", itemName)
-			return false
+			return nil
 		}
 		// validate max score deduction high
 		if defaultItemConfig.MaxScoreDeductionHigh > 100 || defaultItemConfig.MaxScoreDeductionHigh < 0 {
 			log.Errorf("item name: %s max score deduction high is invalid.", itemName)
-			return false
+			return nil
 		}
 		// validate score deduction per unit medium
 		if defaultItemConfig.ScoreDeductionPerUnitMedium > 100 || defaultItemConfig.ScoreDeductionPerUnitMedium < 0 || defaultItemConfig.ScoreDeductionPerUnitMedium > defaultItemConfig.MaxScoreDeductionMedium {
 			log.Errorf("item name: %s score deduction per unit medium is invalid.", itemName)
-			return false
+			return nil
 		}
 		// validate max score deduction medium
 		if defaultItemConfig.MaxScoreDeductionMedium > 100 || defaultItemConfig.MaxScoreDeductionMedium < 0 {
 			log.Errorf("item name: %s max score deduction medium is invalid.", itemName)
-			return false
+			return nil
 		}
 		itemWeightCount += defaultItemConfig.ItemWeight
 	}
 	// validate item weigh count is 100
 	if itemWeightCount != 100 {
 		log.Errorf("all items weight weight count is not 100.")
-		return false
+		return nil
 	}
-	return true
+	return nil
 }
 
 type DefaultEngine struct {
@@ -236,7 +236,7 @@ func (de *DefaultEngine) getItemConfig(item string) *DefaultItemConfig {
 	return de.engineConfig.getItemConfig(item)
 }
 
-func (de *DefaultEngine) getPrometheusVersion() (int, error) {
+func (de *DefaultEngine) getPmmVersion() (int, error) {
 	prometheusInfo, err := de.monitorPrometheusConn.API.Buildinfo(context.Background())
 	if err != nil {
 		return 0, err
@@ -364,7 +364,7 @@ func (de *DefaultEngine) loadEngineConfig() error {
 	}
 	// validate config
 	validate := entityList.Validate()
-	if validate == false {
+	if validate == nil {
 		return errors.New("default engine config formant is invalid.")
 	}
 	return nil
@@ -388,21 +388,16 @@ func (de *DefaultEngine) checkDBConfig() error {
 	if err != nil {
 		return err
 	}
-	// init entity
-	variableMap := make(map[string]string, result.RowNumber())
-	for i := range variableList {
-		variableName := variableList[i].VariableName
-		variableMap[variableName] = variableList[i].VariableValue
-	}
 
 	dbConfigConfig := de.getItemConfig(defaultDBConfigItemName)
 
 	var (
 		dbConfigCount   int
 		dbConfigInvalid []GlobalVariables
-		dbConfigAdvice  []string
+		dbConfigAdvice  []GlobalVariables
 		advice          string
 	)
+
 	// max_user_connection
 	if variableMap[dbConfigMaxUserConnection] != dbConfigMaxUserConnectionValid {
 		dbConfigCount++
@@ -545,34 +540,6 @@ func (de *DefaultEngine) checkDBConfig() error {
 		advice = "It is recommended that " + dbConfigReportPort + " be set to " + strconv.Itoa(portNum) + "." + "\n"
 		dbConfigAdvice = append(dbConfigAdvice, advice)
 	}
-	// innodb_buffer_pool_chunk_size
-	innodbBufferPoolSize, _ := strconv.Atoi(variableMap[dbConfigInnodbBufferPoolSize])
-	innodbBufferPoolChunkSize, _ := strconv.Atoi(variableMap[dbConfigInnodbBufferPoolChunkSize])
-	innodbBufferPoolSize = innodbBufferPoolSize / 1024 / 1024
-	flag := 0
-	innodbBufferPoolChunkSizeValid := 0
-	if innodbBufferPoolChunkSize%1048576 != 0 {
-		flag = 1
-		advice = "Integer times " + dbConfigInnodbBufferPoolChunkSize + " advice is set to 128 MB.\n"
-		dbConfigAdvice = append(dbConfigAdvice, advice)
-	}
-	if innodbBufferPoolSize <= 120 {
-		innodbBufferPoolChunkSizeValid = 128 * 1024 * 1024
-	} else if innodbBufferPoolSize > 120 {
-		innodbBufferPoolChunkSizeValid = 256 * 1024 * 1024
-	}
-	if innodbBufferPoolSize != innodbBufferPoolChunkSizeValid {
-		flag = 1
-		advice = "It is recommended that " + dbConfigInnodbBufferPoolChunkSize + " be set to " + strconv.Itoa(innodbBufferPoolChunkSizeValid) + "." + "\n"
-		dbConfigAdvice = append(dbConfigAdvice, advice)
-	}
-	if flag == 1 {
-		dbConfigCount++
-		dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
-			dbConfigInnodbBufferPoolChunkSize,
-			variableMap[dbConfigInnodbBufferPoolChunkSize],
-		})
-	}
 
 	// innodb_flush_method
 	if variableMap[dbConfigInnodbFlushMethod] != dbConfigInnodbFlushMethodValid {
@@ -656,7 +623,7 @@ func (de *DefaultEngine) checkCPUUsage() error {
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
-	prometheusVersion, err := de.getPrometheusVersion()
+	prometheusVersion, err := de.getPmmVersion()
 	if err != nil {
 		return err
 	}
@@ -757,7 +724,7 @@ func (de *DefaultEngine) checkIOUtil() error {
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
-	prometheusVersion, err := de.getPrometheusVersion()
+	prometheusVersion, err := de.getPmmVersion()
 	if err != nil {
 		return err
 	}
@@ -855,7 +822,7 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
-	prometheusVersion, err := de.getPrometheusVersion()
+	prometheusVersion, err := de.getPmmVersion()
 	if err != nil {
 		return err
 	}
@@ -953,7 +920,7 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
-	prometheusVersion, err := de.getPrometheusVersion()
+	prometheusVersion, err := de.getPmmVersion()
 	if err != nil {
 		return err
 	}
@@ -1050,7 +1017,7 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
-	prometheusVersion, err := de.getPrometheusVersion()
+	prometheusVersion, err := de.getPmmVersion()
 	if err != nil {
 		return err
 	}
@@ -1146,7 +1113,7 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
 	// get prometheus version
-	prometheusVersion, err := de.getPrometheusVersion()
+	prometheusVersion, err := de.getPmmVersion()
 	if err != nil {
 		return err
 	}

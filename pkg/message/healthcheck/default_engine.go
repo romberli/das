@@ -28,7 +28,5 @@ func initDefaultEngineInfoMessage() {
 }
 
 func initDefaultEngineErrorMessage() {
-	message.Messages[ErrHealthcheckUpdateOperationStatus] = config.NewErrMessage(
-		message.DefaultMessageHeader, ErrHealthcheckUpdateOperationStatus,
-		"got error when updating operation status.\n%s")
+	message.Messages[ErrHealthcheckUpdateOperationStatus] = config.NewErrMessage(message.DefaultMessageHeader, ErrHealthcheckUpdateOperationStatus, "got error when updating operation status.\n%s")
 }
