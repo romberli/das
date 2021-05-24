@@ -1,7 +1,6 @@
 package healthcheck
 
 import (
-	"fmt"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/constant"
 	"github.com/romberli/go-util/middleware/mysql"
@@ -11,7 +10,7 @@ import (
 
 const (
 	defaultEngineConfigAddr   = "localhost:3306"
-	defaultEngineConfigDBName = "das"
+	defaultEngineConfigDBName = "performance_schema"
 	defaultEngineConfigDBUser = "root"
 	defaultEngineConfigDBPass = "rootroot"
 
@@ -43,23 +42,16 @@ func initDefaultEngineConfigRepo() *Repository {
 }
 
 func TestMiddlewareClusterRepo_Execute(t *testing.T) {
-	sql := `
-		select id, item_name, item_weight, low_watermark, high_watermark, unit, score_deduction_per_unit_high, max_score_deduction_high,
-		score_deduction_per_unit_medium, max_score_deduction_medium, del_flag, create_time, last_update_time
-		from t_hc_default_engine_config
-		where del_flag = 0;
-	`
-	log.Debugf("healcheck Repository.loadEngineConfig() sql: \n%s\nplaceholders: %s", sql)
+	// load database config
+	sql := `select variable_name, variable_value
+		from global_variables;`
 	result, _ := defaultEngineConfigRepo.Execute(sql)
 
-	// init []*DefaultItemConfig
-	defaultEngineConfigList := make([]*DefaultItemConfig, result.RowNumber())
-	for i := range defaultEngineConfigList {
-		defaultEngineConfigList[i] = NewEmptyDefaultItemConfig()
+	globalVariables := make([]*GlobalVariables, result.RowNumber())
+	for i := range globalVariables {
+		globalVariables[i] = NewEmptyGlobalVariables()
 	}
 	// map to struct
-	result.MapToStructSlice(defaultEngineConfigList, constant.DefaultMiddlewareTag)
-	for i := range defaultEngineConfigList {
-		fmt.Println(defaultEngineConfigList[i])
-	}
+	result.MapToStructSlice(globalVariables, constant.DefaultMiddlewareTag)
+
 }
