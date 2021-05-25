@@ -52,8 +52,6 @@ const (
 	dbConfigRelayLogInfoRepository    = "relay_log_info_repository"
 	dbConfigReportHost                = "report_host"
 	dbConfigReportPort                = "report_port"
-	dbConfigInnodbBufferPoolSize      = "innodb_buffer_pool_size"
-	dbConfigInnodbBufferPoolChunkSize = "innodb_buffer_pool_chunk_size"
 	dbConfigInnodbFlushMethod         = "innodb_flush_method"
 	dbConfigInnodbMonitorEnable       = "innodb_monitor_enable"
 	dbConfigInnodbPrintAllDeadlocks   = "innodb_print_all_deadlocks"
@@ -131,60 +129,61 @@ func (dec DefaultEngineConfig) getItemConfig(item string) *DefaultItemConfig {
 }
 
 // Validate validates if engine configuration is valid
+// TODO 改成error
 func (dec DefaultEngineConfig) Validate() error {
 	itemWeightCount := constant.ZeroInt
 	// validate defaultEngineConfig exits items
 	if len(dec) == constant.ZeroInt {
-		log.Errorf("default engine config doesn't have content.")
-		return nil
+		err := message.NewMessage(msghc.ErrDefaultEngineConfigContent)
+		return err
 	}
 	for itemName, defaultItemConfig := range dec {
 		// validate item weight
 		if defaultItemConfig.ItemWeight > 100 || defaultItemConfig.ItemWeight < 0 {
-			log.Errorf("item name: %s item weight is invalid.", itemName)
-			return nil
+			err := message.NewMessage(msghc.ErrItemWeightItemInvalid, itemName, defaultItemConfig.ItemWeight)
+			return err
 		}
 		// validate low watermark
 		if defaultItemConfig.LowWatermark < 0 {
-			log.Errorf("item name: %s low watermark is invalid.", itemName)
-			return nil
+			err := message.NewMessage(msghc.ErrLowWatermarkItemInvalid, itemName, defaultItemConfig.LowWatermark)
+			return err
 		}
 		// validate high watermark
 		if defaultItemConfig.HighWatermark <= defaultItemConfig.LowWatermark {
-			log.Errorf("item name: %s high watermark is invalid.", itemName)
-			return nil
+			err := message.NewMessage(msghc.ErrHighWatermarkItemInvalid, itemName, defaultItemConfig.HighWatermark)
+			return err
 		}
 		// validate unit
 		if defaultItemConfig.Unit < 0 {
-			log.Errorf("item name: %s unit is invalid.", itemName)
-			return nil
+			err := message.NewMessage(msghc.ErrUnitItemInvalid, itemName, defaultItemConfig.Unit)
+			return err
 		}
 		// validate score deduction per unit high
 		if defaultItemConfig.ScoreDeductionPerUnitHigh > 100 || defaultItemConfig.ScoreDeductionPerUnitHigh < 0 || defaultItemConfig.ScoreDeductionPerUnitHigh > defaultItemConfig.MaxScoreDeductionHigh {
-			log.Errorf("item name: %s score deduction per unit high is invalid.", itemName)
-			return nil
+			err := message.NewMessage(msghc.ErrScoreDeductionPerUnitHighItemInvalid, itemName, defaultItemConfig.ScoreDeductionPerUnitHigh)
+			return err
 		}
 		// validate max score deduction high
 		if defaultItemConfig.MaxScoreDeductionHigh > 100 || defaultItemConfig.MaxScoreDeductionHigh < 0 {
-			log.Errorf("item name: %s max score deduction high is invalid.", itemName)
-			return nil
+			err := message.NewMessage(msghc.ErrMaxScoreDeductionHighItemInvalid, itemName, defaultItemConfig.MaxScoreDeductionHigh)
+			return err
 		}
 		// validate score deduction per unit medium
 		if defaultItemConfig.ScoreDeductionPerUnitMedium > 100 || defaultItemConfig.ScoreDeductionPerUnitMedium < 0 || defaultItemConfig.ScoreDeductionPerUnitMedium > defaultItemConfig.MaxScoreDeductionMedium {
-			log.Errorf("item name: %s score deduction per unit medium is invalid.", itemName)
-			return nil
+			err := message.NewMessage(msghc.ErrScoreDeductionPerUnitMediumItemInvalid, itemName, defaultItemConfig.ScoreDeductionPerUnitMedium)
+			return err
 		}
 		// validate max score deduction medium
 		if defaultItemConfig.MaxScoreDeductionMedium > 100 || defaultItemConfig.MaxScoreDeductionMedium < 0 {
-			log.Errorf("item name: %s max score deduction medium is invalid.", itemName)
-			return nil
+			err := message.NewMessage(msghc.ErrMaxScoreDeductionMediumItemInvalid, itemName, defaultItemConfig.MaxScoreDeductionMedium)
+			return err
 		}
 		itemWeightCount += defaultItemConfig.ItemWeight
 	}
 	// validate item weigh count is 100
 	if itemWeightCount != 100 {
-		log.Errorf("all items weight weight count is not 100.")
-		return nil
+		err := message.NewMessage(msghc.ErrItemWeightPercentInvalid)
+		return err
 	}
 	return nil
 }
