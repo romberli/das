@@ -79,7 +79,6 @@ const (
 
 func ByteToFloat64(bytes []byte) float64 {
 	bits := binary.LittleEndian.Uint64(bytes)
-
 	return math.Float64frombits(bits)
 }
 
@@ -129,7 +128,6 @@ func (dec DefaultEngineConfig) getItemConfig(item string) *DefaultItemConfig {
 }
 
 // Validate validates if engine configuration is valid
-// TODO 改成error
 func (dec DefaultEngineConfig) Validate() error {
 	itemWeightCount := constant.ZeroInt
 	// validate defaultEngineConfig exits items
@@ -149,7 +147,7 @@ func (dec DefaultEngineConfig) Validate() error {
 			return err
 		}
 		// validate high watermark
-		if defaultItemConfig.HighWatermark <= defaultItemConfig.LowWatermark {
+		if defaultItemConfig.HighWatermark < defaultItemConfig.LowWatermark {
 			err := message.NewMessage(msghc.ErrHighWatermarkItemInvalid, itemName, defaultItemConfig.HighWatermark)
 			return err
 		}
