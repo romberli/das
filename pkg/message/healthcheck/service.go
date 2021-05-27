@@ -49,16 +49,16 @@ func initServiceDebugMessage() {
 func initServiceInfoMessage() {
 	message.Messages[InfoHealthcheckGetResultByOperationID] = config.NewErrMessage(
 		message.DefaultMessageHeader, InfoHealthcheckGetResultByOperationID,
-		"healthcheck: get result by operation id compeleted. operation_id: %d")
+		"healthcheck: get result by operation id completed. operation_id: %d")
 	message.Messages[InfoHealthcheckCheck] = config.NewErrMessage(
 		message.DefaultMessageHeader, InfoHealthcheckCheck,
-		"healthcheck: check compeleted. %s")
+		"healthcheck: check completed. %s")
 	message.Messages[InfoHealthcheckCheckByHostInfo] = config.NewErrMessage(
 		message.DefaultMessageHeader, InfoHealthcheckCheckByHostInfo,
-		"healthcheck: check by host info compeleted. %s")
+		"healthcheck: check by host info completed. %s")
 	message.Messages[InfoHealthcheckReviewAccurate] = config.NewErrMessage(
 		message.DefaultMessageHeader, InfoHealthcheckReviewAccurate,
-		"healthcheck: review accurate compeleted. %s")
+		"healthcheck: review accurate completed. %s")
 }
 
 func initServiceErrorMessage() {

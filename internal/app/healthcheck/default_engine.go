@@ -39,7 +39,7 @@ const (
 
 	dbConfigMaxUserConnection         = "max_user_connection"
 	dbConfigLogBin                    = "log_bin"
-	dbConfigBinlogFormat              = "binglog_format"
+	dbConfigBinlogFormat              = "binlog_format"
 	dbConfigBinlogRowImage            = "binlog_row_image"
 	dbConfigSyncBinlog                = "sync_binlog"
 	dbConfigInnodbFlushLogAtTrxCommit = "innodb_flush_log_at_trx_commit"
@@ -88,9 +88,17 @@ type GlobalVariable struct {
 	VariableValue string `middleware:"variable_value" json:"variable_value"`
 }
 
-// NewEmptyGlobalVariables returns a new *GlobalVariables
+// NewEmptyGlobalVariable returns a new *GlobalVariables
 func NewEmptyGlobalVariable() *GlobalVariable {
 	return &GlobalVariable{}
+}
+
+// NewGlobalVariable returns a *GlobalVariable
+func NewGlobalVariable(name, value string) *GlobalVariable {
+	return &GlobalVariable{
+		VariableName:  name,
+		VariableValue: value,
+	}
 }
 
 type DefaultItemConfig struct {
@@ -350,7 +358,7 @@ func (de *DefaultEngine) loadEngineConfig() error {
 		from t_hc_default_engine_config
 		where del_flag = 0;
 	`
-	log.Debugf("healcheck Repository.loadEngineConfig() sql: \n%s\n", sql)
+	log.Debugf("healthcheck Repository.loadEngineConfig() sql: \n%s\n", sql)
 	result, err := de.Repository.Execute(sql)
 	if err != nil {
 		return nil
@@ -371,8 +379,8 @@ func (de *DefaultEngine) loadEngineConfig() error {
 		defaultEngine[itemName] = defaultEngineConfigList[i]
 	}
 	// validate config
-	validate := defaultEngine.Validate()
-	if validate == nil {
+	err = defaultEngine.Validate()
+	if err == nil {
 		return message.NewMessage(msghc.ErrDefaultEngineConfigFormatInValid)
 	}
 	return nil
@@ -401,260 +409,146 @@ func (de *DefaultEngine) checkDBConfig() error {
 
 	var (
 		dbConfigCount   int
-		dbConfigInvalid []GlobalVariable
-		dbConfigAdvice  []GlobalVariable
+		dbConfigInvalid []*GlobalVariable
+		dbConfigAdvice  []*GlobalVariable
 	)
 
-	for i := range globalVariables {
-		switch globalVariables[i].VariableName {
+	for _, globalVariable := range globalVariables {
+		switch globalVariable.VariableName {
 		// max_user_connection
 		case dbConfigMaxUserConnection:
-			if globalVariables[i].VariableValue != dbConfigMaxUserConnectionValid {
+			if globalVariable.VariableValue != dbConfigMaxUserConnectionValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigMaxUserConnection,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigMaxUserConnection,
-					VariableValue: dbConfigMaxUserConnectionValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigMaxUserConnection, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigMaxUserConnection, dbConfigMaxUserConnectionValid))
 			}
 		// log_bin
 		case dbConfigLogBin:
-			if globalVariables[i].VariableValue != dbConfigLogBinValid {
+			if globalVariable.VariableValue != dbConfigLogBinValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigLogBin,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigLogBin,
-					VariableValue: dbConfigLogBinValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigLogBin, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigLogBin, dbConfigLogBinValid))
 			}
 		// binlog_format
 		case dbConfigBinlogFormat:
-			if globalVariables[i].VariableValue != dbConfigBinlogFormatValid {
+			if globalVariable.VariableValue != dbConfigBinlogFormatValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigBinlogFormat,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigBinlogFormat,
-					VariableValue: dbConfigBinlogFormatValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigBinlogFormat, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigBinlogFormat, dbConfigBinlogFormatValid))
 			}
 		// binlog_row_image
 		case dbConfigBinlogRowImage:
-			if globalVariables[i].VariableValue != dbConfigBinlogRowImageValid {
+			if globalVariable.VariableValue != dbConfigBinlogRowImageValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigBinlogRowImage,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigBinlogRowImage,
-					VariableValue: dbConfigBinlogRowImageValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigBinlogRowImage, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigBinlogRowImage, dbConfigBinlogRowImageValid))
 			}
 		// sync_binlog
 		case dbConfigSyncBinlog:
-			if globalVariables[i].VariableValue != dbConfigSyncBinlogValid {
+			if globalVariable.VariableValue != dbConfigSyncBinlogValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigSyncBinlog,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigSyncBinlog,
-					VariableValue: dbConfigSyncBinlogValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigSyncBinlog, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSyncBinlog, dbConfigSyncBinlogValid))
 			}
 		// innodb_flush_log_at_trx_commit
 		case dbConfigInnodbFlushLogAtTrxCommit:
-			if globalVariables[i].VariableValue != dbConfigInnodbFlushLogAtTrxCommitValid {
+			if globalVariable.VariableValue != dbConfigInnodbFlushLogAtTrxCommitValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigInnodbFlushLogAtTrxCommit,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigInnodbFlushLogAtTrxCommit,
-					VariableValue: dbConfigInnodbFlushLogAtTrxCommitValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigInnodbFlushLogAtTrxCommit, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigInnodbFlushLogAtTrxCommit, dbConfigInnodbFlushLogAtTrxCommitValid))
 			}
 		// gtid_mode
 		case dbConfigGtidMode:
-			if globalVariables[i].VariableValue != dbConfigGtidModeValid {
+			if globalVariable.VariableValue != dbConfigGtidModeValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigGtidMode,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigGtidMode,
-					VariableValue: dbConfigGtidModeValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigGtidMode, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigGtidMode, dbConfigGtidModeValid))
 			}
 		// enforce_gtid_consistency
 		case dbConfigEnforceGtidConsistency:
-			if globalVariables[i].VariableValue != dbConfigEnforceGtidConsistencyValid {
+			if globalVariable.VariableValue != dbConfigEnforceGtidConsistencyValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigEnforceGtidConsistency,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigEnforceGtidConsistency,
-					VariableValue: dbConfigEnforceGtidConsistencyValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigEnforceGtidConsistency, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigEnforceGtidConsistency, dbConfigEnforceGtidConsistencyValid))
 			}
 		// slave-parallel-type
 		case dbConfigSlaveParallelType:
-			if globalVariables[i].VariableValue != dbConfigSlaveParallelTypeValid {
+			if globalVariable.VariableValue != dbConfigSlaveParallelTypeValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigSlaveParallelType,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigSlaveParallelType,
-					VariableValue: dbConfigSlaveParallelTypeValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigSlaveParallelType, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSlaveParallelType, dbConfigSlaveParallelTypeValid))
 			}
 		// slave-parallel-workers
 		case dbConfigSlaveParallelWorkers:
-			if globalVariables[i].VariableValue != dbConfigSlaveParallelWorkersValid {
+			if globalVariable.VariableValue != dbConfigSlaveParallelWorkersValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigSlaveParallelWorkers,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigSlaveParallelWorkers,
-					VariableValue: dbConfigSlaveParallelWorkersValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigSlaveParallelWorkers, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSlaveParallelWorkers, dbConfigSlaveParallelWorkersValid))
 			}
 		// master_info_repository
 		case dbConfigMasterInfoRepository:
-			if globalVariables[i].VariableValue != dbConfigMasterInfoRepositoryValid {
+			if globalVariable.VariableValue != dbConfigMasterInfoRepositoryValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigMasterInfoRepository,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigMasterInfoRepository,
-					VariableValue: dbConfigMasterInfoRepositoryValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigMasterInfoRepository, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigMasterInfoRepository, dbConfigMasterInfoRepositoryValid))
 			}
 		// relay_log_info_repository
 		case dbConfigRelayLogInfoRepository:
-			if globalVariables[i].VariableValue != dbConfigRelayLogInfoRepositoryValid {
+			if globalVariable.VariableValue != dbConfigRelayLogInfoRepositoryValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigRelayLogInfoRepository,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigRelayLogInfoRepository,
-					VariableValue: dbConfigRelayLogInfoRepositoryValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigRelayLogInfoRepository, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigRelayLogInfoRepository, dbConfigRelayLogInfoRepositoryValid))
 			}
 		// report_host
 		case dbConfigReportHost:
-			serverName := de.operationInfo.MySQLServer.GetServerName()
-			if globalVariables[i].VariableValue != serverName {
+			host := de.operationInfo.MySQLServer.GetHostIP()
+			if globalVariable.VariableValue != host {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigReportHost,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigReportHost,
-					VariableValue: serverName,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigReportHost, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigReportHost, host))
 			}
 		// report_port
 		case dbConfigReportPort:
 			portNum := strconv.Itoa(de.operationInfo.MySQLServer.GetPortNum())
-			if globalVariables[i].VariableValue != portNum {
+			if globalVariable.VariableValue != portNum {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigReportPort,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigReportPort,
-					VariableValue: portNum,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigReportPort, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigReportPort, portNum))
 			}
 		// innodb_flush_method
 		case dbConfigInnodbFlushMethod:
-			if globalVariables[i].VariableValue != dbConfigInnodbFlushMethodValid {
+			if globalVariable.VariableValue != dbConfigInnodbFlushMethodValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigInnodbFlushMethod,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigInnodbFlushMethod,
-					VariableValue: dbConfigInnodbFlushMethodValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigInnodbFlushMethod, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigInnodbFlushMethod, dbConfigInnodbFlushMethodValid))
 			}
 		// innodb_monitor_enable
 		case dbConfigInnodbMonitorEnable:
-			if globalVariables[i].VariableValue != dbConfigInnodbMonitorEnableValid {
+			if globalVariable.VariableValue != dbConfigInnodbMonitorEnableValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigInnodbMonitorEnable,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigInnodbMonitorEnable,
-					VariableValue: dbConfigInnodbMonitorEnableValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigInnodbMonitorEnable, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigInnodbMonitorEnable, dbConfigInnodbMonitorEnableValid))
 			}
 		// innodb_print_all_deadlocks
 		case dbConfigInnodbPrintAllDeadlocks:
-			if globalVariables[i].VariableValue != dbConfigInnodbPrintAllDeadlocksValid {
+			if globalVariable.VariableValue != dbConfigInnodbPrintAllDeadlocksValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigInnodbPrintAllDeadlocks,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigInnodbPrintAllDeadlocks,
-					VariableValue: dbConfigInnodbPrintAllDeadlocksValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigInnodbPrintAllDeadlocks, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigInnodbPrintAllDeadlocks, dbConfigInnodbPrintAllDeadlocksValid))
 			}
 		// slow_query_log
 		case dbConfigSlowQueryLog:
-			if globalVariables[i].VariableValue != dbConfigSlowQueryLogValid {
+			if globalVariable.VariableValue != dbConfigSlowQueryLogValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigSlowQueryLog,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigSlowQueryLog,
-					VariableValue: dbConfigSlowQueryLogValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigSlowQueryLog, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSlowQueryLog, dbConfigSlowQueryLogValid))
 			}
 		// performance_schema
 		case dbConfigPerformanceSchema:
-			if globalVariables[i].VariableValue != dbConfigPerformanceSchemaValid {
+			if globalVariable.VariableValue != dbConfigPerformanceSchemaValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
-					VariableName:  dbConfigPerformanceSchema,
-					VariableValue: globalVariables[i].VariableValue,
-				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
-					VariableName:  dbConfigPerformanceSchema,
-					VariableValue: dbConfigPerformanceSchemaValid,
-				})
+				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigPerformanceSchema, globalVariable.VariableValue))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigPerformanceSchema, dbConfigPerformanceSchemaValid))
 			}
 		}
 		// database config data
