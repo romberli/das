@@ -90,26 +90,26 @@ func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result
 
 // IsRunning gets status by the mysqlServerID from the middleware
 func (r *Repository) IsRunning(mysqlServerID int) (bool, error) {
-	sql := `select status from t_hc_operation_info where del_flag = 0 and mysql_server_id = ? order by id desc limit 0,1;`
+	sql := `select count(1) from t_hc_operation_info where del_flag = 0 and mysql_server_id = ? and status = 1;`
 	log.Debugf("healthCheck Repository.IsRunning() select sql: \n%s\nplaceholders: %s", sql, mysqlServerID)
 
 	result, err := r.Execute(sql, mysqlServerID)
 	if err != nil {
 		return false, err
 	}
-	resultStatus, _ := result.GetInt(constant.ZeroInt, constant.ZeroInt)
+	count, _ := result.GetInt(constant.ZeroInt, constant.ZeroInt)
 
-	return resultStatus == 1, nil
+	return count != 0, nil
 }
 
 // InitOperation creates a operationInfo in the middleware
 func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Time, step time.Duration) (int, error) {
-	sql := `insert into t_hc_operation_info(mysql_server_id, start_time, end_time, step) values(?, ?, ?, ?);`
-	log.Debugf("healthCheck Repository.InitOperation() insert sql: %s", sql)
-
 	startTimeStr := startTime.Format(constant.TimeLayoutSecond)
 	endTimeStr := endTime.Format(constant.TimeLayoutSecond)
 	stepInt := int(step.Seconds())
+
+	sql := `insert into t_hc_operation_info(mysql_server_id, start_time, end_time, step) values(?, ?, ?, ?);`
+	log.Debugf("healthCheck Repository.InitOperation() insert sql: \n%s\nplaceholders: %s, %s, %s, %s", sql, mysqlServerID, startTimeStr, endTimeStr, stepInt)
 
 	_, err := r.Execute(sql, mysqlServerID, startTimeStr, endTimeStr, stepInt)
 	if err != nil {
@@ -120,7 +120,7 @@ func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Ti
 		select id from t_hc_operation_info where del_flag = 0 and 
 		mysql_server_id = ? and start_time = ? and end_time = ? and step = ?;
 	`
-	log.Debugf("healthCheck Repository.InitOperation() select sql: %s", sql)
+	log.Debugf("healthCheck Repository.InitOperation() select sql: \n%s\nplaceholders: %s, %s, %s, %s", sql, mysqlServerID, startTimeStr, endTimeStr, stepInt)
 
 	result, err := r.Execute(sql, mysqlServerID, startTimeStr, endTimeStr, stepInt)
 	if err != nil {
@@ -133,7 +133,7 @@ func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Ti
 // UpdateOperationStatus updates the status and message by the operationID in the middleware
 func (r *Repository) UpdateOperationStatus(operationID int, status int, message string) error {
 	sql := `update t_hc_operation_info set status = ?, message = ? where id = ?;`
-	log.Debugf("healthCheck Repository.UpdateOperationStatus() update sql: \n%s\nplaceholders: %s", sql, operationID)
+	log.Debugf("healthCheck Repository.UpdateOperationStatus() update sql: \n%s\nplaceholders: %s, %s, %s", sql, operationID, status, message)
 	_, err := r.Execute(sql, status, message, operationID)
 
 	return err
@@ -151,7 +151,17 @@ func (r *Repository) SaveResult(result healthcheck.Result) error {
 		slow_query_data, slow_query_advice, accurate_review) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
 		?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`
-	log.Debugf("healthCheck Repository.SaveResult() insert sql: %s", sql)
+	log.Debugf("healthCheck Repository.SaveResult() insert sql: \n%s\nplaceholders: %s, %s, %s, %s, %s, "+
+		"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s",
+		sql, result.GetOperationID(), result.GetWeightedAverageScore(), result.GetDBConfigScore(), result.GetDBConfigData(),
+		result.GetDBConfigAdvice(), result.GetCPUUsageScore(), result.GetCPUUsageData(), result.GetCPUUsageHigh(),
+		result.GetIOUtilScore(), result.GetIOUtilData(), result.GetIOUtilHigh(), result.GetDiskCapacityUsageScore(),
+		result.GetDiskCapacityUsageData(), result.GetDiskCapacityUsageHigh(), result.GetConnectionUsageScore(),
+		result.GetConnectionUsageData(), result.GetConnectionUsageHigh(), result.GetAverageActiveSessionNumScore(),
+		result.GetAverageActiveSessionNumData(), result.GetAverageActiveSessionNumHigh(), result.GetCacheMissRatioScore(),
+		result.GetCacheMissRatioData(), result.GetCacheMissRatioHigh(), result.GetTableSizeScore(), result.GetTableSizeData(),
+		result.GetTableSizeHigh(), result.GetSlowQueryScore(), result.GetSlowQueryData(), result.GetSlowQueryAdvice(),
+		result.GetAccurateReview())
 
 	// execute
 	_, err := r.Execute(sql, result.GetOperationID(), result.GetWeightedAverageScore(), result.GetDBConfigScore(),
@@ -170,7 +180,7 @@ func (r *Repository) SaveResult(result healthcheck.Result) error {
 // UpdateAccurateReviewByOperationID updates the accurateReview by the operationID in the middleware
 func (r *Repository) UpdateAccurateReviewByOperationID(operationID int, review int) error {
 	sql := `update t_hc_result set accurate_review = ? where operation_id = ?;`
-	log.Debugf("healthCheck Repository.UpdateAccurateReviewByOperationID() update sql: \n%s\nplaceholders: %s", sql, operationID)
+	log.Debugf("healthCheck Repository.UpdateAccurateReviewByOperationID() update sql: \n%s\nplaceholders: %s, %s", sql, operationID, review)
 
 	_, err := r.Execute(sql, review, operationID)
 	return err
