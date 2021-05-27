@@ -28,6 +28,7 @@ const (
 	ErrHealthcheckCheck                  = 401013
 	ErrHealthcheckCheckByHostInfo        = 401014
 	ErrHealthcheckReviewAccurate         = 401015
+	ErrHealthcheckCloseConnection        = 401016
 )
 
 func initServiceDebugMessage() {
@@ -73,7 +74,8 @@ func initServiceErrorMessage() {
 	message.Messages[ErrHealthcheckCheckByHostInfo] = config.NewErrMessage(
 		message.DefaultMessageHeader, ErrHealthcheckCheckByHostInfo,
 		"healthcheck: check by host info failed. host info %s")
-	message.Messages[ErrHealthcheckReviewAccurate] = config.NewErrMessage(
-		message.DefaultMessageHeader, ErrHealthcheckReviewAccurate,
-		"healthcheck: review accurate failed.  %s")
+	message.Messages[ErrHealthcheckCloseConnection] = config.NewErrMessage(
+		message.DefaultMessageHeader, ErrHealthcheckCloseConnection,
+		"healthcheck: close middleware connection failed.\n%s")
+
 }
