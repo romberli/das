@@ -54,7 +54,7 @@ func (msr *MySQLServerRepo) Transaction() (middleware.Transaction, error) {
 // GetAll returns all available entities
 func (msr *MySQLServerRepo) GetAll() ([]metadata.MySQLServer, error) {
 	sql := `
-		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
+		select id, cluster_id, server_name, service_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
 		from t_meta_mysql_server_info
 		where del_flag = 0
@@ -88,7 +88,7 @@ func (msr *MySQLServerRepo) GetAll() ([]metadata.MySQLServer, error) {
 // GetByClusterID Select returns an available mysqlServer of the given cluster id
 func (msr *MySQLServerRepo) GetByClusterID(clusterID int) ([]metadata.MySQLServer, error) {
 	sql := `
-		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
+		select id, cluster_id, server_name, service_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
 		from t_meta_mysql_server_info 
 		where del_flag = 0
@@ -124,7 +124,7 @@ func (msr *MySQLServerRepo) GetByClusterID(clusterID int) ([]metadata.MySQLServe
 // GetByID Select returns an available mysqlServer of the given id
 func (msr *MySQLServerRepo) GetByID(id int) (metadata.MySQLServer, error) {
 	sql := `
-		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
+		select id, cluster_id, server_name, service_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
 		from t_meta_mysql_server_info
 		where del_flag = 0
@@ -156,7 +156,7 @@ func (msr *MySQLServerRepo) GetByID(id int) (metadata.MySQLServer, error) {
 // GetByHostInfo gets a mysql server with given host ip and port number
 func (msr *MySQLServerRepo) GetByHostInfo(hostIP string, portNum int) (metadata.MySQLServer, error) {
 	sql := `
-		select id, cluster_id, server_name, host_ip, port_num, deployment_type, version, del_flag, 
+		select id, cluster_id, server_name, service_name, host_ip, port_num, deployment_type, version, del_flag, 
 			create_time, last_update_time
 		from t_meta_mysql_server_info
 		where del_flag = 0
@@ -238,13 +238,14 @@ func (msr *MySQLServerRepo) GetMonitorSystem(id int) (metadata.MonitorSystem, er
 func (msr *MySQLServerRepo) Create(mysqlServer metadata.MySQLServer) (metadata.MySQLServer, error) {
 	sql := `
 		insert into t_meta_mysql_server_info(
-			cluster_id, server_name, host_ip, port_num, deployment_type, version) 
-		values(?, ?, ?, ?, ?, ?);`
+			cluster_id, server_name, service_name, host_ip, port_num, deployment_type, version) 
+		values(?, ?, ?, ?, ?, ?, ?);`
 	log.Debugf("metadata MySQLServerRepo.Create() insert sql: %s", sql)
 	// execute
 	_, err := msr.Execute(sql,
 		mysqlServer.GetClusterID(),
 		mysqlServer.GetServerName(),
+		mysqlServer.GetServiceName(),
 		mysqlServer.GetHostIP(),
 		mysqlServer.GetPortNum(),
 		mysqlServer.GetDeploymentType(),
@@ -266,7 +267,7 @@ func (msr *MySQLServerRepo) Create(mysqlServer metadata.MySQLServer) (metadata.M
 func (msr *MySQLServerRepo) Update(mysqlServer metadata.MySQLServer) error {
 	sql := `
 		update t_meta_mysql_server_info set 
-			cluster_id = ?, server_name = ?, host_ip = ?, port_num = ?, deployment_type = ?, 
+			cluster_id = ?, server_name = ?, service_name = ?, host_ip = ?, port_num = ?, deployment_type = ?, 
 			version = ?, del_flag = ? 
 		where id = ?;`
 	log.Debugf("metadata MySQLServerRepo.Update() update sql: %s", sql)
@@ -274,6 +275,7 @@ func (msr *MySQLServerRepo) Update(mysqlServer metadata.MySQLServer) error {
 	_, err := msr.Execute(sql,
 		mysqlServerInfo.ClusterID,
 		mysqlServerInfo.ServerName,
+		mysqlServerInfo.ServiceName,
 		mysqlServerInfo.HostIP,
 		mysqlServerInfo.PortNum,
 		mysqlServerInfo.DeploymentType,

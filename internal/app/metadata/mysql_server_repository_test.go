@@ -85,7 +85,7 @@ func TestMySQLServerRepo_Transaction(t *testing.T) {
 
 	sql := `
 	insert into t_meta_mysql_server_info(
-		id, cluster_id, server_name, host_ip, port_num, deployment_type, version) 
+		id, cluster_id, server_name, service_name, host_ip, port_num, deployment_type, version) 
 	values(?,?,?,?,?,?,?);`
 
 	tx, err := mysqlServerRepo.Transaction()
@@ -96,6 +96,7 @@ func TestMySQLServerRepo_Transaction(t *testing.T) {
 		testTransactionServerID,
 		defaultMySQLServerInfoClusterID,
 		defaultMySQLServerInfoServerName,
+		defaultMySQLServerInfoServiceName,
 		testTransactionHostIP,
 		testTransactionPortNum,
 		defaultMySQLServerInfoDeploymentType,
@@ -135,8 +136,8 @@ func TestMySQLServerRepo_GetAll(t *testing.T) {
 
 	sql := `
 	insert into t_meta_mysql_server_info(
-		id, cluster_id, server_name, host_ip, port_num, deployment_type, version) 
-	values(?,?,?,?,?,?,?);`
+		id, cluster_id, server_name, service_name, host_ip, port_num, deployment_type, version) 
+	values(?,?,?,?,?,?,?,?);`
 
 	// init data avoid empty set
 	_, err := mysqlServerRepo.Execute(sql,

@@ -15,6 +15,7 @@ const (
 	defaultMySQLServerInfoID                   = 1
 	defaultMySQLServerInfoClusterID            = 1
 	defaultMySQLServerInfoServerName           = "server1"
+	defaultMySQLServerInfoServiceName          = "service1"
 	defaultMySQLServerInfoHostIP               = "127.0.0.1"
 	defaultMySQLServerInfoPortNum              = 3306
 	defaultMySQLServerInfoDeploymentType       = 1
@@ -34,6 +35,7 @@ func initNewMySQLServerInfo() *MySQLServerInfo {
 		defaultMySQLServerInfoID,
 		defaultMySQLServerInfoClusterID,
 		defaultMySQLServerInfoServerName,
+		defaultMySQLServerInfoServiceName,
 		defaultMySQLServerInfoHostIP,
 		defaultMySQLServerInfoPortNum,
 		defaultMySQLServerInfoDeploymentType,
@@ -46,6 +48,8 @@ func initNewMySQLServerInfo() *MySQLServerInfo {
 func equalMySQLServerInfo(a, b *MySQLServerInfo) bool {
 	return a.ID == b.ID &&
 		a.ClusterID == b.ClusterID &&
+		a.ServerName == b.ServerName &&
+		a.ServiceName == b.ServiceName &&
 		a.HostIP == b.HostIP &&
 		a.PortNum == b.PortNum &&
 		a.DeploymentType == b.DeploymentType &&
