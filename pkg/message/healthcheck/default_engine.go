@@ -28,6 +28,7 @@ const (
 	ErrScoreDeductionPerUnitMediumItemInvalid = 401009
 	ErrMaxScoreDeductionMediumItemInvalid     = 401010
 	ErrItemWeightPercentInvalid               = 401011
+	ErrDefaultEngineConfigFormatInValid       = 401012
 )
 
 func initDefaultEngineDebugMessage() {
@@ -49,4 +50,5 @@ func initDefaultEngineErrorMessage() {
 	message.Messages[ErrScoreDeductionPerUnitMediumItemInvalid] = config.NewErrMessage(message.DefaultMessageHeader, ErrScoreDeductionPerUnitMediumItemInvalid, "score deduction per unit medium of %s must be in [1, 100], %f is not valid")
 	message.Messages[ErrMaxScoreDeductionMediumItemInvalid] = config.NewErrMessage(message.DefaultMessageHeader, ErrMaxScoreDeductionMediumItemInvalid, "max score deduction medium of %s must be in [1, 100], %f is not valid")
 	message.Messages[ErrItemWeightPercentInvalid] = config.NewErrMessage(message.DefaultMessageHeader, ErrItemWeightPercentInvalid, "all items weight count is not 100")
+	message.Messages[ErrDefaultEngineConfigFormatInValid] = config.NewErrMessage(message.DefaultMessageHeader, ErrDefaultEngineConfigFormatInValid, "default engine config format is invalid")
 }

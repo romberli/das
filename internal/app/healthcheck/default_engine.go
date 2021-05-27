@@ -10,8 +10,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/pingcap/errors"
-
 	"github.com/romberli/das/internal/dependency/healthcheck"
 	"github.com/romberli/das/pkg/message"
 	msghc "github.com/romberli/das/pkg/message/healthcheck"
@@ -26,6 +24,7 @@ const (
 	defaultDBConfigScore                   = 5
 	defaultMinScore                        = 0
 	defaultMaxScore                        = 100.0
+	defaultHundred                         = 100
 	defaultDBConfigItemName                = "db_config"
 	defaultCPUUsageItemName                = "cpu_usage"
 	defaultIOUtilItemName                  = "io_util"
@@ -84,14 +83,14 @@ func ByteToFloat64(bytes []byte) float64 {
 
 var _ healthcheck.Engine = (*DefaultEngine)(nil)
 
-type GlobalVariables struct {
+type GlobalVariable struct {
 	VariableName  string `middleware:"variable_name" json:"variable_name"`
 	VariableValue string `middleware:"variable_value" json:"variable_value"`
 }
 
 // NewEmptyGlobalVariables returns a new *GlobalVariables
-func NewEmptyGlobalVariables() *GlobalVariables {
-	return &GlobalVariables{}
+func NewEmptyGlobalVariable() *GlobalVariable {
+	return &GlobalVariable{}
 }
 
 type DefaultItemConfig struct {
@@ -132,56 +131,46 @@ func (dec DefaultEngineConfig) Validate() error {
 	itemWeightCount := constant.ZeroInt
 	// validate defaultEngineConfig exits items
 	if len(dec) == constant.ZeroInt {
-		err := message.NewMessage(msghc.ErrDefaultEngineConfigContent)
-		return err
+		return message.NewMessage(msghc.ErrDefaultEngineConfigContent)
 	}
 	for itemName, defaultItemConfig := range dec {
 		// validate item weight
-		if defaultItemConfig.ItemWeight > 100 || defaultItemConfig.ItemWeight < 0 {
-			err := message.NewMessage(msghc.ErrItemWeightItemInvalid, itemName, defaultItemConfig.ItemWeight)
-			return err
+		if defaultItemConfig.ItemWeight > defaultHundred || defaultItemConfig.ItemWeight < constant.ZeroInt {
+			return message.NewMessage(msghc.ErrItemWeightItemInvalid, itemName, defaultItemConfig.ItemWeight)
 		}
 		// validate low watermark
-		if defaultItemConfig.LowWatermark < 0 {
-			err := message.NewMessage(msghc.ErrLowWatermarkItemInvalid, itemName, defaultItemConfig.LowWatermark)
-			return err
+		if defaultItemConfig.LowWatermark < constant.ZeroInt {
+			return message.NewMessage(msghc.ErrLowWatermarkItemInvalid, itemName, defaultItemConfig.LowWatermark)
 		}
 		// validate high watermark
 		if defaultItemConfig.HighWatermark < defaultItemConfig.LowWatermark {
-			err := message.NewMessage(msghc.ErrHighWatermarkItemInvalid, itemName, defaultItemConfig.HighWatermark)
-			return err
+			return message.NewMessage(msghc.ErrHighWatermarkItemInvalid, itemName, defaultItemConfig.HighWatermark)
 		}
 		// validate unit
-		if defaultItemConfig.Unit < 0 {
-			err := message.NewMessage(msghc.ErrUnitItemInvalid, itemName, defaultItemConfig.Unit)
-			return err
+		if defaultItemConfig.Unit < constant.ZeroInt {
+			return message.NewMessage(msghc.ErrUnitItemInvalid, itemName, defaultItemConfig.Unit)
 		}
 		// validate score deduction per unit high
-		if defaultItemConfig.ScoreDeductionPerUnitHigh > 100 || defaultItemConfig.ScoreDeductionPerUnitHigh < 0 || defaultItemConfig.ScoreDeductionPerUnitHigh > defaultItemConfig.MaxScoreDeductionHigh {
-			err := message.NewMessage(msghc.ErrScoreDeductionPerUnitHighItemInvalid, itemName, defaultItemConfig.ScoreDeductionPerUnitHigh)
-			return err
+		if defaultItemConfig.ScoreDeductionPerUnitHigh > defaultHundred || defaultItemConfig.ScoreDeductionPerUnitHigh < constant.ZeroInt || defaultItemConfig.ScoreDeductionPerUnitHigh > defaultItemConfig.MaxScoreDeductionHigh {
+			return message.NewMessage(msghc.ErrScoreDeductionPerUnitHighItemInvalid, itemName, defaultItemConfig.ScoreDeductionPerUnitHigh)
 		}
 		// validate max score deduction high
-		if defaultItemConfig.MaxScoreDeductionHigh > 100 || defaultItemConfig.MaxScoreDeductionHigh < 0 {
-			err := message.NewMessage(msghc.ErrMaxScoreDeductionHighItemInvalid, itemName, defaultItemConfig.MaxScoreDeductionHigh)
-			return err
+		if defaultItemConfig.MaxScoreDeductionHigh > defaultHundred || defaultItemConfig.MaxScoreDeductionHigh < constant.ZeroInt {
+			return message.NewMessage(msghc.ErrMaxScoreDeductionHighItemInvalid, itemName, defaultItemConfig.MaxScoreDeductionHigh)
 		}
 		// validate score deduction per unit medium
-		if defaultItemConfig.ScoreDeductionPerUnitMedium > 100 || defaultItemConfig.ScoreDeductionPerUnitMedium < 0 || defaultItemConfig.ScoreDeductionPerUnitMedium > defaultItemConfig.MaxScoreDeductionMedium {
-			err := message.NewMessage(msghc.ErrScoreDeductionPerUnitMediumItemInvalid, itemName, defaultItemConfig.ScoreDeductionPerUnitMedium)
-			return err
+		if defaultItemConfig.ScoreDeductionPerUnitMedium > defaultHundred || defaultItemConfig.ScoreDeductionPerUnitMedium < constant.ZeroInt || defaultItemConfig.ScoreDeductionPerUnitMedium > defaultItemConfig.MaxScoreDeductionMedium {
+			return message.NewMessage(msghc.ErrScoreDeductionPerUnitMediumItemInvalid, itemName, defaultItemConfig.ScoreDeductionPerUnitMedium)
 		}
 		// validate max score deduction medium
-		if defaultItemConfig.MaxScoreDeductionMedium > 100 || defaultItemConfig.MaxScoreDeductionMedium < 0 {
-			err := message.NewMessage(msghc.ErrMaxScoreDeductionMediumItemInvalid, itemName, defaultItemConfig.MaxScoreDeductionMedium)
-			return err
+		if defaultItemConfig.MaxScoreDeductionMedium > defaultHundred || defaultItemConfig.MaxScoreDeductionMedium < constant.ZeroInt {
+			return message.NewMessage(msghc.ErrMaxScoreDeductionMediumItemInvalid, itemName, defaultItemConfig.MaxScoreDeductionMedium)
 		}
 		itemWeightCount += defaultItemConfig.ItemWeight
 	}
 	// validate item weigh count is 100
-	if itemWeightCount != 100 {
-		err := message.NewMessage(msghc.ErrItemWeightPercentInvalid)
-		return err
+	if itemWeightCount != defaultHundred {
+		return message.NewMessage(msghc.ErrItemWeightPercentInvalid)
 	}
 	return nil
 }
@@ -361,7 +350,7 @@ func (de *DefaultEngine) loadEngineConfig() error {
 		from t_hc_default_engine_config
 		where del_flag = 0;
 	`
-	log.Debugf("healcheck Repository.loadEngineConfig() sql: \n%s\nplaceholders: %s", sql)
+	log.Debugf("healcheck Repository.loadEngineConfig() sql: \n%s\n", sql)
 	result, err := de.Repository.Execute(sql)
 	if err != nil {
 		return nil
@@ -376,15 +365,15 @@ func (de *DefaultEngine) loadEngineConfig() error {
 	if err != nil {
 		return err
 	}
-	entityList := NewEmptyDefaultEngineConfig()
+	defaultEngine := NewEmptyDefaultEngineConfig()
 	for i := range defaultEngineConfigList {
 		itemName := defaultEngineConfigList[i].ItemName
-		entityList[itemName] = defaultEngineConfigList[i]
+		defaultEngine[itemName] = defaultEngineConfigList[i]
 	}
 	// validate config
-	validate := entityList.Validate()
+	validate := defaultEngine.Validate()
 	if validate == nil {
-		return errors.New("default engine config formant is invalid.")
+		return message.NewMessage(msghc.ErrDefaultEngineConfigFormatInValid)
 	}
 	return nil
 }
@@ -398,9 +387,9 @@ func (de *DefaultEngine) checkDBConfig() error {
 	if err != nil {
 		return err
 	}
-	globalVariables := make([]*GlobalVariables, result.RowNumber())
+	globalVariables := make([]*GlobalVariable, result.RowNumber())
 	for i := range globalVariables {
-		globalVariables[i] = NewEmptyGlobalVariables()
+		globalVariables[i] = NewEmptyGlobalVariable()
 	}
 	// map to struct
 	err = result.MapToStructSlice(globalVariables, constant.DefaultMiddlewareTag)
@@ -412,8 +401,8 @@ func (de *DefaultEngine) checkDBConfig() error {
 
 	var (
 		dbConfigCount   int
-		dbConfigInvalid []GlobalVariables
-		dbConfigAdvice  []GlobalVariables
+		dbConfigInvalid []GlobalVariable
+		dbConfigAdvice  []GlobalVariable
 	)
 
 	for i := range globalVariables {
@@ -422,11 +411,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigMaxUserConnection:
 			if globalVariables[i].VariableValue != dbConfigMaxUserConnectionValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigMaxUserConnection,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigMaxUserConnection,
 					VariableValue: dbConfigMaxUserConnectionValid,
 				})
@@ -435,11 +424,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigLogBin:
 			if globalVariables[i].VariableValue != dbConfigLogBinValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigLogBin,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigLogBin,
 					VariableValue: dbConfigLogBinValid,
 				})
@@ -448,11 +437,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigBinlogFormat:
 			if globalVariables[i].VariableValue != dbConfigBinlogFormatValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigBinlogFormat,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigBinlogFormat,
 					VariableValue: dbConfigBinlogFormatValid,
 				})
@@ -461,11 +450,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigBinlogRowImage:
 			if globalVariables[i].VariableValue != dbConfigBinlogRowImageValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigBinlogRowImage,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigBinlogRowImage,
 					VariableValue: dbConfigBinlogRowImageValid,
 				})
@@ -474,11 +463,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigSyncBinlog:
 			if globalVariables[i].VariableValue != dbConfigSyncBinlogValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigSyncBinlog,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigSyncBinlog,
 					VariableValue: dbConfigSyncBinlogValid,
 				})
@@ -487,11 +476,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigInnodbFlushLogAtTrxCommit:
 			if globalVariables[i].VariableValue != dbConfigInnodbFlushLogAtTrxCommitValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigInnodbFlushLogAtTrxCommit,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigInnodbFlushLogAtTrxCommit,
 					VariableValue: dbConfigInnodbFlushLogAtTrxCommitValid,
 				})
@@ -500,11 +489,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigGtidMode:
 			if globalVariables[i].VariableValue != dbConfigGtidModeValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigGtidMode,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigGtidMode,
 					VariableValue: dbConfigGtidModeValid,
 				})
@@ -513,11 +502,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigEnforceGtidConsistency:
 			if globalVariables[i].VariableValue != dbConfigEnforceGtidConsistencyValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigEnforceGtidConsistency,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigEnforceGtidConsistency,
 					VariableValue: dbConfigEnforceGtidConsistencyValid,
 				})
@@ -526,11 +515,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigSlaveParallelType:
 			if globalVariables[i].VariableValue != dbConfigSlaveParallelTypeValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigSlaveParallelType,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigSlaveParallelType,
 					VariableValue: dbConfigSlaveParallelTypeValid,
 				})
@@ -539,11 +528,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigSlaveParallelWorkers:
 			if globalVariables[i].VariableValue != dbConfigSlaveParallelWorkersValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigSlaveParallelWorkers,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigSlaveParallelWorkers,
 					VariableValue: dbConfigSlaveParallelWorkersValid,
 				})
@@ -552,11 +541,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigMasterInfoRepository:
 			if globalVariables[i].VariableValue != dbConfigMasterInfoRepositoryValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigMasterInfoRepository,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigMasterInfoRepository,
 					VariableValue: dbConfigMasterInfoRepositoryValid,
 				})
@@ -565,11 +554,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigRelayLogInfoRepository:
 			if globalVariables[i].VariableValue != dbConfigRelayLogInfoRepositoryValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigRelayLogInfoRepository,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigRelayLogInfoRepository,
 					VariableValue: dbConfigRelayLogInfoRepositoryValid,
 				})
@@ -579,11 +568,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 			serverName := de.operationInfo.MySQLServer.GetServerName()
 			if globalVariables[i].VariableValue != serverName {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigReportHost,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigReportHost,
 					VariableValue: serverName,
 				})
@@ -593,11 +582,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 			portNum := strconv.Itoa(de.operationInfo.MySQLServer.GetPortNum())
 			if globalVariables[i].VariableValue != portNum {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigReportPort,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigReportPort,
 					VariableValue: portNum,
 				})
@@ -606,11 +595,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigInnodbFlushMethod:
 			if globalVariables[i].VariableValue != dbConfigInnodbFlushMethodValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigInnodbFlushMethod,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigInnodbFlushMethod,
 					VariableValue: dbConfigInnodbFlushMethodValid,
 				})
@@ -619,11 +608,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigInnodbMonitorEnable:
 			if globalVariables[i].VariableValue != dbConfigInnodbMonitorEnableValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigInnodbMonitorEnable,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigInnodbMonitorEnable,
 					VariableValue: dbConfigInnodbMonitorEnableValid,
 				})
@@ -632,11 +621,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigInnodbPrintAllDeadlocks:
 			if globalVariables[i].VariableValue != dbConfigInnodbPrintAllDeadlocksValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigInnodbPrintAllDeadlocks,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigInnodbPrintAllDeadlocks,
 					VariableValue: dbConfigInnodbPrintAllDeadlocksValid,
 				})
@@ -645,11 +634,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigSlowQueryLog:
 			if globalVariables[i].VariableValue != dbConfigSlowQueryLogValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigSlowQueryLog,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigSlowQueryLog,
 					VariableValue: dbConfigSlowQueryLogValid,
 				})
@@ -658,11 +647,11 @@ func (de *DefaultEngine) checkDBConfig() error {
 		case dbConfigPerformanceSchema:
 			if globalVariables[i].VariableValue != dbConfigPerformanceSchemaValid {
 				dbConfigCount++
-				dbConfigInvalid = append(dbConfigInvalid, GlobalVariables{
+				dbConfigInvalid = append(dbConfigInvalid, GlobalVariable{
 					VariableName:  dbConfigPerformanceSchema,
 					VariableValue: globalVariables[i].VariableValue,
 				})
-				dbConfigAdvice = append(dbConfigAdvice, GlobalVariables{
+				dbConfigAdvice = append(dbConfigAdvice, GlobalVariable{
 					VariableName:  dbConfigPerformanceSchema,
 					VariableValue: dbConfigPerformanceSchemaValid,
 				})
