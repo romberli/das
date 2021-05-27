@@ -95,14 +95,11 @@ func (r *Repository) IsRunning(mysqlServerID int) (bool, error) {
 
 	result, err := r.Execute(sql, mysqlServerID)
 	if err != nil {
-		return true, err
+		return false, err
 	}
 	resultStatus, _ := result.GetInt(constant.ZeroInt, constant.ZeroInt)
-	if resultStatus == 1 {
-		return true, err
-	}
 
-	return false, nil
+	return resultStatus == 1, nil
 }
 
 // InitOperation creates a operationInfo in the middleware
@@ -112,7 +109,7 @@ func (r *Repository) InitOperation(mysqlServerID int, startTime, endTime time.Ti
 
 	startTimeStr := startTime.Format(constant.TimeLayoutSecond)
 	endTimeStr := endTime.Format(constant.TimeLayoutSecond)
-	stepInt := int(step)
+	stepInt := int(step.Seconds())
 
 	_, err := r.Execute(sql, mysqlServerID, startTimeStr, endTimeStr, stepInt)
 	if err != nil {

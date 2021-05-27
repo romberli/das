@@ -1,7 +1,6 @@
 package healthcheck
 
 import (
-	"context"
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/json"
@@ -10,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/pingcap/errors"
 
 	"github.com/romberli/das/internal/dependency/healthcheck"
@@ -189,10 +189,10 @@ func (dec DefaultEngineConfig) Validate() error {
 type DefaultEngine struct {
 	healthcheck.Repository
 	operationInfo         *OperationInfo
-	applicationMysqlConn  *mysql.Conn
+	applicationMySQLConn  *mysql.Conn
 	monitorPrometheusConn *prometheus.Conn
 	monitorClickhouseConn *clickhouse.Conn
-	monitorMysqlConn      *mysql.Conn
+	monitorMySQLConn      *mysql.Conn
 	engineConfig          DefaultEngineConfig
 	result                *Result
 }
@@ -203,10 +203,10 @@ func NewDefaultEngine(repo healthcheck.Repository, operationInfo *OperationInfo,
 	return &DefaultEngine{
 		Repository:            repo,
 		operationInfo:         operationInfo,
-		applicationMysqlConn:  applicationMySQLConn,
+		applicationMySQLConn:  applicationMySQLConn,
 		monitorPrometheusConn: monitorPrometheusConn,
 		monitorClickhouseConn: monitorClickhouseConn,
-		monitorMysqlConn:      monitorMySQLConn,
+		monitorMySQLConn:      monitorMySQLConn,
 		engineConfig:          NewEmptyDefaultEngineConfig(),
 		result:                NewEmptyResult(),
 	}
@@ -233,23 +233,21 @@ func (de *DefaultEngine) getItemConfig(item string) *DefaultItemConfig {
 	return de.engineConfig.getItemConfig(item)
 }
 
-func (de *DefaultEngine) getPmmVersion() (int, error) {
-	prometheusInfo, err := de.monitorPrometheusConn.API.Buildinfo(context.Background())
-	if err != nil {
-		return 0, err
-	}
-	prometheusVersion, err := strconv.Atoi(prometheusInfo.Version[0:1])
-	if err != nil {
-		return 0, err
-	}
-	return prometheusVersion, nil
+func (de *DefaultEngine) getPMMVersion() int {
+	return de.operationInfo.MonitorSystem.GetSystemType()
 }
 
 // Run runs healthcheck
 func (de *DefaultEngine) Run() {
+	defer func() {
+		err := de.closeConnections()
+		if err != nil {
+			log.Error(message.NewMessage(msghc.ErrHealthcheckCloseConnection, err.Error()).Error())
+		}
+	}()
+
 	// run
 	err := de.run()
-
 	if err != nil {
 		log.Error(message.NewMessage(msghc.ErrHealthcheckDefaultEngineRun, err.Error()).Error())
 		// update status
@@ -323,6 +321,30 @@ func (de *DefaultEngine) run() error {
 	de.summarize()
 	// post run
 	return de.postRun()
+}
+
+func (de *DefaultEngine) closeConnections() error {
+	merr := &multierror.Error{}
+
+	err := de.applicationMySQLConn.Close()
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+
+	switch de.getPMMVersion() {
+	case 1:
+		err = de.monitorMySQLConn.Close()
+		if err != nil {
+			merr = multierror.Append(merr, err)
+		}
+	case 2:
+		err = de.monitorClickhouseConn.Close()
+		if err != nil {
+			merr = multierror.Append(merr, err)
+		}
+	}
+
+	return merr.ErrorOrNil()
 }
 
 // preRun performs pre-run actions, for now, it only loads engine config
@@ -679,13 +701,10 @@ func (de *DefaultEngine) checkCPUUsage() error {
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
-	// get prometheus version
-	prometheusVersion, err := de.getPmmVersion()
-	if err != nil {
-		return err
-	}
+
 	var query string
-	switch prometheusVersion {
+
+	switch de.getPMMVersion() {
 	case 1:
 		query = fmt.Sprintf(`
 		sum(((avg by (mode) ( (clamp_max(rate(node_cpu{instance=~"%s",mode!="idle"}[$interval]),1)) 
@@ -780,13 +799,9 @@ func (de *DefaultEngine) checkIOUtil() error {
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
-	// get prometheus version
-	prometheusVersion, err := de.getPmmVersion()
-	if err != nil {
-		return err
-	}
 	var query string
-	switch prometheusVersion {
+
+	switch de.getPMMVersion() {
 	case 1:
 		query = fmt.Sprintf(`
 		rate(node_disk_io_time_ms{device=~"(sda|sdb|sdc|sr0)", instance=~"%s"}[$interval])/1000 or 
@@ -878,13 +893,10 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
-	// get prometheus version
-	prometheusVersion, err := de.getPmmVersion()
-	if err != nil {
-		return err
-	}
+
 	var query string
-	switch prometheusVersion {
+
+	switch de.getPMMVersion() {
 	case 1:
 		query = fmt.Sprintf(`
 		node_filesystem_size{instance=~"%s",mountpoint="/", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"} 
@@ -976,13 +988,10 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
-	// get prometheus version
-	prometheusVersion, err := de.getPmmVersion()
-	if err != nil {
-		return err
-	}
+
 	var query string
-	switch prometheusVersion {
+
+	switch de.getPMMVersion() {
 	case 1:
 		query = fmt.Sprintf(`
 		max(max_over_time(mysql_global_status_threads_connected{instance=~"%s"}[$interval]) or 
@@ -1073,13 +1082,10 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
-	// get prometheus version
-	prometheusVersion, err := de.getPmmVersion()
-	if err != nil {
-		return err
-	}
+
 	var query string
-	switch prometheusVersion {
+
+	switch de.getPMMVersion() {
 	case 1:
 		query = fmt.Sprintf(`
 		avg_over_time(mysql_global_status_threads_running{instance=~"%s"}[$interval]) or 
@@ -1169,13 +1175,10 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	serverName := de.operationInfo.MySQLServer.GetServerName()
 	portNum := de.operationInfo.MySQLServer.GetPortNum()
 	host := serverName + strconv.Itoa(portNum)
-	// get prometheus version
-	prometheusVersion, err := de.getPmmVersion()
-	if err != nil {
-		return err
-	}
+
 	var query string
-	switch prometheusVersion {
+
+	switch de.getPMMVersion() {
 	case 1:
 		query = fmt.Sprintf(`
 		1- (rate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[$interval]) or 
@@ -1276,7 +1279,7 @@ func (de *DefaultEngine) checkTableSize() error {
 		as TABLE_SIZE from TABLES
 		where TABLE_TYPE='BASE TABLE';
 	`
-	result, err := de.monitorMysqlConn.Execute(sql)
+	result, err := de.monitorMySQLConn.Execute(sql)
 	if err != nil {
 		return err
 	}

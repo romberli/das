@@ -1,6 +1,7 @@
 package healthcheck
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -28,29 +29,26 @@ const (
 	defaultFailedStatus            = 3
 )
 
-var (
-	defaultStartTime = time.Now().Add(-7 * 24 * time.Hour)
-	defaultEndTime   = time.Now()
-)
-
 var _ healthcheck.Service = (*Service)(nil)
 
 type OperationInfo struct {
-	OperationID int
-	MySQLServer depmeta.MySQLServer
-	StartTime   time.Time
-	EndTime     time.Time
-	Step        time.Duration
+	OperationID   int
+	MySQLServer   depmeta.MySQLServer
+	MonitorSystem depmeta.MonitorSystem
+	StartTime     time.Time
+	EndTime       time.Time
+	Step          time.Duration
 }
 
 // NewOperationInfo returns a new *OperationInfo
-func NewOperationInfo(operationID int, mysqlServer depmeta.MySQLServer, startTime, endTime time.Time, step time.Duration) *OperationInfo {
+func NewOperationInfo(operationID int, mysqlServer depmeta.MySQLServer, MonitorSystem depmeta.MonitorSystem, startTime, endTime time.Time, step time.Duration) *OperationInfo {
 	return &OperationInfo{
-		OperationID: operationID,
-		MySQLServer: mysqlServer,
-		StartTime:   startTime,
-		EndTime:     endTime,
-		Step:        step,
+		OperationID:   operationID,
+		MySQLServer:   mysqlServer,
+		MonitorSystem: MonitorSystem,
+		StartTime:     startTime,
+		EndTime:       endTime,
+		Step:          step,
 	}
 }
 
@@ -139,9 +137,12 @@ func (s *Service) check(mysqlServerID int, startTime, endTime time.Time, step ti
 // init initiates healthcheck operation and engine
 func (s *Service) init(mysqlServerID int, startTime, endTime time.Time, step time.Duration) error {
 	// check if operation with the same mysql server id is still running
-	_, err := s.Repository.IsRunning(mysqlServerID)
+	isRunning, err := s.Repository.IsRunning(mysqlServerID)
 	if err != nil {
 		return err
+	}
+	if isRunning {
+		return errors.New(fmt.Sprintf("healthcheck of mysql server is still running. mysql server id: %d", mysqlServerID))
 	}
 	// insert operation message
 	id, err := s.Repository.InitOperation(mysqlServerID, startTime, endTime, step)
@@ -209,7 +210,7 @@ func (s *Service) init(mysqlServerID int, startTime, endTime time.Time, step tim
 		return fmt.Errorf("healthcheck: monitor system type should be either 1 or 2, %d is not valid", monitorSystemType)
 	}
 
-	s.OperationInfo = NewOperationInfo(id, mysqlServer, startTime, endTime, step)
+	s.OperationInfo = NewOperationInfo(id, mysqlServer, monitorSystem, startTime, endTime, step)
 	s.Engine = NewDefaultEngine(s.Repository, s.OperationInfo, applicationMySQLConn, monitorPrometheusConn, monitorClickhouseConn, monitorMySQLConn)
 
 	return nil
