@@ -20,7 +20,7 @@ Accept: application/json
 POST http://{{baseURL}}/api/v1/metadata/mysql-server
 Content-Type: application/json
 
-{"cluster_id": 1, "server_name": "test", "host_ip": "192.168.1.1", "port_num": 3306, "deployment_type": 1}
+{"cluster_id": 1, "server_name": "test", "service_name": "test", "host_ip": "192.168.1.1", "port_num": 3306, "deployment_type": 1}
 
 ### update mysql server by id
 POST http://{{baseURL}}/api/v1/metadata/mysql-server/update/86
