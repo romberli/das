@@ -231,8 +231,17 @@ func (de *DefaultEngine) getItemConfig(item string) *DefaultItemConfig {
 	return de.engineConfig.getItemConfig(item)
 }
 
+// getPMMVersion return the pmm version
 func (de *DefaultEngine) getPMMVersion() int {
 	return de.operationInfo.MonitorSystem.GetSystemType()
+}
+
+// getMySQLVersion return the mysql version
+func (de *DefaultEngine) getMySQLVersion() float64 {
+	versionSplit := strings.Split(de.operationInfo.MySQLServer.GetVersion(), ".")
+	versionStr := versionSplit[0] + "." + versionSplit[1]
+	version, _ := strconv.ParseFloat(versionStr, 64)
+	return version
 }
 
 // Run runs healthcheck
@@ -390,8 +399,15 @@ func (de *DefaultEngine) loadEngineConfig() error {
 // checkDBConfig checks database configuration
 func (de *DefaultEngine) checkDBConfig() error {
 	// load database config
-	sql := `select variable_name, variable_value
-		from global_variables;`
+	var sql string
+	mysqlVersion := de.getMySQLVersion()
+	if mysqlVersion < 5.7 {
+		sql = `select variable_name, variable_value
+		from information_schema.global_variables;`
+	} else {
+		sql = `select variable_name, variable_value
+		from performance_schema.global_variables;`
+	}
 	log.Debugf("healthcheck Repository.checkDBConfig() sql: \n%s\n", sql)
 
 	result, err := de.result.Execute(sql)
@@ -600,7 +616,6 @@ func (de *DefaultEngine) checkCPUUsage() error {
 		(avg_over_time(node_cpu_average{instance=~"%s", mode!="total", mode!="idle"}[$interval]) or 
 		avg_over_time(node_cpu_average{instance=~"%s", mode!="total", mode!="idle"}[5m]))))
 	`, host, host, host, host)
-		log.Debugf("healthcheck Repository.checkCPUUsage() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
@@ -609,8 +624,8 @@ func (de *DefaultEngine) checkCPUUsage() error {
 		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
 		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
 	`, serverName, serverName, serverName, serverName)
-		log.Debugf("healthcheck Repository.checkCPUUsage() query: \n%s\n", query)
 	}
+	log.Debugf("healthcheck Repository.checkCPUUsage() query: \n%s\n", query)
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -697,7 +712,6 @@ func (de *DefaultEngine) checkIOUtil() error {
 		rate(node_disk_io_time_ms{device=~"(sda|sdb|sdc|sr0)", instance=~"%s"}[$interval])/1000 or 
 		irate(node_disk_io_time_ms{device=~"(sda|sdb|sdc|sr0)", instance=~"%s"}[5m])/1000
 	`, host, host)
-		log.Debugf("healthcheck Repository.checkIOUtil() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		sum by (node_name) (rate(node_disk_io_time_seconds_total{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]) or 
@@ -705,8 +719,8 @@ func (de *DefaultEngine) checkIOUtil() error {
 		(max_over_time(rdsosmetrics_diskIO_util{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]) or 
 		max_over_time(rdsosmetrics_diskIO_util{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]))/100)
 	`, serverName, serverName, serverName, serverName)
-		log.Debugf("healthcheck Repository.checkIOUtil() query: \n%s\n", query)
 	}
+	log.Debugf("healthcheck Repository.checkIOUtil() query: \n%s\n", query)
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -794,7 +808,6 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 		node_filesystem_size{instance=~"%s",mountpoint="/", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"} 
 		- node_filesystem_free{instance=~"%s",mountpoint="/", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}
 	`, host, host)
-		log.Debugf("healthcheck Repository.checkDiskCapacityUsage() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		sum(avg by (node_name,mountpoint) (1 - (max_over_time(node_filesystem_free_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]) or 
@@ -802,8 +815,8 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 		(max_over_time(node_filesystem_size_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]) or 
 		max_over_time(node_filesystem_size_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]))))
 	`, serverName, serverName, serverName, serverName)
-		log.Debugf("healthcheck Repository.checkDiskCapacityUsage() query: \n%s\n", query)
 	}
+	log.Debugf("healthcheck Repository.checkDiskCapacityUsage() query: \n%s\n", query)
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -891,15 +904,14 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 		max(max_over_time(mysql_global_status_threads_connected{instance=~"%s"}[$interval]) or 
 		mysql_global_status_threads_connected{instance=~"%s"} )
 	`, host, host)
-		log.Debugf("healthcheck Repository.checkConnectionUsage() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		clamp_max((avg by (service_name) (max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m]) or 
 		max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m])) / avg by (service_name) 
 		(mysql_global_variables_max_connections{service_name=~"%s"})),1)
 	`, serverName, serverName, serverName)
-		log.Debugf("healthcheck Repository.checkConnectionUsage() query: \n%s\n", query)
 	}
+	log.Debugf("healthcheck Repository.checkConnectionUsage() query: \n%s\n", query)
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -987,14 +999,13 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 		avg_over_time(mysql_global_status_threads_running{instance=~"%s"}[$interval]) or 
 		avg_over_time(mysql_global_status_threads_running{instance=~"%s"}[5m])
 	`, host, host)
-		log.Debugf("healthcheck Repository.checkActiveSessionNum() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		avg by (service_name) (avg_over_time(mysql_global_status_threads_running{service_name=~"%s"}[5m]) or 
 		avg_over_time(mysql_global_status_threads_running{service_name=~"%s"}[5m]))
 	`, serverName, serverName)
-		log.Debugf("healthcheck Repository.checkActiveSessionNum() query: \n%s\n", query)
 	}
+	log.Debugf("healthcheck Repository.checkActiveSessionNum() query: \n%s\n", query)
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
@@ -1086,7 +1097,6 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 		(rate(mysql_global_status_table_open_cache_misses{instance=~"%s"}[$interval]) or 
 		irate(mysql_global_status_table_open_cache_misses{instance=~"%s"}[5m])))
 	`, host, host, host, host, host, host)
-		log.Debugf("healthcheck Repository.checkCacheMissRatio() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		clamp_max((1 - avg by (service_name)(rate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]) or 
@@ -1096,8 +1106,8 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 		(rate(mysql_global_status_table_open_cache_misses{service_name=~"%s"}[5m]) or 
 		irate(mysql_global_status_table_open_cache_misses{service_name=~"%s"}[5m])))),1)
 	`, serverName, serverName, serverName, serverName, serverName, serverName)
-		log.Debugf("healthcheck Repository.checkCacheMissRatio() query: \n%s\n", query)
 	}
+	log.Debugf("healthcheck Repository.checkCacheMissRatio() query: \n%s\n", query)
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
 		return err
