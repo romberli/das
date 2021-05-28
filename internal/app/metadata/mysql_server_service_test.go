@@ -82,6 +82,7 @@ func TestMySQLServerService_Create(t *testing.T) {
 	err := s.Create(map[string]interface{}{
 		clusterIDStruct:      defaultMySQLServerInfoClusterID,
 		serverNameStruct:     defaultMySQLServerInfoServerName,
+		serviceNameStruct:    defaultMySQLServerInfoServiceName,
 		hostIPStruct:         testInsertHostIP,
 		portNumStruct:        testInitPortNum,
 		deploymentTypeStruct: defaultMySQLServerInfoDeploymentType,

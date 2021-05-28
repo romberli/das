@@ -17,6 +17,7 @@ type MySQLServerInfo struct {
 	ID             int       `middleware:"id" json:"id"`
 	ClusterID      int       `middleware:"cluster_id" json:"cluster_id"`
 	ServerName     string    `middleware:"server_name" json:"server_name"`
+	ServiceName    string    `middleware:"service_name" json:"service_name"`
 	HostIP         string    `middleware:"host_ip" json:"host_ip"`
 	PortNum        int       `middleware:"port_num" json:"port_num"`
 	DeploymentType int       `middleware:"deployment_type" json:"deployment_type"`
@@ -31,6 +32,7 @@ func NewMySQLServerInfo(repo metadata.MySQLServerRepo,
 	id int,
 	clusterID int,
 	serverName string,
+	serviceName string,
 	hostIP string,
 	portNum int,
 	deploymentType int,
@@ -42,6 +44,7 @@ func NewMySQLServerInfo(repo metadata.MySQLServerRepo,
 		id,
 		clusterID,
 		serverName,
+		serviceName,
 		hostIP,
 		portNum,
 		deploymentType,
@@ -57,6 +60,7 @@ func NewMySQLServerInfoWithGlobal(
 	id int,
 	clusterID int,
 	serverName string,
+	serviceName string,
 	hostIP string,
 	portNum int,
 	deploymentType int,
@@ -68,6 +72,7 @@ func NewMySQLServerInfoWithGlobal(
 		id,
 		clusterID,
 		serverName,
+		serviceName,
 		hostIP,
 		portNum,
 		deploymentType,
@@ -126,6 +131,11 @@ func (msi *MySQLServerInfo) GetServerName() string {
 	return msi.ServerName
 }
 
+// GetServiceName returns the service name
+func (msi *MySQLServerInfo) GetServiceName() string {
+	return msi.ServiceName
+}
+
 // GetHostIP returns the host ip
 func (msi *MySQLServerInfo) GetHostIP() string {
 	return msi.HostIP
@@ -161,6 +171,7 @@ func (msi *MySQLServerInfo) GetLastUpdateTime() time.Time {
 	return msi.LastUpdateTime
 }
 
+// GetMonitorSystem gets monitor system from the mysql
 func (msi *MySQLServerInfo) GetMonitorSystem() (metadata.MonitorSystem, error) {
 	return msi.MySQLServerRepo.GetMonitorSystem(msi.Identity())
 }

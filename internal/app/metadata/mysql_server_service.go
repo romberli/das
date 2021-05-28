@@ -13,6 +13,7 @@ import (
 const (
 	clusterIDStruct      = "ClusterID"
 	serverNameStruct     = "ServerName"
+	serviceNameStruct    = "ServiceName"
 	hostIPStruct         = "HostIP"
 	portNumStruct        = "PortNum"
 	deploymentTypeStruct = "DeploymentType"
@@ -98,18 +99,20 @@ func (mss *MySQLServerService) Create(fields map[string]interface{}) error {
 	// generate new map
 	_, clusterIDExists := fields[clusterIDStruct]
 	_, serverNameExists := fields[serverNameStruct]
+	_, ServiceNameExists := fields[serviceNameStruct]
 	_, hostIPExists := fields[hostIPStruct]
 	_, portNumExists := fields[portNumStruct]
 	_, deploymentTypeExists := fields[deploymentTypeStruct]
 
-	if !clusterIDExists || !serverNameExists || !hostIPExists || !portNumExists ||
+	if !clusterIDExists || !serverNameExists || !ServiceNameExists || !hostIPExists || !portNumExists ||
 		!deploymentTypeExists {
 		return message.NewMessage(
 			message.ErrFieldNotExists,
 			fmt.Sprintf(
-				"%s and %s and %s and %s and %s",
+				"%s and %s and %s and %s and %s and %s",
 				clusterIDStruct,
 				serverNameStruct,
+				serviceNameStruct,
 				hostIPStruct,
 				portNumStruct,
 				deploymentTypeStruct))

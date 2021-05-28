@@ -14,6 +14,8 @@ type MySQLServer interface {
 	GetClusterID() int
 	// GetServerName returns the server name
 	GetServerName() string
+	// GetServiceName returns the service name
+	GetServiceName() string
 	// GetHostIP returns the host ip
 	GetHostIP() string
 	// GetPortNum returns the port number
