@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
@@ -57,7 +58,7 @@ const (
 	dbConfigSlowQueryLog              = "slow_query_log"
 	dbConfigPerformanceSchema         = "performance_schema"
 
-	dbConfigMaxUserConnectionValid         = "2000"
+	dbConfigMaxUserConnectionValid         = 2000
 	dbConfigLogBinValid                    = "ON"
 	dbConfigBinlogFormatValid              = "ROW"
 	dbConfigBinlogRowImageValid            = "FULL"
@@ -66,7 +67,7 @@ const (
 	dbConfigGtidModeValid                  = "ON"
 	dbConfigEnforceGtidConsistencyValid    = "ON"
 	dbConfigSlaveParallelTypeValid         = "LOGICAL_CLOCK"
-	dbConfigSlaveParallelWorkersValid      = "16"
+	dbConfigSlaveParallelWorkersValid      = 16
 	dbConfigMasterInfoRepositoryValid      = "TABLE"
 	dbConfigRelayLogInfoRepositoryValid    = "TABLE"
 	dbConfigInnodbFlushMethodValid         = "O_DIRECT"
@@ -391,6 +392,8 @@ func (de *DefaultEngine) checkDBConfig() error {
 	// load database config
 	sql := `select variable_name, variable_value
 		from global_variables;`
+	log.Debugf("healthcheck Repository.checkDBConfig() sql: \n%s\n", sql)
+
 	result, err := de.result.Execute(sql)
 	if err != nil {
 		return err
@@ -417,84 +420,86 @@ func (de *DefaultEngine) checkDBConfig() error {
 		switch globalVariable.VariableName {
 		// max_user_connection
 		case dbConfigMaxUserConnection:
-			if globalVariable.VariableValue != dbConfigMaxUserConnectionValid {
+			maxUserConnection, _ := strconv.Atoi(globalVariable.VariableValue)
+			if maxUserConnection < dbConfigMaxUserConnectionValid {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigMaxUserConnection, globalVariable.VariableValue))
-				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigMaxUserConnection, dbConfigMaxUserConnectionValid))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigMaxUserConnection, strconv.Itoa(dbConfigMaxUserConnectionValid)))
 			}
 		// log_bin
 		case dbConfigLogBin:
-			if globalVariable.VariableValue != dbConfigLogBinValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigLogBinValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigLogBin, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigLogBin, dbConfigLogBinValid))
 			}
 		// binlog_format
 		case dbConfigBinlogFormat:
-			if globalVariable.VariableValue != dbConfigBinlogFormatValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigBinlogFormatValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigBinlogFormat, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigBinlogFormat, dbConfigBinlogFormatValid))
 			}
 		// binlog_row_image
 		case dbConfigBinlogRowImage:
-			if globalVariable.VariableValue != dbConfigBinlogRowImageValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigBinlogRowImageValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigBinlogRowImage, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigBinlogRowImage, dbConfigBinlogRowImageValid))
 			}
 		// sync_binlog
 		case dbConfigSyncBinlog:
-			if globalVariable.VariableValue != dbConfigSyncBinlogValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigSyncBinlogValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigSyncBinlog, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSyncBinlog, dbConfigSyncBinlogValid))
 			}
 		// innodb_flush_log_at_trx_commit
 		case dbConfigInnodbFlushLogAtTrxCommit:
-			if globalVariable.VariableValue != dbConfigInnodbFlushLogAtTrxCommitValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigInnodbFlushLogAtTrxCommitValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigInnodbFlushLogAtTrxCommit, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigInnodbFlushLogAtTrxCommit, dbConfigInnodbFlushLogAtTrxCommitValid))
 			}
 		// gtid_mode
 		case dbConfigGtidMode:
-			if globalVariable.VariableValue != dbConfigGtidModeValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigGtidModeValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigGtidMode, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigGtidMode, dbConfigGtidModeValid))
 			}
 		// enforce_gtid_consistency
 		case dbConfigEnforceGtidConsistency:
-			if globalVariable.VariableValue != dbConfigEnforceGtidConsistencyValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigEnforceGtidConsistencyValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigEnforceGtidConsistency, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigEnforceGtidConsistency, dbConfigEnforceGtidConsistencyValid))
 			}
 		// slave-parallel-type
 		case dbConfigSlaveParallelType:
-			if globalVariable.VariableValue != dbConfigSlaveParallelTypeValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigSlaveParallelTypeValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigSlaveParallelType, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSlaveParallelType, dbConfigSlaveParallelTypeValid))
 			}
 		// slave-parallel-workers
 		case dbConfigSlaveParallelWorkers:
-			if globalVariable.VariableValue != dbConfigSlaveParallelWorkersValid {
+			slaveParallelWorkers, _ := strconv.Atoi(globalVariable.VariableValue)
+			if slaveParallelWorkers < dbConfigSlaveParallelWorkersValid {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigSlaveParallelWorkers, globalVariable.VariableValue))
-				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSlaveParallelWorkers, dbConfigSlaveParallelWorkersValid))
+				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSlaveParallelWorkers, strconv.Itoa(dbConfigSlaveParallelWorkersValid)))
 			}
 		// master_info_repository
 		case dbConfigMasterInfoRepository:
-			if globalVariable.VariableValue != dbConfigMasterInfoRepositoryValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigMasterInfoRepositoryValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigMasterInfoRepository, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigMasterInfoRepository, dbConfigMasterInfoRepositoryValid))
 			}
 		// relay_log_info_repository
 		case dbConfigRelayLogInfoRepository:
-			if globalVariable.VariableValue != dbConfigRelayLogInfoRepositoryValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigRelayLogInfoRepositoryValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigRelayLogInfoRepository, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigRelayLogInfoRepository, dbConfigRelayLogInfoRepositoryValid))
@@ -517,35 +522,35 @@ func (de *DefaultEngine) checkDBConfig() error {
 			}
 		// innodb_flush_method
 		case dbConfigInnodbFlushMethod:
-			if globalVariable.VariableValue != dbConfigInnodbFlushMethodValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigInnodbFlushMethodValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigInnodbFlushMethod, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigInnodbFlushMethod, dbConfigInnodbFlushMethodValid))
 			}
 		// innodb_monitor_enable
 		case dbConfigInnodbMonitorEnable:
-			if globalVariable.VariableValue != dbConfigInnodbMonitorEnableValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigInnodbMonitorEnableValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigInnodbMonitorEnable, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigInnodbMonitorEnable, dbConfigInnodbMonitorEnableValid))
 			}
 		// innodb_print_all_deadlocks
 		case dbConfigInnodbPrintAllDeadlocks:
-			if globalVariable.VariableValue != dbConfigInnodbPrintAllDeadlocksValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigInnodbPrintAllDeadlocksValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigInnodbPrintAllDeadlocks, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigInnodbPrintAllDeadlocks, dbConfigInnodbPrintAllDeadlocksValid))
 			}
 		// slow_query_log
 		case dbConfigSlowQueryLog:
-			if globalVariable.VariableValue != dbConfigSlowQueryLogValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigSlowQueryLogValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigSlowQueryLog, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigSlowQueryLog, dbConfigSlowQueryLogValid))
 			}
 		// performance_schema
 		case dbConfigPerformanceSchema:
-			if globalVariable.VariableValue != dbConfigPerformanceSchemaValid {
+			if strings.ToUpper(globalVariable.VariableValue) != strings.ToUpper(dbConfigPerformanceSchemaValid) {
 				dbConfigCount++
 				dbConfigInvalid = append(dbConfigInvalid, NewGlobalVariable(dbConfigPerformanceSchema, globalVariable.VariableValue))
 				dbConfigAdvice = append(dbConfigAdvice, NewGlobalVariable(dbConfigPerformanceSchema, dbConfigPerformanceSchemaValid))
@@ -595,6 +600,7 @@ func (de *DefaultEngine) checkCPUUsage() error {
 		(avg_over_time(node_cpu_average{instance=~"%s", mode!="total", mode!="idle"}[$interval]) or 
 		avg_over_time(node_cpu_average{instance=~"%s", mode!="total", mode!="idle"}[5m]))))
 	`, host, host, host, host)
+		log.Debugf("healthcheck Repository.checkCPUUsage() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
@@ -603,6 +609,7 @@ func (de *DefaultEngine) checkCPUUsage() error {
 		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
 		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
 	`, serverName, serverName, serverName, serverName)
+		log.Debugf("healthcheck Repository.checkCPUUsage() query: \n%s\n", query)
 	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
@@ -690,6 +697,7 @@ func (de *DefaultEngine) checkIOUtil() error {
 		rate(node_disk_io_time_ms{device=~"(sda|sdb|sdc|sr0)", instance=~"%s"}[$interval])/1000 or 
 		irate(node_disk_io_time_ms{device=~"(sda|sdb|sdc|sr0)", instance=~"%s"}[5m])/1000
 	`, host, host)
+		log.Debugf("healthcheck Repository.checkIOUtil() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		sum by (node_name) (rate(node_disk_io_time_seconds_total{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]) or 
@@ -697,6 +705,7 @@ func (de *DefaultEngine) checkIOUtil() error {
 		(max_over_time(rdsosmetrics_diskIO_util{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]) or 
 		max_over_time(rdsosmetrics_diskIO_util{device=~"(sda|sdb|sdc|sr0)",node_name=~"%s"}[5m]))/100)
 	`, serverName, serverName, serverName, serverName)
+		log.Debugf("healthcheck Repository.checkIOUtil() query: \n%s\n", query)
 	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
@@ -785,6 +794,7 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 		node_filesystem_size{instance=~"%s",mountpoint="/", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"} 
 		- node_filesystem_free{instance=~"%s",mountpoint="/", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}
 	`, host, host)
+		log.Debugf("healthcheck Repository.checkDiskCapacityUsage() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		sum(avg by (node_name,mountpoint) (1 - (max_over_time(node_filesystem_free_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]) or 
@@ -792,6 +802,7 @@ func (de *DefaultEngine) checkDiskCapacityUsage() error {
 		(max_over_time(node_filesystem_size_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]) or 
 		max_over_time(node_filesystem_size_bytes{node_name=~"%s", fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs"}[5m]))))
 	`, serverName, serverName, serverName, serverName)
+		log.Debugf("healthcheck Repository.checkDiskCapacityUsage() query: \n%s\n", query)
 	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
@@ -880,12 +891,14 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 		max(max_over_time(mysql_global_status_threads_connected{instance=~"%s"}[$interval]) or 
 		mysql_global_status_threads_connected{instance=~"%s"} )
 	`, host, host)
+		log.Debugf("healthcheck Repository.checkConnectionUsage() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		clamp_max((avg by (service_name) (max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m]) or 
 		max_over_time(mysql_global_status_max_used_connections{service_name=~"%s"}[5m])) / avg by (service_name) 
 		(mysql_global_variables_max_connections{service_name=~"%s"})),1)
 	`, serverName, serverName, serverName)
+		log.Debugf("healthcheck Repository.checkConnectionUsage() query: \n%s\n", query)
 	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
@@ -974,11 +987,13 @@ func (de *DefaultEngine) checkActiveSessionNum() error {
 		avg_over_time(mysql_global_status_threads_running{instance=~"%s"}[$interval]) or 
 		avg_over_time(mysql_global_status_threads_running{instance=~"%s"}[5m])
 	`, host, host)
+		log.Debugf("healthcheck Repository.checkActiveSessionNum() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		avg by (service_name) (avg_over_time(mysql_global_status_threads_running{service_name=~"%s"}[5m]) or 
 		avg_over_time(mysql_global_status_threads_running{service_name=~"%s"}[5m]))
 	`, serverName, serverName)
+		log.Debugf("healthcheck Repository.checkActiveSessionNum() query: \n%s\n", query)
 	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
@@ -1071,6 +1086,7 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 		(rate(mysql_global_status_table_open_cache_misses{instance=~"%s"}[$interval]) or 
 		irate(mysql_global_status_table_open_cache_misses{instance=~"%s"}[5m])))
 	`, host, host, host, host, host, host)
+		log.Debugf("healthcheck Repository.checkCacheMissRatio() query: \n%s\n", query)
 	case 2:
 		query = fmt.Sprintf(`
 		clamp_max((1 - avg by (service_name)(rate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]) or 
@@ -1080,6 +1096,7 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 		(rate(mysql_global_status_table_open_cache_misses{service_name=~"%s"}[5m]) or 
 		irate(mysql_global_status_table_open_cache_misses{service_name=~"%s"}[5m])))),1)
 	`, serverName, serverName, serverName, serverName, serverName, serverName)
+		log.Debugf("healthcheck Repository.checkCacheMissRatio() query: \n%s\n", query)
 	}
 	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
 	if err != nil {
@@ -1162,6 +1179,7 @@ func (de *DefaultEngine) checkTableSize() error {
 		as TABLE_SIZE from TABLES
 		where TABLE_TYPE='BASE TABLE';
 	`
+	log.Debugf("healthcheck Repository.checkTableSize() sql: \n%s\n", sql)
 	result, err := de.monitorMySQLConn.Execute(sql)
 	if err != nil {
 		return err
