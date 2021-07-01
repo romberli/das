@@ -33,7 +33,7 @@ func NewMySQLClusterRepo(db middleware.Pool) *MySQLClusterRepo {
 
 // NewMySQLClusterRepoWithGlobal returns *MySQLClusterRepo with global mysql pool
 func NewMySQLClusterRepoWithGlobal() *MySQLClusterRepo {
-	return NewMySQLClusterRepo(global.MySQLPool)
+	return NewMySQLClusterRepo(global.DASMySQLPool)
 }
 
 // Execute implements metadata.MySQLClusterRepo interface,

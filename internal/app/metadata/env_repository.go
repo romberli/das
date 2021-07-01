@@ -26,7 +26,7 @@ func NewEnvRepo(db middleware.Pool) *EnvRepo {
 
 // NewEnvRepoWithGlobal returns *EnvRepo with global mysql pool
 func NewEnvRepoWithGlobal() *EnvRepo {
-	return NewEnvRepo(global.MySQLPool)
+	return NewEnvRepo(global.DASMySQLPool)
 }
 
 // Execute executes given command and placeholders on the middleware

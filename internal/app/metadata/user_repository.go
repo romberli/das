@@ -27,7 +27,7 @@ func NewUserRepo(db middleware.Pool) *UserRepo {
 
 // NewUserRepoWithGlobal returns *UserRepo with global mysql pool
 func NewUserRepoWithGlobal() *UserRepo {
-	return NewUserRepo(global.MySQLPool)
+	return NewUserRepo(global.DASMySQLPool)
 }
 
 // Execute implements dependency.Repository interface,

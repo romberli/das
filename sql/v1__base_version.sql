@@ -11,6 +11,7 @@ CREATE TABLE `t_meta_app_info` (
   KEY `idx02_level` (`level`),
   KEY `idx03_owner_id` (`owner_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '应用系统信息表';
+
 CREATE TABLE `t_meta_app_db_map` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `app_id` int(11) NOT NULL COMMENT '应用系统ID',
@@ -22,6 +23,7 @@ CREATE TABLE `t_meta_app_db_map` (
   UNIQUE KEY `idx01_app_id_db_id` (`app_id`, `db_id`),
   KEY `idx02_db_id` (`db_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '应用系统-数据库映射表';
+
 CREATE TABLE `t_meta_db_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `db_name` varchar(100) NOT NULL COMMENT '数据库名称',
@@ -35,6 +37,7 @@ CREATE TABLE `t_meta_db_info` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx01_db_name_cluster_id_cluster_type` (`db_name`, `cluster_id`, `cluster_type`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '数据库信息表';
+
 CREATE TABLE `t_meta_env_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `env_name` varchar(100) NOT NULL COMMENT '环境名称',
@@ -44,6 +47,7 @@ CREATE TABLE `t_meta_env_info` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx01_env_name` (`env_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '环境信息表';
+
 CREATE TABLE `t_meta_middleware_cluster_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_name` varchar(100) NOT NULL COMMENT '中间件集群名称',
@@ -57,6 +61,7 @@ CREATE TABLE `t_meta_middleware_cluster_info` (
   KEY `idx02_owner_id` (`owner_id`),
   KEY `idx03_env_id` (`env_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '中间件集群信息表';
+
 CREATE TABLE `t_meta_middleware_server_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_id` int(11) NOT NULL COMMENT '中间件集群ID',
@@ -71,6 +76,7 @@ CREATE TABLE `t_meta_middleware_server_info` (
   UNIQUE KEY `idx01_host_ip_port_num` (`host_ip`, `port_num`),
   KEY `idx02_cluster_id_middleware_role_env_id` (`cluster_id`, `middleware_role`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '中间件服务器信息表';
+
 CREATE TABLE `t_meta_monitor_system_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `system_name` varchar(100) NOT NULL COMMENT '监控系统名称',
@@ -88,6 +94,7 @@ CREATE TABLE `t_meta_monitor_system_info` (
   UNIQUE KEY `idx02_host_ip_port_num` (`host_ip`, `port_num`),
   KEY `idx03_env_id` (`env_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '监控系统信息表';
+
 CREATE TABLE `t_meta_mysql_cluster_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_name` varchar(100) NOT NULL COMMENT '集群名称',
@@ -104,6 +111,7 @@ CREATE TABLE `t_meta_mysql_cluster_info` (
   KEY `idx04_owner_id` (`owner_id`),
   key `idx05_env_id` (`env_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'MySQL集群信息表';
+
 CREATE TABLE `t_meta_mysql_server_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cluster_id` int(11) NOT NULL COMMENT '集群ID',
@@ -120,6 +128,7 @@ CREATE TABLE `t_meta_mysql_server_info` (
   KEY `idx01_cluster_id` (`cluster_id`),
   UNIQUE KEY `idx02_host_ip_port_num` (`host_ip`, `port_num`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'MySQL服务器信息表';
+
 CREATE TABLE `t_meta_user_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `user_name` varchar(100) NOT NULL COMMENT '姓名',
@@ -141,6 +150,7 @@ CREATE TABLE `t_meta_user_info` (
   UNIQUE KEY `idx05_mobile` (`mobile`),
   KEY `idx06_user_name` (`user_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户信息表';
+
 CREATE TABLE `t_hc_default_engine_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `item_name` varchar(100) NOT NULL COMMENT '检查项名称',
@@ -158,6 +168,7 @@ CREATE TABLE `t_hc_default_engine_config` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx01_item_name` (`item_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '健康检查默认引擎配置表';
+
 CREATE TABLE `t_hc_result` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `operation_id` int(11) NOT NULL COMMENT '操作ID',
@@ -198,6 +209,7 @@ CREATE TABLE `t_hc_result` (
   KEY `idx02_operation_id_weighted_average_score` (`operation_id`, `weighted_average_score`),
   KEY `idx03_weighted_average_score` (`weighted_average_score`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '健康检查结果表';
+
 CREATE TABLE `t_hc_operation_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `mysql_server_id` int(11) NOT NULL COMMENT 'mysql服务器ID',
@@ -213,3 +225,17 @@ CREATE TABLE `t_hc_operation_info` (
   KEY `idx01_mysql_server_id_status` (`mysql_server_id`, `status`),
   KEY `idx02_start_time` (`start_time`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '健康检查操作表';
+
+CREATE TABLE `t_sa_operation_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `db_id` int(11) NOT NULL COMMENT '数据库ID',
+  `sql_text` varchar(1000) NOT NULL COMMENT 'sql文本',
+  `result` mediumtext DEFAULT NULL COMMENT '优化建议',
+  `message` mediumtext DEFAULT NULL COMMENT '执行日志',
+  `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标记: 0-未删除, 1-已删除',
+  `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx01_db_id_sql_text` (`db_id`, `sql_text`),
+  KEY `idx02_create_time` (`create_time`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'sql优化操作表';

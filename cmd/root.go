@@ -37,7 +37,6 @@ var (
 	baseDir string
 	cfgFile string
 	// daemon
-	daemon    bool
 	daemonStr string
 	// log
 	logFileName   string
@@ -70,6 +69,17 @@ var (
 	dbMonitorMySQLPass       string
 	dbApplicationMySQLUser   string
 	dbApplicationMySQLPass   string
+	dbSoarMySQLAddr          string
+	dbSoarMySQLName          string
+	dbSoarMySQLUser          string
+	dbSoarMySQLPass          string
+	// sqladvisor
+	sqladvisorSoarBin          string
+	sqladvisorSoarConfig       string
+	sqladvisorSoarSamplingStr  string
+	sqladvisorSoarProfilingStr string
+	sqladvisorSoarTraceStr     string
+	sqladvisorSoarExplainStr   string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -132,7 +142,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVar(&serverWriteTimeout, "server-write-timeout", constant.DefaultRandomInt, fmt.Sprintf("specify the read timeout in seconds of http request(default: %d)", config.DefaultServerReadTimeout))
 	// database
 	rootCmd.PersistentFlags().StringVar(&dbDASMySQLAddr, "db-das-mysql-addr", constant.DefaultRandomString, fmt.Sprintf("specify das database address(format: host:port)(default: %s)", fmt.Sprintf("%s:%d", constant.DefaultLocalHostIP, constant.DefaultMySQLPort)))
-	rootCmd.PersistentFlags().StringVar(&dbDASMySQLName, "db-das-mysql-name", constant.DefaultRandomString, fmt.Sprintf("specify das database name(default: %s)", config.DefaultDBName))
+	rootCmd.PersistentFlags().StringVar(&dbDASMySQLName, "db-das-mysql-name", constant.DefaultRandomString, fmt.Sprintf("specify das database name(default: %s)", config.DefaultDBDASMySQLName))
 	rootCmd.PersistentFlags().StringVar(&dbDASMySQLUser, "db-das-mysql-user", constant.DefaultRandomString, fmt.Sprintf("specify das database user name(default: %s)", config.DefaultDBUser))
 	rootCmd.PersistentFlags().StringVar(&dbDASMySQLPass, "db-das-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify das database user password(default: %s)", config.DefaultDBPass))
 	rootCmd.PersistentFlags().IntVar(&dbPoolMaxConnections, "db-pool-max-connections", constant.DefaultRandomInt, fmt.Sprintf("specify max connections of the connection pool(default: %d)", mysql.DefaultMaxConnections))
@@ -148,6 +158,17 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&dbMonitorClickhousePass, "db-monitor-clickhouse-pass", constant.DefaultRandomString, fmt.Sprintf("specify clickhouse user password of monitor system(default: %s)", config.DefaultDBPass))
 	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLUser, "db-monitor-mysql-user", constant.DefaultRandomString, fmt.Sprintf("specify mysql user name of monitor system(default: %s)", config.DefaultDBUser))
 	rootCmd.PersistentFlags().StringVar(&dbMonitorMySQLPass, "db-monitor-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify mysql user password of monitor system(default: %s)", config.DefaultDBPass))
+	rootCmd.PersistentFlags().StringVar(&dbSoarMySQLAddr, "db-soar-mysql-addr", constant.DefaultRandomString, fmt.Sprintf("specify soar database address(format: host:port)(default: %s)", fmt.Sprintf("%s:%d", constant.DefaultLocalHostIP, constant.DefaultMySQLPort)))
+	rootCmd.PersistentFlags().StringVar(&dbSoarMySQLName, "db-soar-mysql-name", constant.DefaultRandomString, fmt.Sprintf("specify soar database name(default: %s)", config.DefaultDBSoarMySQLName))
+	rootCmd.PersistentFlags().StringVar(&dbSoarMySQLUser, "db-soar-mysql-user", constant.DefaultRandomString, fmt.Sprintf("specify soar database user name(default: %s)", config.DefaultDBSoarMySQLUser))
+	rootCmd.PersistentFlags().StringVar(&dbSoarMySQLPass, "db-soar-mysql-pass", constant.DefaultRandomString, fmt.Sprintf("specify soar database user password(default: %s)", config.DefaultDBSoarMySQLPass))
+	// sqladvisor
+	rootCmd.PersistentFlags().StringVar(&sqladvisorSoarBin, "sqladvisor-soar-bin", constant.DefaultRandomString, fmt.Sprintf("specify binary path of soar(default: %s)", config.DefaultSQLAdvisorSoarBin))
+	rootCmd.PersistentFlags().StringVar(&sqladvisorSoarConfig, "sqladvisor-soar-config", constant.DefaultRandomString, fmt.Sprintf("specify config file path of soar(default: %s)", config.DefaultSQLAdvisorSoarConfig))
+	rootCmd.PersistentFlags().StringVar(&sqladvisorSoarSamplingStr, "sqladvisor-soar-sampling", constant.DefaultRandomString, fmt.Sprintf("specify if enabling sampling for soar(default: %s)", constant.FalseString))
+	rootCmd.PersistentFlags().StringVar(&sqladvisorSoarProfilingStr, "sqladvisor-soar-profiling", constant.DefaultRandomString, fmt.Sprintf("specify if enabling profiling for soar(default: %s)", constant.FalseString))
+	rootCmd.PersistentFlags().StringVar(&sqladvisorSoarTraceStr, "sqladvisor-soar-trace", constant.DefaultRandomString, fmt.Sprintf("specify if enabling trace for soar(default: %s)", constant.FalseString))
+	rootCmd.PersistentFlags().StringVar(&sqladvisorSoarExplainStr, "sqladvisor-soar-explain", constant.DefaultRandomString, fmt.Sprintf("specify if enabling explain for soar(default: %s)", constant.FalseString))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -340,6 +361,47 @@ func OverrideConfig() (err error) {
 	if dbApplicationMySQLPass != constant.DefaultRandomString {
 		viper.Set(config.DBApplicationMySQLPassKey, dbApplicationMySQLPass)
 	}
+	if dbSoarMySQLAddr != constant.DefaultRandomString {
+		viper.Set(config.DBDASMySQLAddrKey, dbSoarMySQLAddr)
+	}
+	if dbSoarMySQLName != constant.DefaultRandomString {
+		viper.Set(config.DBDASMySQLNameKey, dbSoarMySQLName)
+	}
+	if dbSoarMySQLUser != constant.DefaultRandomString {
+		viper.Set(config.DBDASMySQLUserKey, dbSoarMySQLUser)
+	}
+	if dbSoarMySQLPass != constant.DefaultRandomString {
+		viper.Set(config.DBDASMySQLPassKey, dbSoarMySQLPass)
+	}
+
+	// override sqladvisor
+	if sqladvisorSoarBin != constant.DefaultRandomString {
+		viper.Set(config.SQLAdvisorSoarBin, sqladvisorSoarBin)
+	}
+	if sqladvisorSoarConfig != constant.DefaultRandomString {
+		viper.Set(config.SQLAdvisorSoarConfig, sqladvisorSoarConfig)
+	}
+	if sqladvisorSoarSamplingStr == constant.TrueString {
+		viper.Set(config.SQLAdvisorSoarSamplingKey, true)
+	} else {
+		viper.Set(config.SQLAdvisorSoarSamplingKey, false)
+	}
+	if sqladvisorSoarProfilingStr == constant.TrueString {
+		viper.Set(config.SQLAdvisorSoarProfilingKey, true)
+	} else {
+		viper.Set(config.SQLAdvisorSoarProfilingKey, false)
+	}
+	if sqladvisorSoarTraceStr == constant.TrueString {
+		viper.Set(config.SQLAdvisorSoarTraceKey, true)
+	} else {
+		viper.Set(config.SQLAdvisorSoarTraceKey, false)
+	}
+	if sqladvisorSoarExplainStr == constant.TrueString {
+		viper.Set(config.SQLAdvisorSoarExplainKey, true)
+	} else {
+		viper.Set(config.SQLAdvisorSoarExplainKey, false)
+	}
+
 	// validate configuration
 	err = config.ValidateConfig()
 	if err != nil {

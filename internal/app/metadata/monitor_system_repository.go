@@ -26,7 +26,7 @@ func NewMonitorSystemRepo(db middleware.Pool) *MonitorSystemRepo {
 
 // NewMonitorSystemRepo returns *MonitorSystemRepo with global mysql pool
 func NewMonitorSystemRepoWithGlobal() *MonitorSystemRepo {
-	return NewMonitorSystemRepo(global.MySQLPool)
+	return NewMonitorSystemRepo(global.DASMySQLPool)
 }
 
 // Execute executes given command and placeholders on the middleware

@@ -162,3 +162,43 @@ db:
       # type: string
       # default: root
       pass: root
+  # soar configuration
+  soar:
+    # mysql configuration
+    mysql:
+      # description: database address, format: host:port
+      # type: string
+      # default: 127.0.0.1:3306
+      addr: "127.0.0.1:3306"
+      # description: database name
+      # type: string
+      # default: das
+      name: das
+      # description: database user name
+      # type: string
+      # default: root
+      user: root
+      # description: database password
+      # type: string
+      # default: root
+      pass: root
+# sqladvisor configuration
+sqladvisor:
+  # soar configuration
+  soar:
+    # description: specify if enabling sampling feature
+    # type: bool
+    # default: false
+    sampling: false
+    # description: specify if enabling profiling feature
+    # type: bool
+    # default: false
+    profiling: false
+    # description: specify if enabling trace feature
+    # type: bool
+    # default: false
+    trace: false
+    # description: specify if enabling explain feature
+    # type: bool
+    # default: false
+    explain: falase

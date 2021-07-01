@@ -40,7 +40,8 @@ const (
 	MaxServerWriteTimeout          = 60
 	DaemonArgTrue                  = "--daemon=true"
 	DaemonArgFalse                 = "--daemon=false"
-	DefaultDBName                  = DefaultCommandName
+	DefaultDBDASMySQLName          = "das"
+	DefaultDBSoarMySQLName         = "soar"
 	DefaultDBUser                  = "root"
 	DefaultDBPass                  = "root"
 	MinDBPoolMaxConnections        = 1
@@ -61,22 +62,32 @@ const (
 	DefaultDBMonitorMySQLPass      = "root"
 	DefaultDBApplicationMySQLUser  = "root"
 	DefaultDBApplicationMySQLPass  = "root"
+	DefaultDBSoarMySQLUser         = "root"
+	DefaultDBSoarMySQLPass         = "root"
+	DefaultSQLAdvisorSoarBin       = "./soar"
+	DefaultSQLAdvisorSoarConfig    = "./soar.yaml"
+	DefaultSQLAdvisorSoarBlacklist = "./soar.blacklist"
 )
 
 // configuration constant
 const (
-	ConfKey                     = "config"
-	DaemonKey                   = "daemon"
-	LogFileKey                  = "log.file"
-	LogLevelKey                 = "log.level"
-	LogFormatKey                = "log.format"
-	LogMaxSizeKey               = "log.maxSize"
-	LogMaxDaysKey               = "log.maxDays"
-	LogMaxBackupsKey            = "log.maxBackups"
-	ServerAddrKey               = "server.addr"
-	ServerPidFileKey            = "server.pidFile"
-	ServerReadTimeoutKey        = "server.readTimeout"
-	ServerWriteTimeoutKey       = "server.writeTimeout"
+	// config
+	ConfKey = "config"
+	// daemon
+	DaemonKey = "daemon"
+	// log
+	LogFileKey       = "log.file"
+	LogLevelKey      = "log.level"
+	LogFormatKey     = "log.format"
+	LogMaxSizeKey    = "log.maxSize"
+	LogMaxDaysKey    = "log.maxDays"
+	LogMaxBackupsKey = "log.maxBackups"
+	// server
+	ServerAddrKey         = "server.addr"
+	ServerPidFileKey      = "server.pidFile"
+	ServerReadTimeoutKey  = "server.readTimeout"
+	ServerWriteTimeoutKey = "server.writeTimeout"
+	// database
 	DBDASMySQLAddrKey           = "db.das.mysql.addr"
 	DBDASMySQLNameKey           = "db.das.mysql.name"
 	DBDASMySQLUserKey           = "db.das.mysql.user"
@@ -94,4 +105,15 @@ const (
 	DBMonitorClickhousePassKey  = "db.monitor.clickhouse.pass"
 	DBMonitorMySQLUserKey       = "db.monitor.mysql.user"
 	DBMonitorMySQLPassKey       = "db.monitor.mysql.pass"
+	DBSoarMySQLAddrKey          = "db.soar.mysql.addr"
+	DBSoarMySQLNameKey          = "db.soar.mysql.name"
+	DBSoarMySQLUserKey          = "db.soar.mysql.user"
+	DBSoarMySQLPassKey          = "db.soar.mysql.pass"
+	// sqladvisor
+	SQLAdvisorSoarBin          = "sqladvisor.soar.Bin"
+	SQLAdvisorSoarConfig       = "sqladvisor.soar.Config"
+	SQLAdvisorSoarSamplingKey  = "sqladvisor.soar.sampling"
+	SQLAdvisorSoarProfilingKey = "sqladvisor.soar.profiling"
+	SQLAdvisorSoarTraceKey     = "sqladvisor.soar.trace"
+	SQLAdvisorSoarExplainKey   = "sqladvisor.soar.explain"
 )

@@ -25,7 +25,7 @@ func NewMiddlewareServerRepo(db middleware.Pool) *MiddlewareServerRepo {
 
 // NewMiddlewareServerRepo returns *MiddlewareServerRepo with global mysql pool
 func NewMiddlewareServerRepoWithGlobal() *MiddlewareServerRepo {
-	return NewMiddlewareServerRepo(global.MySQLPool)
+	return NewMiddlewareServerRepo(global.DASMySQLPool)
 }
 
 // Execute implements dependency.Repository interface,

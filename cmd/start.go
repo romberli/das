@@ -72,7 +72,7 @@ var startCmd = &cobra.Command{
 		}
 
 		// check if runs in daemon mode
-		daemon = viper.GetBool(config.DaemonKey)
+		daemon := viper.GetBool(config.DaemonKey)
 		if daemon {
 			// set daemon to false
 			args = os.Args[1:]
@@ -106,7 +106,7 @@ var startCmd = &cobra.Command{
 			log.CloneStdoutLogger().Info(message.NewMessage(message.InfoServerStart, serverPid, serverPidFile).Error())
 
 			// init connection pool
-			err = global.InitMySQLPool()
+			err = global.InitDASMySQLPool()
 			if err != nil {
 				log.Error(fmt.Sprintf("%s\n%s", message.NewMessage(message.ErrInitConnectionPool).Error(), err.Error()))
 				os.Exit(constant.DefaultAbnormalExitCode)

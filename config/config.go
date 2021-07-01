@@ -57,7 +57,7 @@ func SetDefaultConfig(baseDir string) {
 	viper.SetDefault(ServerWriteTimeoutKey, DefaultServerWriteTimeout)
 	// database
 	viper.SetDefault(DBDASMySQLAddrKey, fmt.Sprintf("%s:%d", constant.DefaultLocalHostIP, constant.DefaultMySQLPort))
-	viper.SetDefault(DBDASMySQLNameKey, DefaultDBName)
+	viper.SetDefault(DBDASMySQLNameKey, DefaultDBDASMySQLName)
 	viper.SetDefault(DBDASMySQLUserKey, DefaultDBUser)
 	viper.SetDefault(DBDASMySQLPassKey, DefaultDBPass)
 	viper.SetDefault(DBPoolMaxConnectionsKey, mysql.DefaultMaxConnections)
@@ -73,6 +73,17 @@ func SetDefaultConfig(baseDir string) {
 	viper.SetDefault(DBMonitorMySQLPassKey, DefaultDBMonitorMySQLPass)
 	viper.SetDefault(DBApplicationMySQLUserKey, DefaultDBApplicationMySQLUser)
 	viper.SetDefault(DBApplicationMySQLPassKey, DefaultDBApplicationMySQLPass)
+	viper.SetDefault(DBSoarMySQLAddrKey, fmt.Sprintf("%s:%d", constant.DefaultLocalHostIP, constant.DefaultMySQLPort))
+	viper.SetDefault(DBSoarMySQLNameKey, DefaultDBDASMySQLName)
+	viper.SetDefault(DBSoarMySQLUserKey, DefaultDBUser)
+	viper.SetDefault(DBSoarMySQLPassKey, DefaultDBPass)
+	// sqladvisor
+	viper.SetDefault(SQLAdvisorSoarBin, DefaultSQLAdvisorSoarBin)
+	viper.SetDefault(SQLAdvisorSoarConfig, DefaultSQLAdvisorSoarConfig)
+	viper.SetDefault(SQLAdvisorSoarSamplingKey, false)
+	viper.SetDefault(SQLAdvisorSoarProfilingKey, false)
+	viper.SetDefault(SQLAdvisorSoarTraceKey, false)
+	viper.SetDefault(SQLAdvisorSoarExplainKey, false)
 }
 
 // ValidateConfig validates if the configuration is valid
@@ -99,6 +110,12 @@ func ValidateConfig() (err error) {
 
 	// validate database section
 	err = ValidateDatabase()
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+
+	// validate soar section
+	err = ValidateSQLAdvisor()
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
@@ -255,36 +272,37 @@ func ValidateServer() error {
 	return merr.ErrorOrNil()
 }
 
+// ValidateDatabase validates if database section is valid
 func ValidateDatabase() error {
 	merr := &multierror.Error{}
 
-	// validate db.addr
-	dbAddr, err := cast.ToStringE(viper.Get(DBDASMySQLAddrKey))
+	// validate db.das.mysql.addr
+	dbDASAddr, err := cast.ToStringE(viper.Get(DBDASMySQLAddrKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
-	addr := strings.Split(dbAddr, ":")
-	if len(addr) != 2 {
-		merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbAddr))
+	dasAddr := strings.Split(dbDASAddr, ":")
+	if len(dasAddr) != 2 {
+		merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbDASAddr))
 	} else {
-		if !govalidator.IsIPv4(addr[0]) {
-			merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbAddr))
+		if !govalidator.IsIPv4(dasAddr[0]) {
+			merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbDASAddr))
 		}
-		if !govalidator.IsPort(addr[1]) {
-			merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbAddr))
+		if !govalidator.IsPort(dasAddr[1]) {
+			merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbDASAddr))
 		}
 	}
-	// validate db.das.name
+	// validate db.das.mysql.name
 	_, err = cast.ToStringE(viper.Get(DBDASMySQLNameKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
-	// validate db.das.user
+	// validate db.das.mysql.user
 	_, err = cast.ToStringE(viper.Get(DBDASMySQLUserKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
-	// validate db.das.pass
+	// validate db.das.mysql.pass
 	_, err = cast.ToStringE(viper.Get(DBDASMySQLPassKey))
 	if err != nil {
 		merr = multierror.Append(merr, err)
@@ -369,9 +387,109 @@ func ValidateDatabase() error {
 	if err != nil {
 		merr = multierror.Append(merr, err)
 	}
+	// validate db.soar.mysql.addr
+	dbSoarAddr, err := cast.ToStringE(viper.Get(DBDASMySQLAddrKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	soarAddr := strings.Split(dbSoarAddr, ":")
+	if len(soarAddr) != 2 {
+		merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbSoarAddr))
+	} else {
+		if !govalidator.IsIPv4(soarAddr[0]) {
+			merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbSoarAddr))
+		}
+		if !govalidator.IsPort(soarAddr[1]) {
+			merr = multierror.Append(merr, message.Messages[message.ErrNotValidDBAddr].Renew(dbSoarAddr))
+		}
+	}
+	// validate db.soar.mysql.name
+	_, err = cast.ToStringE(viper.Get(DBSoarMySQLNameKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.soar.mysql.user
+	_, err = cast.ToStringE(viper.Get(DBSoarMySQLUserKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate db.soar.mysql.pass
+	_, err = cast.ToStringE(viper.Get(DBSoarMySQLPassKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
 
-	return merr
+	return merr.ErrorOrNil()
+}
 
+// ValidateSQLAdvisor validates if sqladvisor section is valid
+func ValidateSQLAdvisor() error {
+	merr := &multierror.Error{}
+
+	// validate sqladvisor.soar.bin
+	soarBin, err := cast.ToStringE(viper.Get(SQLAdvisorSoarBin))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	soarBin = strings.TrimSpace(soarBin)
+	if soarBin == constant.EmptyString {
+		merr = multierror.Append(merr, message.Messages[message.ErrEmptySoarBin])
+	}
+	isAbs := filepath.IsAbs(soarBin)
+	if !isAbs {
+		soarBin, err = filepath.Abs(soarBin)
+		if err != nil {
+			merr = multierror.Append(merr, err)
+		}
+	}
+	valid, _ := govalidator.IsFilePath(soarBin)
+	if !valid {
+		merr = multierror.Append(merr, message.Messages[message.ErrNotValidSoarBin].Renew(soarBin))
+	}
+
+	// validate sqladvisor.soar.config
+	config, err := cast.ToStringE(viper.Get(SQLAdvisorSoarConfig))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	config = strings.TrimSpace(config)
+	if soarBin == constant.EmptyString {
+		merr = multierror.Append(merr, message.Messages[message.ErrEmptySoarConfig])
+	}
+	isAbs = filepath.IsAbs(config)
+	if !isAbs {
+		config, err = filepath.Abs(config)
+		if err != nil {
+			merr = multierror.Append(merr, err)
+		}
+	}
+	valid, _ = govalidator.IsFilePath(config)
+	if !valid {
+		merr = multierror.Append(merr, message.Messages[message.ErrNotValidSoarConfig].Renew(config))
+	}
+
+	// validate sqladvisor.soar.sampling
+	_, err = cast.ToBoolE(viper.Get(SQLAdvisorSoarSamplingKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate sqladvisor.soar.profiling
+	_, err = cast.ToBoolE(viper.Get(SQLAdvisorSoarProfilingKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate sqladvisor.soar.trace
+	_, err = cast.ToBoolE(viper.Get(SQLAdvisorSoarTraceKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+	// validate sqladvisor.soar.explain
+	_, err = cast.ToBoolE(viper.Get(SQLAdvisorSoarExplainKey))
+	if err != nil {
+		merr = multierror.Append(merr, err)
+	}
+
+	return merr.ErrorOrNil()
 }
 
 // TrimSpaceOfArg trims spaces of given argument

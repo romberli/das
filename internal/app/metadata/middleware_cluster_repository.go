@@ -25,7 +25,7 @@ func NewMiddlewareClusterRepo(db middleware.Pool) *MiddlewareClusterRepo {
 
 // NewMiddlewareClusterRepo returns *MiddlewareClusterRepo with global mysql pool
 func NewMiddlewareClusterRepoWithGlobal() *MiddlewareClusterRepo {
-	return NewMiddlewareClusterRepo(global.MySQLPool)
+	return NewMiddlewareClusterRepo(global.DASMySQLPool)
 }
 
 // Execute executes command with arguments on database

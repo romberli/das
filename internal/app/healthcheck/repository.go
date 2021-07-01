@@ -25,7 +25,7 @@ func NewRepository(db middleware.Pool) *Repository {
 
 // NewRepository returns *Repository with global mysql pool
 func NewRepositoryWithGlobal() *Repository {
-	return NewRepository(global.MySQLPool)
+	return NewRepository(global.DASMySQLPool)
 }
 
 // Execute executes given command and placeholders on the middleware

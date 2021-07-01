@@ -5,7 +5,6 @@ import (
 )
 
 const (
-	// server
 	ErrPrintHelpInfo                    = 400001
 	ErrEmptyLogFileName                 = 400002
 	ErrNotValidLogFileName              = 400003
@@ -55,10 +54,15 @@ const (
 	ErrTypeConversion                   = 400047
 	ErrNotValidTimeLayout               = 400048
 	ErrNotValidTimeDuration             = 400049
+	ErrEmptySoarBin                     = 400050
+	ErrNotValidSoarBin                  = 400051
+	ErrEmptySoarConfig                  = 400052
+	ErrNotValidSoarConfig               = 400053
+	ErrEmptySoarBlacklist               = 400054
+	ErrNotValidSoarBlacklist            = 400055
 )
 
 func initErrorMessage() {
-	// server
 	Messages[ErrPrintHelpInfo] = config.NewErrMessage(DefaultMessageHeader, ErrPrintHelpInfo, "got message when printing help information")
 	Messages[ErrEmptyLogFileName] = config.NewErrMessage(DefaultMessageHeader, ErrEmptyLogFileName, "Log file name could not be an empty string")
 	Messages[ErrNotValidLogFileName] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidLogFileName, "Log file name must be either unix or windows path format, %s is not valid")
@@ -108,4 +112,10 @@ func initErrorMessage() {
 	Messages[ErrTypeConversion] = config.NewErrMessage(DefaultMessageHeader, ErrTypeConversion, "type conversion failed.\n%s")
 	Messages[ErrNotValidTimeLayout] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidTimeLayout, "time layout must be formatted as yyyy-MM-dd HH:mm:ss, %s is not valid")
 	Messages[ErrNotValidTimeDuration] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidTimeDuration, "time duration must be formatted, e.g. such as 300ms, -1.5h or 2h45m, %s is not valid")
+	Messages[ErrEmptySoarBin] = config.NewErrMessage(DefaultMessageHeader, ErrEmptySoarBin, "soar binary path could not be an empty string")
+	Messages[ErrNotValidSoarBin] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidSoarBin, "soar binary path must be either unix or windows path format, %s is not valid")
+	Messages[ErrEmptySoarConfig] = config.NewErrMessage(DefaultMessageHeader, ErrEmptySoarConfig, "soar config path could not be an empty string")
+	Messages[ErrNotValidSoarConfig] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidSoarConfig, "soar config path must be either unix or windows path format, %s is not valid")
+	Messages[ErrEmptySoarBlacklist] = config.NewErrMessage(DefaultMessageHeader, ErrEmptySoarBlacklist, "soar blacklist path could not be an empty string")
+	Messages[ErrNotValidSoarBlacklist] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidSoarBlacklist, "soar blacklist path must be either unix or windows path format, %s is not valid")
 }

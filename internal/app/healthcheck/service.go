@@ -115,8 +115,8 @@ func (s *Service) CheckByHostInfo(hostIP string, portNum int, startTime, endTime
 	return s.check(mysqlServerID, startTime, endTime, step)
 }
 
-// check
-
+// check performs healthcheck on the mysql server with given mysql server id,
+// initiating is synchronous, actual running is asynchronous
 func (s *Service) check(mysqlServerID int, startTime, endTime time.Time, step time.Duration) error {
 	// init
 	err := s.init(mysqlServerID, startTime, endTime, step)
