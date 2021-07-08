@@ -46,7 +46,7 @@ func GetMySQLServer(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -85,7 +85,7 @@ func GetMySQLServerByClusterID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -123,7 +123,7 @@ func GetMySQLServerByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -167,7 +167,7 @@ func GetMySQLServerByHostInfo(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -231,7 +231,7 @@ func AddMySQLServer(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -313,7 +313,7 @@ func UpdateMySQLServerByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// resp
@@ -355,7 +355,7 @@ func DeleteMySQLServerByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response

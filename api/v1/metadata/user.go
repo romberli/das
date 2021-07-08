@@ -50,7 +50,7 @@ func GetUser(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// responseF
@@ -82,7 +82,7 @@ func GetUserByName(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -115,7 +115,7 @@ func GetUserByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -147,7 +147,7 @@ func GetUserByEmployeeID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -179,7 +179,7 @@ func GetUserByAccountName(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -211,7 +211,7 @@ func GetUserByEmail(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -243,7 +243,7 @@ func GetUserByTelephone(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -275,7 +275,7 @@ func GetUserByMobile(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -345,7 +345,7 @@ func AddUser(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -403,7 +403,7 @@ func UpdateUserByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, id, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, id, err.Error())
 		return
 	}
 	// resp
@@ -442,7 +442,7 @@ func DeleteUserByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response

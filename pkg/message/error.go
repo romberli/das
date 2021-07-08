@@ -50,7 +50,7 @@ const (
 	ErrGetRawData                       = 400043
 	ErrUnmarshalRawData                 = 400044
 	ErrGenerateNewMapWithTag            = 400045
-	ErrMarshalService                   = 400046
+	ErrMarshalData                      = 400046
 	ErrTypeConversion                   = 400047
 	ErrNotValidTimeLayout               = 400048
 	ErrNotValidTimeDuration             = 400049
@@ -108,7 +108,7 @@ func initErrorMessage() {
 	Messages[ErrGetRawData] = config.NewErrMessage(DefaultMessageHeader, ErrGetRawData, "get raw data from http body failed.\n%s")
 	Messages[ErrUnmarshalRawData] = config.NewErrMessage(DefaultMessageHeader, ErrUnmarshalRawData, "unmarshal raw data failed.\n%s")
 	Messages[ErrGenerateNewMapWithTag] = config.NewErrMessage(DefaultMessageHeader, ErrGenerateNewMapWithTag, "generate new map with tag %s failed.\n%s")
-	Messages[ErrMarshalService] = config.NewErrMessage(DefaultMessageHeader, ErrMarshalService, "marshal service failed.\n%s")
+	Messages[ErrMarshalData] = config.NewErrMessage(DefaultMessageHeader, ErrMarshalData, "marshal service failed.\n%s")
 	Messages[ErrTypeConversion] = config.NewErrMessage(DefaultMessageHeader, ErrTypeConversion, "type conversion failed.\n%s")
 	Messages[ErrNotValidTimeLayout] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidTimeLayout, "time layout must be formatted as yyyy-MM-dd HH:mm:ss, %s is not valid")
 	Messages[ErrNotValidTimeDuration] = config.NewErrMessage(DefaultMessageHeader, ErrNotValidTimeDuration, "time duration must be formatted, e.g. such as 300ms, -1.5h or 2h45m, %s is not valid")

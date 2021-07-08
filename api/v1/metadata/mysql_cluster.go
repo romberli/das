@@ -45,7 +45,7 @@ func GetMySQLCluster(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	fmt.Println("ok")
@@ -81,7 +81,7 @@ func GetMySQLClusterByEnv(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -119,7 +119,7 @@ func GetMySQLClusterByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -146,7 +146,7 @@ func GetMySQLClusterByName(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -177,7 +177,7 @@ func GetMySQLServerIDList(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.MarshalWithFields(mcMySQLServerIDListStruct)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -230,7 +230,7 @@ func AddMySQLCluster(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -307,7 +307,7 @@ func UpdateMySQLClusterByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// resp
@@ -343,7 +343,7 @@ func DeleteMySQLClusterByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response

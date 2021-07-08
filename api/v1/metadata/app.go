@@ -44,7 +44,7 @@ func GetApp(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -81,7 +81,7 @@ func GetAppByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -113,7 +113,7 @@ func GetAppByName(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -152,7 +152,7 @@ func GetDBIDList(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.MarshalWithFields(appDBIDListStruct)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -202,7 +202,7 @@ func AddApp(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -259,7 +259,7 @@ func UpdateAppByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -298,7 +298,7 @@ func DeleteAppByID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.Marshal()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -352,7 +352,7 @@ func AppAddDB(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.MarshalWithFields(appDBIDListStruct)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -405,7 +405,7 @@ func AppDeleteDB(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.MarshalWithFields(appDBIDListStruct)
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response

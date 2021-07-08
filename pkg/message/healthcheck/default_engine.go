@@ -36,6 +36,7 @@ func initDefaultEngineDebugMessage() {
 }
 
 func initDefaultEngineInfoMessage() {
+
 }
 
 func initDefaultEngineErrorMessage() {

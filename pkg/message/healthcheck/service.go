@@ -13,22 +13,22 @@ func init() {
 
 const (
 	// debug
-	DebugHealthcheckGetResultByOperationID = 101012
-	DebugHealthcheckCheck                  = 101013
-	DebugHealthcheckCheckByHostInfo        = 101014
-	DebugHealthcheckReviewAccurate         = 101015
+	DebugHealthcheckGetResultByOperationID = 101001
+	DebugHealthcheckCheck                  = 101002
+	DebugHealthcheckCheckByHostInfo        = 101003
+	DebugHealthcheckReviewAccurate         = 101004
 	// info
-	InfoHealthcheckGetResultByOperationID = 201012
-	InfoHealthcheckCheck                  = 201013
-	InfoHealthcheckCheckByHostInfo        = 201014
-	InfoHealthcheckReviewAccurate         = 201015
+	InfoHealthcheckGetResultByOperationID = 201001
+	InfoHealthcheckCheck                  = 201002
+	InfoHealthcheckCheckByHostInfo        = 201003
+	InfoHealthcheckReviewAccurate         = 201004
 	// error
-	ErrHealthcheckDefaultEngineRun       = 401011
-	ErrHealthcheckGetResultByOperationID = 401012
-	ErrHealthcheckCheck                  = 401013
-	ErrHealthcheckCheckByHostInfo        = 401014
-	ErrHealthcheckReviewAccurate         = 401015
-	ErrHealthcheckCloseConnection        = 401016
+	ErrHealthcheckDefaultEngineRun       = 401013
+	ErrHealthcheckGetResultByOperationID = 401014
+	ErrHealthcheckCheck                  = 401015
+	ErrHealthcheckCheckByHostInfo        = 401016
+	ErrHealthcheckReviewAccurate         = 401017
+	ErrHealthcheckCloseConnection        = 401018
 )
 
 func initServiceDebugMessage() {

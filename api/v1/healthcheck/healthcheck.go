@@ -15,14 +15,14 @@ import (
 )
 
 const (
-	hOperationIDJSON = "operation_id"
-	hServerIDJSON    = "server_id"
-	hHostIPJSON      = "host_ip"
-	hPortNumJSON     = "port_num"
-	hStartTimeJSON   = "start_time"
-	hEndTimeJSON     = "end_time"
-	hStepJSON        = "step"
-	hReviewJSON      = "review"
+	operationIDJSON = "operation_id"
+	serverIDJSON    = "server_id"
+	hostIPJSON      = "host_ip"
+	portNumJSON     = "port_num"
+	startTimeJSON   = "start_time"
+	endTimeJSON     = "end_time"
+	stepJSON        = "step"
+	reviewJSON      = "review"
 )
 
 // @Tags healthcheck
@@ -32,9 +32,9 @@ const (
 // @Router /api/v1/healthcheck/result/:id [get]
 func GetResultByOperationID(c *gin.Context) {
 	// get data
-	operationIDStr := c.Param(hOperationIDJSON)
+	operationIDStr := c.Param(operationIDJSON)
 	if operationIDStr == constant.EmptyString {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hOperationIDJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, operationIDJSON)
 		return
 	}
 	operationID, err := strconv.Atoi(operationIDStr)
@@ -53,7 +53,7 @@ func GetResultByOperationID(c *gin.Context) {
 	// marshal service
 	jsonBytes, err := s.MarshalJSON()
 	if err != nil {
-		resp.ResponseNOK(c, message.ErrMarshalService, err.Error())
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
 		return
 	}
 	// response
@@ -77,39 +77,39 @@ func Check(c *gin.Context) {
 	dataMap := make(map[string]string)
 	err = json.Unmarshal(data, &dataMap)
 	if err != nil {
-		resp.ResponseNOK(c, msghealth.ErrHealthcheckCheck, err.Error())
+		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
 		return
 	}
-	mysqlServerIDStr, mysqlServerIDExists := dataMap[hServerIDJSON]
+	mysqlServerIDStr, mysqlServerIDExists := dataMap[serverIDJSON]
 	if !mysqlServerIDExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hServerIDJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, serverIDJSON)
 		return
 	}
 	mysqlServerID, err := strconv.Atoi(mysqlServerIDStr)
 	if err != nil {
 		resp.ResponseNOK(c, msghealth.ErrHealthcheckCheck, err.Error())
 	}
-	startTimeStr, startTimeExists := dataMap[hStartTimeJSON]
+	startTimeStr, startTimeExists := dataMap[startTimeJSON]
 	if !startTimeExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hStartTimeJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, startTimeJSON)
 		return
 	}
 	startTime, err := time.ParseInLocation(constant.TimeLayoutSecond, startTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, startTimeStr)
 	}
-	endTimeStr, endTimeExists := dataMap[hEndTimeJSON]
+	endTimeStr, endTimeExists := dataMap[endTimeJSON]
 	if !endTimeExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hEndTimeJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, endTimeJSON)
 		return
 	}
 	endTime, err := time.ParseInLocation(constant.TimeLayoutSecond, endTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, endTimeStr)
 	}
-	stepStr, stepExists := dataMap[hStepJSON]
+	stepStr, stepExists := dataMap[stepJSON]
 	if !stepExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hStepJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, stepJSON)
 		return
 	}
 	step, err := time.ParseDuration(stepStr)
@@ -147,14 +147,14 @@ func CheckByHostInfo(c *gin.Context) {
 		resp.ResponseNOK(c, msghealth.ErrHealthcheckCheck, err.Error())
 		return
 	}
-	hostIP, hostIPExists := dataMap[hHostIPJSON]
+	hostIP, hostIPExists := dataMap[hostIPJSON]
 	if !hostIPExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hHostIPJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, hostIPJSON)
 		return
 	}
-	portNumStr, portNumExists := dataMap[hPortNumJSON]
+	portNumStr, portNumExists := dataMap[portNumJSON]
 	if !portNumExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hPortNumJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, portNumJSON)
 		return
 	}
 	portNum, err := strconv.Atoi(portNumStr)
@@ -162,27 +162,27 @@ func CheckByHostInfo(c *gin.Context) {
 		resp.ResponseNOK(c, message.ErrTypeConversion, err.Error())
 		return
 	}
-	startTimeStr, startTimeExists := dataMap[hStartTimeJSON]
+	startTimeStr, startTimeExists := dataMap[startTimeJSON]
 	if !startTimeExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hStartTimeJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, startTimeJSON)
 		return
 	}
 	startTime, err := time.ParseInLocation(constant.TimeLayoutSecond, startTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, startTimeStr)
 	}
-	endTimeStr, endTimeExists := dataMap[hEndTimeJSON]
+	endTimeStr, endTimeExists := dataMap[endTimeJSON]
 	if !endTimeExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hEndTimeJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, endTimeJSON)
 		return
 	}
 	endTime, err := time.ParseInLocation(constant.TimeLayoutSecond, endTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, endTimeStr)
 	}
-	stepStr, stepExists := dataMap[hStepJSON]
+	stepStr, stepExists := dataMap[stepJSON]
 	if !stepExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hStepJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, stepJSON)
 		return
 	}
 	step, err := time.ParseDuration(stepStr)
@@ -220,14 +220,14 @@ func ReviewAccurate(c *gin.Context) {
 		resp.ResponseNOK(c, msghealth.ErrHealthcheckCheck, err.Error())
 		return
 	}
-	operationID, operationIDExists := dataMap[hOperationIDJSON]
+	operationID, operationIDExists := dataMap[operationIDJSON]
 	if !operationIDExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hOperationIDJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, operationIDJSON)
 		return
 	}
-	review, reviewExists := dataMap[hReviewJSON]
+	review, reviewExists := dataMap[reviewJSON]
 	if !reviewExists {
-		resp.ResponseNOK(c, message.ErrFieldNotExists, hReviewJSON)
+		resp.ResponseNOK(c, message.ErrFieldNotExists, reviewJSON)
 		return
 	}
 	// init service
