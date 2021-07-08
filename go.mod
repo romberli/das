@@ -9,13 +9,12 @@ replace (
 )
 
 require (
-	github.com/XiaoMi/soar v0.8.2-0.20210526115350-9a47ddc1089f
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/asaskevich/govalidator v0.0.0-20200819183940-29e1ff8eb0bb
 	github.com/gin-gonic/gin v1.6.3
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/jinzhu/now v1.1.2
-	github.com/romberli/go-util v0.3.9-0.20210621075221-c920fb17a852
+	github.com/romberli/go-util v0.3.9-0.20210702031023-a8d9b4b7fd14
 	github.com/romberli/log v1.0.20
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.1

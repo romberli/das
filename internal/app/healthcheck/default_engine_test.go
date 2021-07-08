@@ -2,6 +2,8 @@ package healthcheck
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/jinzhu/now"
 	"github.com/romberli/das/internal/app/metadata"
 	"github.com/romberli/go-util/common"
@@ -11,7 +13,6 @@ import (
 	"github.com/romberli/go-util/middleware/prometheus"
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 const (
@@ -142,7 +143,7 @@ func TestDefaultEngine_Run(t *testing.T) {
 		monitorClickhouseConn, err = clickhouse.NewConnWithDefault(clickhouseAddr, defaultMonitorClickhouseDBName, defaultEngineConfigDBUser, defaultEngineConfigDBPass)
 		asst.Nil(err, common.CombineMessageWithError("test Run() failed", err))
 
-		operationInfo := NewOperationInfo(id, mysqlServer, startTime, endTime, serviceStep)
+		operationInfo := NewOperationInfo(id, mysqlServer, monitorSystem, startTime, endTime, serviceStep)
 		defaultEngine := NewDefaultEngine(defaultEngineConfigRepo, operationInfo, applicationMySQLConn, monitorPrometheusConn, monitorClickhouseConn, monitorMySQLConn)
 		err = defaultEngine.run()
 		asst.Nil(err, common.CombineMessageWithError("test Run() failed", err))

@@ -44,6 +44,10 @@ func (r *Repository) Transaction() (middleware.Transaction, error) {
 	return r.Database.Transaction()
 }
 
-func (r *Repository) Save(dbID int, sqlText, result, message string) error {
-	return nil
+// Save saves sql tuning advice into the middleware
+func (r *Repository) Save(dbID int, sqlText, advice, message string) error {
+	sql := `insert into t_sa_operation_info(db_id, sql_text, advice, message) values(?, ?, ?, ?);`
+	_, err := r.Execute(sql, dbID, sqlText, advice, message)
+
+	return err
 }

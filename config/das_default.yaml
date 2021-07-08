@@ -186,6 +186,14 @@ db:
 sqladvisor:
   # soar configuration
   soar:
+    # description: specify soar binary path
+    # type: string
+    # default: "./bin/soar"
+    bin: "./bin/soar"
+    # description: specify soar configuration file path
+    # type: string
+    # default: "./config/soar.yaml"
+    config: "./config/soar.yaml"
     # description: specify if enabling sampling feature
     # type: bool
     # default: false
