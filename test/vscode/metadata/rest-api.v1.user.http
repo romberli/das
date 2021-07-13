@@ -1,0 +1,49 @@
+@baseURL = 127.0.0.1:6090
+
+### GetUser
+GET http://{{baseURL}}/api/v1/metadata/user
+Accept: application/json
+
+### GetUserByName
+GET http://{{baseURL}}/api/v1/metadata/user/user-name/user_name
+Accept: application/json
+
+### GetUserByID
+GET http://{{baseURL}}/api/v1/metadata/user/get/5
+Accept: application/json
+
+### GetUserByEmployeeID
+GET http://{{baseURL}}/api/v1/metadata/user/employee-id/employee_id
+Accept: application/json
+
+### GetUserByAccountName
+GET http://{{baseURL}}/api/v1/metadata/user/account-name/account_name
+Accept: application/json
+
+### GetUserByEmail
+GET http://{{baseURL}}/api/v1/metadata/user/email/email
+Accept: application/json
+
+### GetUserByTelephone
+GET http://{{baseURL}}/api/v1/metadata/user/telephone/telephone
+Accept: application/json
+
+### GetUserByMobile
+GET http://{{baseURL}}/api/v1/metadata/user/mobile/mobile
+Accept: application/json
+
+### AddUser
+POST http://{{baseURL}}/api/v1/metadata/user
+Content-Type: application/json
+
+ {"department_name": "department_name","employee_id": "employee_id21", "telephone": "telephone","role": 2,"del_flag": 0,"user_name": "user_name21","account_name": "account_na1me2","email": "emai12l","mobile": "mobile" }
+
+### UpdateUserByID
+POST http://{{baseURL}}/api/v1/metadata/user/update/3
+Content-Type: application/json
+
+  {"department_name": "department_name","employee_id": "employee_id2", "telephone": "telephone","role": 2,"del_flag": 0,"user_name": "user_name2","account_name": "account_name2","email": "emai2l","mobile": "mobile" }
+
+### DeleteUserByID
+POST http://{{baseURL}}/api/v1/metadata/user/delete/1
+Content-Type: application/json
