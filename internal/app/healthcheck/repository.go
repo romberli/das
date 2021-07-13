@@ -14,6 +14,7 @@ import (
 
 var _ healthcheck.Repository = (*Repository)(nil)
 
+// Repository for health check
 type Repository struct {
 	Database middleware.Pool
 }
@@ -23,7 +24,7 @@ func NewRepository(db middleware.Pool) *Repository {
 	return &Repository{Database: db}
 }
 
-// NewRepository returns *Repository with global mysql pool
+// NewRepositoryWithGlobal returns *Repository with global mysql pool
 func NewRepositoryWithGlobal() *Repository {
 	return NewRepository(global.DASMySQLPool)
 }
@@ -73,7 +74,7 @@ func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result
 	}
 	switch result.RowNumber() {
 	case 0:
-		return nil, errors.New(fmt.Sprintf("healthCheck Repository.GetResultByOperationID(): data does not exists, operation_id: %d", operationID))
+		return nil, fmt.Errorf("healthCheck Repository.GetResultByOperationID(): data does not exists, operation_id: %d", operationID)
 	case 1:
 		hcInfo := NewEmptyResultWithRepo(r)
 		// map to struct
@@ -84,7 +85,7 @@ func (r *Repository) GetResultByOperationID(operationID int) (healthcheck.Result
 
 		return hcInfo, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("healthCheck Repository.GetResultByOperationID(): duplicate key exists, operation_id: %d", operationID))
+		return nil, fmt.Errorf("healthCheck Repository.GetResultByOperationID(): duplicate key exists, operation_id: %d", operationID)
 	}
 }
 

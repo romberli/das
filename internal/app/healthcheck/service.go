@@ -31,6 +31,7 @@ const (
 
 var _ healthcheck.Service = (*Service)(nil)
 
+// OperationInfo include info for a operation
 type OperationInfo struct {
 	OperationID   int
 	MySQLServer   depmeta.MySQLServer
@@ -52,6 +53,7 @@ func NewOperationInfo(operationID int, mysqlServer depmeta.MySQLServer, MonitorS
 	}
 }
 
+// Service of health check
 type Service struct {
 	healthcheck.Repository
 	OperationInfo *OperationInfo
@@ -142,7 +144,7 @@ func (s *Service) init(mysqlServerID int, startTime, endTime time.Time, step tim
 		return err
 	}
 	if isRunning {
-		return errors.New(fmt.Sprintf("healthcheck of mysql server is still running. mysql server id: %d", mysqlServerID))
+		return fmt.Errorf("healthcheck of mysql server is still running. mysql server id: %d", mysqlServerID)
 	}
 	// insert operation message
 	id, err := s.Repository.InitOperation(mysqlServerID, startTime, endTime, step)
@@ -261,12 +263,12 @@ func (s *Service) ReviewAccurate(id, review int) error {
 	return s.Repository.UpdateAccurateReviewByOperationID(id, review)
 }
 
-// Marshal marshals Service to json bytes
+// MarshalJSON marshals Service to json bytes
 func (s *Service) MarshalJSON() ([]byte, error) {
 	return s.MarshalJSONWithFields(resultStruct)
 }
 
-// MarshalWithFields marshals only specified fields of the Service to json bytes
+// MarshalJSONWithFields marshals only specified fields of the Service to json bytes
 func (s *Service) MarshalJSONWithFields(fields ...string) ([]byte, error) {
 	return common.MarshalStructWithFields(s.Result, fields...)
 }
