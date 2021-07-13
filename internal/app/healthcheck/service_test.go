@@ -44,7 +44,7 @@ func initGlobalMySQLPool() error {
 	poolConfig := mysql.NewPoolConfigWithConfig(config, maxConnections, initConnections, maxIdleConnections, maxIdleTime, keepAliveInterval)
 	log.Debugf("pool config: %v", poolConfig)
 	var err error
-	global.MySQLPool, err = mysql.NewPoolWithPoolConfig(poolConfig)
+	global.DASMySQLPool, err = mysql.NewPoolWithPoolConfig(poolConfig)
 
 	return err
 }

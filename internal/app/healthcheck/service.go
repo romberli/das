@@ -1,7 +1,6 @@
 package healthcheck
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
