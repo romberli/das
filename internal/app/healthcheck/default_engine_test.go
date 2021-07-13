@@ -17,9 +17,9 @@ import (
 
 const (
 	defaultEngineConfigAddr   = "localhost:3306"
-	defaultEngineConfigDBName = "das"
+	defaultEngineConfigDBName = "performance_schema"
 	defaultEngineConfigDBUser = "root"
-	defaultEngineConfigDBPass = "rootroot"
+	defaultEngineConfigDBPass = "root"
 
 	applicationMysqlAddr   = "192.168.10.210:3306"
 	applicationMysqlDBName = "performance_schema"
