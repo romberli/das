@@ -22,8 +22,8 @@ const (
 // @Tags sqladvisor
 // @Summary get sql fingerprint
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"sql_id": 66, "sql_text": "select * from t01"}"
-// @Router /api/v1/sqladvisor/fingerprint/:sql [get]
+// @Success 200 {string} string "{"fingerprint": "select * from a","sql_text": "select * from a;"}"
+// @Router /api/v1/sqladvisor/fingerprint/ [get]
 func GetFingerprint(c *gin.Context) {
 	// get data
 	data, err := c.GetRawData()
@@ -61,8 +61,8 @@ func GetFingerprint(c *gin.Context) {
 // @Tags sqladvisor
 // @Summary get sql id
 // @Produce  application/json
-// @Success 200 {string} string "{"code": 200, "data": [{"sql_id": 66, "sql_text": "select * from t01"}"
-// @Router /api/v1/sqladvisor/sql-id/:sql [get]
+// @Success 200 {string} string "{"sql_id": "EE56B94E867DC9D5","sql_text": "select * from a;"}"
+// @Router /api/v1/sqladvisor/sql-id/ [get]
 func GetSQLID(c *gin.Context) {
 	// get data
 	data, err := c.GetRawData()
