@@ -141,5 +141,5 @@ func Advise(c *gin.Context) {
 		return
 	}
 
-	resp.ResponseOK(c, advice, msgadvisor.InfoSQLAdvisorAdvice, dbID, sqlTextJSON, advice)
+	resp.ResponseOK(c, advice, msgadvisor.InfoSQLAdvisorAdvice, dbID, sqlText, advice)
 }
