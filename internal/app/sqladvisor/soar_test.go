@@ -6,7 +6,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var advisor = NewDefaultAdvisorWithDefault()
+const (
+	defaultDBSoarMySQLUser = "root"
+	defaultDBSoarMySQLPass = "root"
+)
+
+var advisor = NewDefaultAdvisor(defaultSoarBin, defaultConfigFile)
 
 func TestDefaultAdvisor_All(t *testing.T) {
 	TestDefaultAdvisor_GetFingerprint(t)
@@ -31,7 +36,9 @@ func TestDefaultAdvisor_GetSQLID(t *testing.T) {
 func TestDefaultAdvisor_Advise(t *testing.T) {
 	asst := assert.New(t)
 
-	advice, err := service.Advise(defaultDBID, defaultSQLText)
+	advice, message, err := advisor.advise(defaultDBID, defaultSQLText, defaultDBSoarMySQLUser, defaultDBSoarMySQLPass)
 	asst.Nil(err, "test Advise() failed")
 	asst.NotEmpty(advice, "test Advise() failed")
+	t.Log(message)
+	t.Log(advice)
 }

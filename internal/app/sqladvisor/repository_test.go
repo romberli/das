@@ -3,11 +3,16 @@ package sqladvisor
 import (
 	"testing"
 
+	"github.com/romberli/das/global"
 	"github.com/romberli/go-util/common"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/log"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	initDASMySQLPool()
+}
 
 const (
 	defaultDASMySQLAddr = "192.168.137.11:3306"
@@ -23,15 +28,21 @@ const (
 
 var repository = initRepository()
 
-func initRepository() *Repository {
-	pool, err := mysql.NewPoolWithDefault(defaultDASMySQLAddr, defaultDASMySQLName, defaultDASMySQLUser, defaultDASMySQLPass)
-	log.Infof("pool: %v, error: %v", pool, err)
+func initDASMySQLPool() *mysql.Pool {
+	var err error
+
+	global.DASMySQLPool, err = mysql.NewPoolWithDefault(defaultDASMySQLAddr, defaultDASMySQLName, defaultDASMySQLUser, defaultDASMySQLPass)
+	log.Infof("pool: %v, error: %v", global.DASMySQLPool, err)
 	if err != nil {
 		log.Error(common.CombineMessageWithError("initRepository() failed", err))
 		return nil
 	}
 
-	return NewRepository(pool)
+	return global.DASMySQLPool
+}
+
+func initRepository() *Repository {
+	return NewRepository(global.DASMySQLPool)
 }
 
 func deleteResult() error {

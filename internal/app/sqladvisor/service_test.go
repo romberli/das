@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	defaultSoarBin    = "/Users/romber/work/source_code/go/src/github.com/romberli/das/bin"
+	defaultSoarBin    = "/Users/romber/work/source_code/go/src/github.com/romberli/das/bin/soar"
 	defaultConfigFile = "/Users/romber/work/source_code/go/src/github.com/romberli/das/config/soar.yaml"
 
 	defaultFingerprint = "select * from t_meta_db_info where create_time<?"

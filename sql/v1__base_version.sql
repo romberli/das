@@ -236,6 +236,6 @@ CREATE TABLE `t_sa_operation_info` (
   `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `last_update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '最后更新时间',
   PRIMARY KEY (`id`),
-  KEY `idx01_db_id_sql_text` (`db_id`, `sql_text`),
+  KEY `idx01_db_id_sql_text` (`db_id`, `sql_text`(500)),
   KEY `idx02_create_time` (`create_time`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'sql优化操作表';

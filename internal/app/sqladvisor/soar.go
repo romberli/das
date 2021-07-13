@@ -65,12 +65,27 @@ func (da *DefaultAdvisor) GetSQLID(sqlText string) string {
 // Advise parses the sql text and returns the tuning advice,
 // note that only the first sql statement in the sql text will be advised
 func (da *DefaultAdvisor) Advise(dbID int, sqlText string) (string, string, error) {
-	dsn, err := da.getOnlineDSN(dbID)
+	return da.adviseWithDefault(dbID, sqlText)
+}
+
+// advise parses the sql text and returns the tuning advice,
+// note that only the first sql statement in the sql text will be advised
+func (da *DefaultAdvisor) adviseWithDefault(dbID int, sqlText string) (string, string, error) {
+	user := viper.GetString(config.DBSoarMySQLUserKey)
+	pass := viper.GetString(config.DBSoarMySQLPassKey)
+
+	return da.advise(dbID, sqlText, user, pass)
+}
+
+// advise parses the sql text and returns the tuning advice,
+// note that only the first sql statement in the sql text will be advised
+func (da *DefaultAdvisor) advise(dbID int, sqlText, user, pass string) (string, string, error) {
+	dsn, err := da.getOnlineDSN(dbID, user, pass)
 	if err != nil {
-		return constant.EmptyString, constant.EmptyString, nil
+		return constant.EmptyString, constant.EmptyString, err
 	}
 
-	command := fmt.Sprintf("%s -config=%s -online-dsn=%s -query=%s", da.soarBin, da.configFile, dsn, sqlText)
+	command := fmt.Sprintf(`%s -config=%s -online-dsn=%s -query="%s"`, da.soarBin, da.configFile, dsn, sqlText)
 
 	result, err := linux.ExecuteCommand(command)
 	if err != nil {
@@ -81,7 +96,14 @@ func (da *DefaultAdvisor) Advise(dbID int, sqlText string) (string, string, erro
 }
 
 // getOnlineDSN returns the online dsn which will be used by soar
-func (da *DefaultAdvisor) getOnlineDSN(dbID int) (string, error) {
+func (da *DefaultAdvisor) getOnlineDSNWithDefault(dbID int) (string, error) {
+	user := viper.GetString(config.DBSoarMySQLUserKey)
+	pass := viper.GetString(config.DBSoarMySQLPassKey)
+
+	return da.getOnlineDSN(dbID, user, pass)
+}
+
+func (da *DefaultAdvisor) getOnlineDSN(dbID int, user, pass string) (string, error) {
 	// get db service
 	dbService := metadata.NewDBServiceWithDefault()
 	err := dbService.GetByID(dbID)
@@ -98,15 +120,21 @@ func (da *DefaultAdvisor) getOnlineDSN(dbID int) (string, error) {
 	if err != nil {
 		return constant.EmptyString, err
 	}
+
+	mysqlServers := mysqlServerService.GetMySQLServers()
+	if len(mysqlServers) == constant.ZeroInt {
+		return constant.EmptyString, errors.New(fmt.Sprintf("could not find mysql server of the database. db id: %d", dbID))
+	}
 	// get mysql server
 	mysqlServer := mysqlServerService.GetMySQLServers()[constant.ZeroInt]
-
 	hostIP := mysqlServer.GetHostIP()
 	portNum := mysqlServer.GetPortNum()
-	mysqlUser := viper.GetString(config.DBSoarMySQLUserKey)
-	mysqlPass := viper.GetString(config.DBSoarMySQLPassKey)
 
-	return fmt.Sprintf("%s:%s@%s:%d/%s", mysqlUser, mysqlPass, hostIP, portNum, dbName), nil
+	return fmt.Sprintf("%s:%s@%s:%d/%s", user, pass, hostIP, portNum, dbName), nil
+}
+
+func (da *DefaultAdvisor) getDBSoarMySQLUser() string {
+	return viper.GetString(config.DBSoarMySQLUserKey)
 }
 
 // parseResult parses result, it will split the advice information and the log information
@@ -130,12 +158,12 @@ func (da *DefaultAdvisor) parseResult(result string) (string, string, error) {
 		}
 
 		if isLogMsg {
-			message += line
+			message += line + constant.CRLFString
 			stringList := strings.Split(line, constant.SpaceString)
 			if len(stringList) >= 3 {
 				logLevel := string(stringList[2][1])
 				if logLevel == "E" || logLevel == "F" {
-					errMsg += line
+					errMsg += line + constant.CRLFString
 				}
 			}
 
