@@ -1,0 +1,19 @@
+@baseURL = 127.0.0.1:6090
+
+### sqladvisor.GetFingerprint
+GET http://{{baseURL}}/api/v1/sqladvisor/fingerprint/
+Content-Type: application/json
+
+{ "sql_text":"select * from a;" }
+
+### sqladvisor.GetSQLID
+GET http://{{baseURL}}/api/v1/sqladvisor/sql-id/
+Content-Type: application/json
+
+{ "sql_text":"select * from a;" }
+
+### sqladvisor.Advise
+POST http://{{baseURL}}/api/v1/sqladvisor/advise/1
+Content-Type: application/json
+
+{ "sql_text":"select * from a;" }

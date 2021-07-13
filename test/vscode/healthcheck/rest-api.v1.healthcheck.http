@@ -1,0 +1,37 @@
+@baseURL = 127.0.0.1:6090
+
+### healthcheck.GetResultByOperationID
+GET http://{{baseURL}}/api/v1/healthcheck/result/1
+Accept: application/json
+
+### healthcheck.Check
+POST http://{{baseURL}}/api/v1/healthcheck/check
+Content-Type: application/json
+
+{
+    "server_id": "1",
+    "start_time":"2021-05-18 12:00:00.000000",
+    "end_time":"2021-05-18 15:00:00.000000",
+    "step": "10s"
+}
+
+### healthcheck.CheckByHostInfo
+POST http://{{baseURL}}/api/v1/healthcheck/check/host-info
+Content-Type: application/json
+
+{
+    "host_ip": "192.168.10.210",
+    "port_num": "3306",
+    "start_time":"2021-05-18 12:00:00.000000",
+    "end_time":"2021-05-18 15:00:00.000000",
+    "step": "10s"
+}
+
+### healthcheck.ReviewAccurate
+POST http://{{baseURL}}/api/v1/healthcheck/review
+Content-Type: application/json
+
+{
+    "operation_id": 1,
+    "review": 1
+}

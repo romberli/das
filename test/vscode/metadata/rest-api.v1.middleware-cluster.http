@@ -1,0 +1,37 @@
+@baseURL = 127.0.0.1:6090
+
+### get all middleware cluster
+GET http://{{baseURL}}/api/v1/metadata/middleware-cluster
+Accept: application/json
+
+### get middleware cluster by env_id
+GET http://{{baseURL}}/api/v1/metadata/middleware-cluster/env/1
+Accept: application/json
+
+### get middleware cluster by id
+GET http://{{baseURL}}/api/v1/metadata/middleware-cluster/get/13
+Accept: application/json
+
+### get middleware cluster by name
+GET http://{{baseURL}}/api/v1/metadata/middleware-cluster/cluster-name/test001
+Accept: application/json
+
+### get middleware server list by cluster id
+GET http://{{baseURL}}/api/v1/metadata/middleware-cluster/middleware-server/13
+Accept: application/json
+
+### add new middleware cluster
+POST http://{{baseURL}}/api/v1/metadata/middleware-cluster
+Content-Type: application/json
+
+{"cluster_name": "rest_test", "owner_id": 1, "envid": 1}
+
+### update middleware cluster by id
+POST http://{{baseURL}}/api/v1/metadata/middleware-cluster/update/13
+Content-Type: application/json
+
+{"cluster_name": "new_test", "del_flag": 1}
+
+### delete middleware cluster by id
+POST http://{{baseURL}}/api/v1/metadata/middleware-cluster/delete/14
+Content-Type: application/json

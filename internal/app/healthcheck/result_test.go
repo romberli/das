@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	resultDBAddress = "127.0.0.1:3306"
+	resultDBAddress = "192.168.10.210:3306"
 	resultHostIP    = "127.0.0.1"
 	resultPortNum   = 3306
 	resultDBName    = "das"

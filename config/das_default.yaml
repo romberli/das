@@ -209,4 +209,4 @@ sqladvisor:
     # description: specify if enabling explain feature
     # type: bool
     # default: false
-    explain: falase
+    explain: false

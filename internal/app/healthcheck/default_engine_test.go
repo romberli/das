@@ -3,6 +3,7 @@ package healthcheck
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/jinzhu/now"
 	"github.com/romberli/das/internal/app/metadata"
@@ -17,9 +18,9 @@ import (
 
 const (
 	defaultEngineConfigAddr   = "localhost:3306"
-	defaultEngineConfigDBName = "das"
+	defaultEngineConfigDBName = "performance_schema"
 	defaultEngineConfigDBUser = "root"
-	defaultEngineConfigDBPass = "rootroot"
+	defaultEngineConfigDBPass = "root"
 
 	applicationMysqlAddr   = "192.168.10.210:3306"
 	applicationMysqlDBName = "performance_schema"
@@ -39,6 +40,11 @@ const (
 	defaultEngineConfigDelFlag                     = 0
 	defaultEngineConfigCreateTimeString            = "2021-01-21 10:00:00.000000"
 	defaultEngineConfigLastUpdateTimeString        = "2021-01-21 13:00:00.000000"
+
+	serviceID        = 1
+	serviceStartTime = "2021-01-21 10:00:00.000000"
+	serviceEndTime   = "2021-01-21 13:00:00.000000"
+	serviceStep      = 1 * time.Millisecond
 )
 
 var defaultEngineConfigRepo = initDefaultEngineConfigRepo()

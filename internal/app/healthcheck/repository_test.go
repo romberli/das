@@ -13,10 +13,10 @@ import (
 
 const (
 	// modify these connection information
-	dbAddr   = "127.0.0.1:3306"
+	dbAddr   = "192.168.10.210:3306"
 	dbDBName = "das"
 	dbDBUser = "root"
-	dbDBPass = "mysql123"
+	dbDBPass = "root"
 
 	defaultResultOperationID                  = 1
 	defaultResultWeightedAverageScore         = 1

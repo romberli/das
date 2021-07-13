@@ -77,13 +77,14 @@ const (
 	dbConfigPerformanceSchemaValid         = "ON"
 )
 
-func ByteToFloat64(bytes []byte) float64 {
+func byteToFloat64(bytes []byte) float64 {
 	bits := binary.LittleEndian.Uint64(bytes)
 	return math.Float64frombits(bits)
 }
 
 var _ healthcheck.Engine = (*DefaultEngine)(nil)
 
+// GlobalVariable encapsulates k-v pairs for global variable
 type GlobalVariable struct {
 	VariableName  string `middleware:"variable_name" json:"variable_name"`
 	VariableValue string `middleware:"variable_value" json:"variable_value"`
@@ -102,6 +103,7 @@ func NewGlobalVariable(name, value string) *GlobalVariable {
 	}
 }
 
+// DefaultItemConfig include all data for a item
 type DefaultItemConfig struct {
 	ID                          int       `middleware:"id" json:"id"`
 	ItemName                    string    `middleware:"item_name" json:"item_name"`
@@ -123,6 +125,7 @@ func NewEmptyDefaultItemConfig() *DefaultItemConfig {
 	return &DefaultItemConfig{}
 }
 
+// DefaultEngineConfig is a map of DefaultItemConfig
 type DefaultEngineConfig map[string]*DefaultItemConfig
 
 // NewEmptyDefaultEngineConfig returns a new empty *DefaultItemConfig
@@ -184,6 +187,7 @@ func (dec DefaultEngineConfig) Validate() error {
 	return nil
 }
 
+// DefaultEngine work for health check module
 type DefaultEngine struct {
 	healthcheck.Repository
 	operationInfo         *OperationInfo
@@ -210,7 +214,7 @@ func NewDefaultEngine(repo healthcheck.Repository, operationInfo *OperationInfo,
 	}
 }
 
-//
+// NewDefaultItemConfig returns new *DefaultItemConfig
 func NewDefaultItemConfig(itemName string, itemWeight int, lowWatermark float64, highWatermark float64, unit float64,
 	scoreDeductionPerUnitHigh float64, maxScoreDeductionHigh float64, scoreDeductionPerUnitMedium float64, maxScoreDeductionMedium float64) *DefaultItemConfig {
 	return &DefaultItemConfig{
@@ -955,7 +959,7 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioHigh = ByteToFloat64(jsonBytesHigh)
+	de.result.CacheMissRatioHigh = byteToFloat64(jsonBytesHigh)
 
 	// connection usage high score deduction
 	connectionUsageScoreDeductionHigh := (connectionUsageHighSum/float64(connectionUsageHighCount) - connectionUsageConfig.HighWatermark) / connectionUsageConfig.Unit * connectionUsageConfig.ScoreDeductionPerUnitHigh
@@ -1141,13 +1145,13 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioData = ByteToFloat64(jsonBytesTotal)
+	de.result.CacheMissRatioData = byteToFloat64(jsonBytesTotal)
 	// cache miss ratio high
 	jsonBytesHigh, err := json.Marshal(cacheMissRatioHigh)
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioHigh = ByteToFloat64(jsonBytesHigh)
+	de.result.CacheMissRatioHigh = byteToFloat64(jsonBytesHigh)
 
 	// cache miss ratio high score deduction
 	cacheMissRatioScoreDeductionHigh := (cacheMissRatioHighSum/float64(cacheMissRatioHighCount) - cacheMissRatioConfig.HighWatermark) / cacheMissRatioConfig.Unit * cacheMissRatioConfig.ScoreDeductionPerUnitHigh

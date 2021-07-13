@@ -1,0 +1,45 @@
+@baseURL = 127.0.0.1:6090
+
+### get all databases
+GET http://{{baseURL}}/api/v1/metadata/db
+Accept: application/json
+
+### get all databases by env_id
+GET http://{{baseURL}}/api/v1/metadata/db/env/2
+Accept: application/json
+
+### get database by id
+GET http://{{baseURL}}/api/v1/metadata/db/get/1
+Accept: application/json
+
+### get all apps by id
+GET http://{{baseURL}}/api/v1/metadata/db/apps/1
+Accept: application/json
+
+### add new database
+POST http://{{baseURL}}/api/v1/metadata/db
+Content-Type: application/json
+
+{"db_name": "db1", "cluster_id": 8, "cluster_type": 1, "env_id": 2}
+
+### update database by id
+POST http://{{baseURL}}/api/v1/metadata/db/update/1
+Content-Type: application/json
+
+{"db_name": "db2", "del_flag": 1}
+
+### delete database by id
+POST http://{{baseURL}}/api/v1/metadata/db/delete/10
+Content-Type: application/json
+
+### add new app by id
+POST http://{{baseURL}}/api/v1/metadata/db/add-app/1
+Content-Type: application/json
+
+{"app_id": 4}
+
+### delete app by id
+POST http://{{baseURL}}/api/v1/metadata/db/delete-app/1
+Content-Type: application/json
+
+{"app_id": 4}

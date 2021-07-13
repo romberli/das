@@ -1,44 +1,46 @@
+@baseURL = 127.0.0.1:6090
+
 ### metadata.GetApp
-GET http://127.0.0.1:6090/api/v1/metadata/app 
+GET http://{{baseURL}}/api/v1/metadata/app 
 Accept: application/json
 
 ### metadata.GetAppByID
-GET http://127.0.0.1:6090/api/v1/metadata/app/get/1 
+GET http://{{baseURL}}/api/v1/metadata/app/get/1 
 Accept: application/json
 
 {"system_name": "1", "del_flag":0}
 
 ### metadata.GetAppByName
-GET http://127.0.0.1:6090/api/v1/metadata/app/app-name/test 
+GET http://{{baseURL}}/api/v1/metadata/app/app-name/test 
 Accept: application/json
 
 ### metadata.GetDBIDList !!!
-GET http://127.0.0.1:6090/api/v1/metadata/app/dbs/17
+GET http://{{baseURL}}/api/v1/metadata/app/dbs/17
 Accept: application/json
 
 ### metadata.AddApp
-POST http://127.0.0.1:6090/api/v1/metadata/app 
+POST http://{{baseURL}}/api/v1/metadata/app 
 Content-Type: application/json
 
 {"app_name": "tese","level":1,"owner_id":1,"id": 1}
 
 ### metadata.UpdateAppByID
-POST http://127.0.0.1:6090/api/v1/metadata/app/update/6 
+POST http://{{baseURL}}/api/v1/metadata/app/update/6 
 Content-Type: application/json
 
 {"app_name": "tes13123","level":1,"owner_id":1}
 
 ### metadata.DeleteAppByID
-POST http://127.0.0.1:6090/api/v1/metadata/app/delete/14 
+POST http://{{baseURL}}/api/v1/metadata/app/delete/14 
 
 ### metadata.AppAddDB
-POST http://127.0.0.1:6090/api/v1/metadata/app/add-db/17
+POST http://{{baseURL}}/api/v1/metadata/app/add-db/17
 Content-Type: application/json
 
 {"db_id":9}
 
 ### metadata.AppDeleteDB
-POST http://127.0.0.1:6090/api/v1/metadata/app/delete-db/17
+POST http://{{baseURL}}/api/v1/metadata/app/delete-db/17
 Content-Type: application/json
 
 {"db_id":9}

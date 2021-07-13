@@ -8,6 +8,7 @@ import (
 	"github.com/romberli/go-util/constant"
 )
 
+// Result include all data needed in healthcheck
 type Result struct {
 	healthcheck.Repository
 	ID                           int       `middleware:"id" json:"id"`
@@ -138,7 +139,7 @@ func NewResultWithDefault(operationID int, weightedAverageScore int, dbConfigSco
 	}
 }
 
-// NewEmptyDBInfoWithRepo return a new DBInfo
+// NewEmptyResult return a empty Result
 func NewEmptyResult() *Result {
 	return &Result{}
 }
