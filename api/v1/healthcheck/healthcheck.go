@@ -88,6 +88,7 @@ func Check(c *gin.Context) {
 	mysqlServerID, err := strconv.Atoi(mysqlServerIDStr)
 	if err != nil {
 		resp.ResponseNOK(c, msghealth.ErrHealthcheckCheck, err.Error())
+		return
 	}
 	startTimeStr, startTimeExists := dataMap[startTimeJSON]
 	if !startTimeExists {
@@ -97,6 +98,7 @@ func Check(c *gin.Context) {
 	startTime, err := time.ParseInLocation(constant.TimeLayoutSecond, startTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, startTimeStr)
+		return
 	}
 	endTimeStr, endTimeExists := dataMap[endTimeJSON]
 	if !endTimeExists {
@@ -106,6 +108,7 @@ func Check(c *gin.Context) {
 	endTime, err := time.ParseInLocation(constant.TimeLayoutSecond, endTimeStr, time.Local)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeLayout, endTimeStr)
+		return
 	}
 	stepStr, stepExists := dataMap[stepJSON]
 	if !stepExists {
@@ -115,6 +118,7 @@ func Check(c *gin.Context) {
 	step, err := time.ParseDuration(stepStr)
 	if err != nil {
 		resp.ResponseNOK(c, message.ErrNotValidTimeDuration, step)
+		return
 	}
 	// init service
 	s := healthcheck.NewServiceWithDefault()
