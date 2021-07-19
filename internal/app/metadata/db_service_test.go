@@ -15,6 +15,7 @@ func TestDBServiceAll(t *testing.T) {
 	TestDBService_GetAll(t)
 	TestDBService_GetByEnv(t)
 	TestDBService_GetByID(t)
+	TestDBService_GetByNameAndClusterInfo(t)
 	TestDBService_GetAppIDList(t)
 	TestDBService_Create(t)
 	TestDBService_Update(t)
@@ -77,6 +78,21 @@ func TestDBService_GetByID(t *testing.T) {
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	s := NewDBService(dbRepo)
 	err = s.GetByID(entity.Identity())
+	asst.Nil(err, "test GetByID() failed")
+	dbName := s.DBs[constant.ZeroInt].GetDBName()
+	asst.Equal(defaultDBInfoDBName, dbName, "test GetByID() failed")
+	// delete
+	err = deleteDBByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
+}
+
+func TestDBService_GetByNameAndClusterInfo(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := createDB()
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
+	s := NewDBService(dbRepo)
+	err = s.GetByNameAndClusterInfo(entity.GetDBName(), entity.GetClusterID(), entity.GetClusterType())
 	asst.Nil(err, "test GetByID() failed")
 	dbName := s.DBs[constant.ZeroInt].GetDBName()
 	asst.Equal(defaultDBInfoDBName, dbName, "test GetByID() failed")

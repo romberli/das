@@ -54,6 +54,7 @@ func TestDBRepoAll(t *testing.T) {
 	TestDBRepo_GetAll(t)
 	TestDBRepo_GetByEnv(t)
 	TestDBRepo_GetByID(t)
+	TestDBRepo_GetByNameAndClusterInfo(t)
 	TestDBRepo_GetAppIDList(t)
 	TestDBRepo_Create(t)
 	TestDBRepo_Update(t)
@@ -141,6 +142,21 @@ func TestDBRepo_GetByID(t *testing.T) {
 	entity, err := createDB()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	db, err := dbRepo.GetByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
+	dbName := db.GetDBName()
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
+	asst.Equal(defaultDBInfoDBName, dbName, "test GetByID() failed")
+	// delete
+	err = deleteDBByID(entity.Identity())
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
+}
+
+func TestDBRepo_GetByNameAndClusterInfo(t *testing.T) {
+	asst := assert.New(t)
+
+	entity, err := createDB()
+	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
+	db, err := dbRepo.GetByNameAndClusterInfo(entity.GetDBName(), entity.GetClusterID(), entity.GetClusterType())
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
 	dbName := db.GetDBName()
 	asst.Nil(err, common.CombineMessageWithError("test GetByID() failed", err))
