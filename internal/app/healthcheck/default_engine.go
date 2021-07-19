@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -11,10 +12,13 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
+	"github.com/romberli/das/internal/app/metadata"
+	"github.com/romberli/das/internal/app/sqladvisor"
 	"github.com/romberli/das/internal/dependency/healthcheck"
 	"github.com/romberli/das/pkg/message"
 	msghc "github.com/romberli/das/pkg/message/healthcheck"
 	"github.com/romberli/go-util/constant"
+	"github.com/romberli/go-util/middleware"
 	"github.com/romberli/go-util/middleware/clickhouse"
 	"github.com/romberli/go-util/middleware/mysql"
 	"github.com/romberli/go-util/middleware/prometheus"
@@ -35,8 +39,9 @@ const (
 	defaultCacheMissRatioItemName          = "cache_miss_ratio"
 	defaultTableRowsItemName               = "table_rows"
 	defaultTableSizeItemName               = "table_size"
-	defaultSlowQueryExecutionTimeItemName  = "slow_query_execution_time"
 	defaultSlowQueryRowsExaminedItemName   = "slow_query_rows_examined"
+	defaultSlowQueryTopSQLNum              = 3
+	defaultClusterType                     = 1
 
 	dbConfigMaxUserConnection         = "max_user_connection"
 	dbConfigLogBin                    = "log_bin"
@@ -185,6 +190,17 @@ func (dec DefaultEngineConfig) Validate() error {
 		return message.NewMessage(msghc.ErrItemWeightPercentInvalid)
 	}
 	return nil
+}
+
+type SlowQuery struct {
+	SQLID           string  `middleware:"sql_id" json:"sql_id"`
+	Fingerprint     string  `middleware:"fingerprint" json:"fingerprint"`
+	Example         string  `middleware:"example" json:"example"`
+	DBName          string  `middleware:"db_name" json:"db_name"`
+	ExecCount       int     `middleware:"exec_count" json:"exec_count"`
+	TotalExecTime   float64 `middleware:"total_exec_time" json:"total_exec_time"`
+	AvgExecTime     float64 `middleware:"avg_exec_time" json:"avg_exec_time"`
+	RowsExaminedMax int     `middleware:"rows_examined_max" json:"rows_examined_max"`
 }
 
 // DefaultEngine work for health check module
@@ -1255,147 +1271,154 @@ func (de *DefaultEngine) checkTableSize() error {
 }
 
 // checkSlowQuery checks slow query
-// TODO
 func (de *DefaultEngine) checkSlowQuery() error {
 	// check slow query execution time
-	// get data
+	var (
+		sql    string
+		result middleware.Result
+		err    error
+	)
+
 	serviceName := de.operationInfo.MySQLServer.GetServiceName()
-	query := fmt.Sprintf(`
-		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
-		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or
-		(clamp_max(irate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[5m]),1)) ))*100 or
-		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
-		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
-	`, serviceName, serviceName, serviceName, serviceName)
-	result, err := de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
-	if err != nil {
-		return err
-	}
-
-	// analyze result
-	length := result.RowNumber()
-	if length == constant.ZeroInt {
-		return nil
-	}
-
-	slowQueryExecutionTimeConfig := de.getItemConfig(defaultSlowQueryExecutionTimeItemName)
-
-	var (
-		slowQueryExecutionTime            float64
-		slowQueryExecutionTimeHighSum     float64
-		slowQueryExecutionTimeHighCount   int
-		slowQueryExecutionTimeMediumSum   float64
-		slowQueryExecutionTimeMediumCount int
-
-		slowQueryExecutionTimeHigh [][]driver.Value
-	)
-
-	for i, rowData := range result.Rows.Values {
-		slowQueryExecutionTime, err = result.GetFloat(i, constant.ZeroInt)
-		if err != nil {
-			return err
-		}
-
-		switch {
-		case slowQueryExecutionTime >= slowQueryExecutionTimeConfig.HighWatermark:
-			slowQueryExecutionTimeHigh = append(slowQueryExecutionTimeHigh, rowData)
-			slowQueryExecutionTimeHighSum += slowQueryExecutionTime
-			slowQueryExecutionTimeHighCount++
-		case slowQueryExecutionTime >= slowQueryExecutionTimeConfig.LowWatermark:
-			slowQueryExecutionTimeMediumSum += slowQueryExecutionTime
-			slowQueryExecutionTimeMediumCount++
-		}
-	}
-
-	// slow query execution time high score deduction
-	slowQueryExecutionTimeScoreDeductionHigh := (slowQueryExecutionTimeHighSum/float64(slowQueryExecutionTimeHighCount) - slowQueryExecutionTimeConfig.HighWatermark) / slowQueryExecutionTimeConfig.Unit * slowQueryExecutionTimeConfig.ScoreDeductionPerUnitHigh
-	if slowQueryExecutionTimeScoreDeductionHigh > slowQueryExecutionTimeConfig.MaxScoreDeductionHigh {
-		slowQueryExecutionTimeScoreDeductionHigh = slowQueryExecutionTimeConfig.MaxScoreDeductionHigh
-	}
-	// slow query execution time medium score deduction
-	slowQueryExecutionTimeScoreDeductionMedium := (slowQueryExecutionTimeMediumSum/float64(slowQueryExecutionTimeMediumCount) - slowQueryExecutionTimeConfig.LowWatermark) / slowQueryExecutionTimeConfig.Unit * slowQueryExecutionTimeConfig.ScoreDeductionPerUnitMedium
-	if slowQueryExecutionTimeScoreDeductionMedium > slowQueryExecutionTimeConfig.MaxScoreDeductionMedium {
-		slowQueryExecutionTimeScoreDeductionMedium = slowQueryExecutionTimeConfig.MaxScoreDeductionMedium
-	}
-
-	// check slow query rows examined
-	// TODO
-	query = fmt.Sprintf(`
-		sum(avg by (node_name,mode) (clamp_max(((avg by (mode,node_name) ((
-		clamp_max(rate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[20s]),1)) or
-		(clamp_max(irate(node_cpu_seconds_total{node_name=~"%s",mode!="idle"}[5m]),1)) ))*100 or
-		(avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[20s]) or
-		avg_over_time(node_cpu_average{node_name=~"%s", mode!="total", mode!="idle"}[5m]))),100)))
-	`, serviceName, serviceName, serviceName, serviceName)
-	result, err = de.monitorPrometheusConn.Execute(query, de.operationInfo.StartTime, de.operationInfo.EndTime, de.operationInfo.Step)
-	if err != nil {
-		return err
-	}
-
-	// analyze result
-	length = result.RowNumber()
-	if length == constant.ZeroInt {
-		return nil
-	}
-
 	slowQueryRowsExaminedConfig := de.getItemConfig(defaultSlowQueryRowsExaminedItemName)
+	pmmVersion := de.getPMMVersion()
+
+	switch pmmVersion {
+	case 1:
+		sql = `
+			select qc.checksum as sql_id,
+				   qc.fingerprint,
+				   qe.query    as example,
+				   qe.db       as db_name,
+				   m.exec_count,
+				   m.total_exec_time,
+				   m.avg_exec_time,
+				   m.rows_examined_max
+			from (
+					 select qcm.query_class_id,
+							sum(qcm.query_count)                                        as exec_count,
+							truncate(sum(qcm.query_time_sum), 2)                        as total_exec_time,
+							truncate(sum(qcm.query_time_sum) / sum(qcm.query_count), 2) as avg_exec_time,
+							qcm.rows_examined_max
+					 from query_class_metrics qcm
+							  inner join instances i on qcm.instance_id = i.instance_id
+					 where i.name = ?
+					   and qcm.start_ts >= ?
+					   and qcm.start_ts < ?
+					   and qcm.rows_examined_max >= ?
+					 group by query_class_id
+					 order by rows_examined_max desc) m
+					 inner join query_examples qe on m.query_class_id = qe.query_class_id
+					 inner join query_classes qc on m.query_class_id = qc.query_class_id
+			;
+		`
+		result, err = de.monitorMySQLConn.Execute(sql, serviceName, de.operationInfo.StartTime, de.operationInfo.EndTime, slowQueryRowsExaminedConfig.LowWatermark)
+	case 2:
+		sql = `
+			select queryid                                                       as sql_id,
+				   fingerprint,
+				   (select example from metrics where queryid = queryid limit 1) as example,
+				   database                                                      as db_name,
+				   sum(num_queries)                                              as exec_count,
+				   truncate(sum(m_query_time_sum), 2)                            as total_exec_time,
+				   truncate(sum(m_query_time_sum) / sum(num_queries), 2)         as avg_exec_time,
+				   max(m_rows_examined_max)                                      as rows_examined_max
+			from metrics
+			where service_type = 'mysql'
+			  and service_name = ?
+			  and period_start >= ?
+			  and period_start < ?
+			  and m_rows_examined_max >= ?
+			group by queryid, fingerprint
+			order by rows_examined_max desc;
+		`
+		result, err = de.monitorClickhouseConn.Execute(sql, serviceName, de.operationInfo.StartTime, de.operationInfo.EndTime, slowQueryRowsExaminedConfig.LowWatermark)
+	default:
+		return errors.New(fmt.Sprintf("pmm version should be 1 or 2, %d is not valid", pmmVersion))
+	}
+	if err != nil {
+		return err
+	}
 
 	var (
-		slowQueryRowsExamined            float64
-		slowQueryRowsExaminedHighSum     float64
+		slowQueries                      []*SlowQuery
+		topSQLList                       []*SlowQuery
+		slowQueryRowsExaminedHighSum     int
 		slowQueryRowsExaminedHighCount   int
-		slowQueryRowsExaminedMediumSum   float64
+		slowQueryRowsExaminedMediumSum   int
 		slowQueryRowsExaminedMediumCount int
-
-		slowQueryRowsExaminedHigh [][]driver.Value
 	)
 
-	for i, rowData := range result.Rows.Values {
-		slowQueryRowsExamined, err = result.GetFloat(i, constant.ZeroInt)
+	err = result.MapToStructSlice(slowQueries, constant.DefaultMiddlewareTag)
+	if err != nil {
+		return err
+	}
+	// slow query data
+	jsonBytesRowsExamined, err := json.Marshal(slowQueries)
+	if err != nil {
+		return err
+	}
+	de.result.SlowQueryData = string(jsonBytesRowsExamined)
+
+	for i, slowQuery := range slowQueries {
+		if i < defaultSlowQueryTopSQLNum {
+			topSQLList = append(topSQLList, slowQuery)
+		}
+
+		if slowQuery.RowsExaminedMax >= int(slowQueryRowsExaminedConfig.HighWatermark) {
+			// slow query rows examined high
+			slowQueryRowsExaminedHighSum += slowQuery.RowsExaminedMax
+			slowQueryRowsExaminedHighCount++
+			continue
+		}
+		// slow query rows examined medium
+		slowQueryRowsExaminedMediumSum += slowQuery.RowsExaminedMax
+		slowQueryRowsExaminedMediumCount++
+	}
+	// slow query rows examined high score
+	slowQueryRowsExaminedHighScore := (float64(slowQueryRowsExaminedHighSum)/float64(slowQueryRowsExaminedHighCount) - slowQueryRowsExaminedConfig.HighWatermark) / slowQueryRowsExaminedConfig.Unit * slowQueryRowsExaminedConfig.ScoreDeductionPerUnitHigh
+	if slowQueryRowsExaminedHighScore > slowQueryRowsExaminedConfig.MaxScoreDeductionHigh {
+		slowQueryRowsExaminedHighScore = slowQueryRowsExaminedConfig.MaxScoreDeductionHigh
+	}
+	// slow query rows examined medium score
+	slowQueryRowsExaminedMediumScore := (float64(slowQueryRowsExaminedMediumSum)/float64(slowQueryRowsExaminedMediumCount) - slowQueryRowsExaminedConfig.LowWatermark) / slowQueryRowsExaminedConfig.Unit * slowQueryRowsExaminedConfig.ScoreDeductionPerUnitMedium
+	if slowQueryRowsExaminedMediumScore > slowQueryRowsExaminedConfig.MaxScoreDeductionMedium {
+		slowQueryRowsExaminedMediumScore = slowQueryRowsExaminedConfig.MaxScoreDeductionMedium
+	}
+	// slow query score
+	de.result.SlowQueryScore = int(defaultMaxScore - slowQueryRowsExaminedHighScore - slowQueryRowsExaminedMediumScore)
+	if de.result.SlowQueryScore < defaultMinScore {
+		de.result.SlowQueryScore = defaultMinScore
+	}
+
+	// sql tuning
+	clusterID := de.operationInfo.MySQLServer.GetClusterID()
+	// init db service
+	dbService := metadata.NewDBServiceWithDefault()
+	for _, sql := range topSQLList {
+		// get db info
+		err = dbService.GetByNameAndClusterInfo(sql.DBName, clusterID, defaultClusterType)
+		if err != nil {
+			return err
+		}
+		if len(dbService.GetDBs()) == constant.ZeroInt {
+			return errors.New(fmt.Sprintf("could not find db info. db_name: %s, cluster_id: %d, cluster_type: %d",
+				sql.DBName, clusterID, defaultClusterType))
+		}
+		// get db id
+		dbID := dbService.GetDBs()[constant.ZeroInt].Identity()
+		// init sql advisor service
+		advisorService := sqladvisor.NewServiceWithDefault()
+		// get advice
+		advice, err := advisorService.Advise(dbID, sql.Example)
 		if err != nil {
 			return err
 		}
 
-		switch {
-		case slowQueryRowsExamined >= slowQueryRowsExaminedConfig.HighWatermark:
-			slowQueryRowsExaminedHigh = append(slowQueryRowsExaminedHigh, rowData)
-			slowQueryRowsExaminedHighSum += slowQueryRowsExamined
-			slowQueryRowsExaminedHighCount++
-		case slowQueryRowsExamined >= slowQueryRowsExaminedConfig.LowWatermark:
-			slowQueryRowsExaminedMediumSum += slowQueryRowsExamined
-			slowQueryRowsExaminedMediumCount++
-		}
+		de.result.SlowQueryAdvice += advice + constant.CommaString
 	}
 
-	// slow query rows examined data
-	jsonBytesTotal, err := json.Marshal(result.Rows.Values)
-	if err != nil {
-		return nil
-	}
-	de.result.SlowQueryData = string(jsonBytesTotal)
-	// slow query rows examined high
-	jsonBytesHigh, err := json.Marshal(slowQueryRowsExaminedHigh)
-	if err != nil {
-		return nil
-	}
-	de.result.SlowQueryAdvice = string(jsonBytesHigh)
-
-	// slow query rows examined high score deduction
-	slowQueryRowsExaminedScoreDeductionHigh := (slowQueryRowsExaminedHighSum/float64(slowQueryRowsExaminedHighCount) - slowQueryRowsExaminedConfig.HighWatermark) / slowQueryRowsExaminedConfig.Unit * slowQueryRowsExaminedConfig.ScoreDeductionPerUnitHigh
-	if slowQueryRowsExaminedScoreDeductionHigh > slowQueryRowsExaminedConfig.MaxScoreDeductionHigh {
-		slowQueryRowsExaminedScoreDeductionHigh = slowQueryRowsExaminedConfig.MaxScoreDeductionHigh
-	}
-	// slow query rows examined medium score deduction
-	slowQueryRowsExaminedScoreDeductionMedium := (slowQueryRowsExaminedMediumSum/float64(slowQueryRowsExaminedMediumCount) - slowQueryRowsExaminedConfig.LowWatermark) / slowQueryRowsExaminedConfig.Unit * slowQueryRowsExaminedConfig.ScoreDeductionPerUnitMedium
-	if slowQueryRowsExaminedScoreDeductionMedium > slowQueryRowsExaminedConfig.MaxScoreDeductionMedium {
-		slowQueryRowsExaminedScoreDeductionMedium = slowQueryRowsExaminedConfig.MaxScoreDeductionMedium
-	}
-
-	// slow query score
-	de.result.SlowQueryScore = int(defaultMaxScore - slowQueryExecutionTimeScoreDeductionHigh - slowQueryExecutionTimeScoreDeductionMedium - slowQueryRowsExaminedScoreDeductionHigh - slowQueryRowsExaminedScoreDeductionMedium)
-	if de.result.SlowQueryScore < constant.ZeroInt {
-		de.result.SlowQueryScore = constant.ZeroInt
-	}
+	strings.Trim(de.result.SlowQueryAdvice, constant.CommaString)
 
 	return nil
 }
@@ -1410,7 +1433,7 @@ func (de *DefaultEngine) summarize() {
 		de.result.AverageActiveSessionNumScore*de.getItemConfig(defaultAverageActiveSessionNumItemName).ItemWeight +
 		de.result.CacheMissRatioScore*de.getItemConfig(defaultCacheMissRatioItemName).ItemWeight +
 		de.result.TableSizeScore*(de.getItemConfig(defaultTableRowsItemName).ItemWeight+de.getItemConfig(defaultTableSizeItemName).ItemWeight) +
-		de.result.SlowQueryScore*(de.getItemConfig(defaultSlowQueryExecutionTimeItemName).ItemWeight+de.getItemConfig(defaultSlowQueryRowsExaminedItemName).ItemWeight)) /
+		de.result.SlowQueryScore*(de.getItemConfig(defaultSlowQueryRowsExaminedItemName).ItemWeight)) /
 		constant.MaxPercentage
 
 	if de.result.WeightedAverageScore < defaultMinScore {

@@ -148,6 +148,38 @@ func (dr *DBRepo) GetByID(id int) (metadata.DB, error) {
 	}
 }
 
+// GetByNameAndClusterInfo gets a database by the db name and cluster info from the middleware
+func (dr *DBRepo) GetByNameAndClusterInfo(name string, clusterID, clusterType int) (metadata.DB, error) {
+	sql := `
+		select id, db_name, cluster_id, cluster_type, owner_id, env_id, del_flag, create_time, last_update_time
+		from t_meta_db_info
+		where del_flag = 0
+		and db_name = ?
+		and cluster_id = ?
+		and cluster_type = ?;
+	`
+	log.Debugf("metadata DBRepo.GetByNameAndClusterInfo() sql: \n%s\nplaceholders: %s, %d, %d", sql, name, clusterID, clusterType)
+	result, err := dr.Execute(sql, name, clusterID, clusterType)
+	if err != nil {
+		return nil, err
+	}
+	switch result.RowNumber() {
+	case 0:
+		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByNameAndClusterInfo(): data does not exists, db name: %s, cluster id: %d, cluster type: %d", name, clusterID, clusterType))
+	case 1:
+		dbInfo := NewEmptyDBInfoWithRepo(dr)
+		// map to struct
+		err = result.MapToStructByRowIndex(dbInfo, constant.ZeroInt, constant.DefaultMiddlewareTag)
+		if err != nil {
+			return nil, err
+		}
+
+		return dbInfo, nil
+	default:
+		return nil, errors.New(fmt.Sprintf("metadata DBInfo.GetByNameAndClusterInfo(): duplicate entry exists, db name: %s, cluster id: %d, cluster type: %d", name, clusterID, clusterType))
+	}
+}
+
 // GetID gets the identity with given database name, cluster id and cluster type from the middleware
 func (dr *DBRepo) GetID(dbName string, clusterID int, clusterType int) (int, error) {
 	sql := `select id from t_meta_db_info where del_flag = 0 and db_name = ? and cluster_id = ? and cluster_type = ?;`

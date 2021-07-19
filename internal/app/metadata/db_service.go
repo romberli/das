@@ -62,7 +62,19 @@ func (ds *DBService) GetByID(id int) error {
 
 	ds.DBs = append(ds.DBs, db)
 
-	return err
+	return nil
+}
+
+// GetByNameAndClusterInfo gets an database of the given db name and cluster info from the middleware
+func (ds *DBService) GetByNameAndClusterInfo(name string, clusterID, clusterType int) error {
+	db, err := ds.DBRepo.GetByNameAndClusterInfo(name, clusterID, clusterType)
+	if err != nil {
+		return err
+	}
+
+	ds.DBs = append(ds.DBs, db)
+
+	return nil
 }
 
 // GetAppIDList gets an app identity list that uses this db

@@ -18,9 +18,12 @@ import (
 )
 
 const (
-	dbIDJSON    = "id"
-	dbEnvIDJSON = "env_id"
-	dbAppIDJSON = "app_id"
+	dbIDJSON          = "id"
+	dbEnvIDJSON       = "env_id"
+	dbAppIDJSON       = "app_id"
+	dbDBNameJSON      = "db_name"
+	dbClusterIDJSON   = "cluster_id"
+	dbClusterTypeJSON = "cluster_type"
 
 	dbDBNameStruct      = "DBName"
 	dbClusterIDStruct   = "ClusterID"
@@ -129,6 +132,45 @@ func GetDBByID(c *gin.Context) {
 	jsonStr := string(jsonBytes)
 	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetDBByID, jsonStr).Error())
 	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetDBByID, id)
+}
+
+// @Tags database
+// @Summary get database by db name and cluster info
+// @Produce  application/json
+// @Success 200 {string} string "{"code": 200, "data": [{"id": 1, "db_name": "db1", "cluster_id": 1, "cluster_type": 1, "owner_id": 1, "env_id": 1, "del_flag": 0, "create_time": "2021-01-22T09:59:21.379851+08:00", "last_update_time": "2021-01-22T09:59:21.379851+08:00"}]}"
+// @Router /api/v1/metadata/db/name-and-cluster-info[get]
+func GetDBByNameAndClusterInfo(c *gin.Context) {
+	var dbInfo *metadata.DBInfo
+	// get data
+	data, err := c.GetRawData()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrGetRawData, err.Error())
+		return
+	}
+	// unmarshal data
+	err = json.Unmarshal(data, dbInfo)
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrUnmarshalRawData, err.Error())
+		return
+	}
+	// init service
+	s := metadata.NewDBServiceWithDefault()
+	// get entity
+	err = s.GetByNameAndClusterInfo(dbInfo.DBName, dbInfo.ClusterID, dbInfo.ClusterType)
+	if err != nil {
+		resp.ResponseNOK(c, msgmeta.ErrMetadataGetDBByNameAndClusterInfo, dbInfo.DBName, dbInfo.ClusterID, dbInfo.ClusterType, err.Error())
+		return
+	}
+	// marshal service
+	jsonBytes, err := s.Marshal()
+	if err != nil {
+		resp.ResponseNOK(c, message.ErrMarshalData, err.Error())
+		return
+	}
+	// response
+	jsonStr := string(jsonBytes)
+	log.Debug(message.NewMessage(msgmeta.DebugMetadataGetDBByNameAndClusterInfo, jsonStr).Error())
+	resp.ResponseOK(c, jsonStr, msgmeta.InfoMetadataGetDBByNameAndClusterInfo, dbInfo.DBName, dbInfo.ClusterID, dbInfo.ClusterType, err.Error())
 }
 
 // @Tags db

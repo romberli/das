@@ -52,6 +52,8 @@ type DBRepo interface {
 	GetByEnv(envID int) ([]DB, error)
 	// GetByID gets a database by the identity from the middleware
 	GetByID(id int) (DB, error)
+	// GetByNameAndClusterInfo gets a database by the db name and cluster info from the middleware
+	GetByNameAndClusterInfo(name string, clusterID, clusterType int) (DB, error)
 	// GetID gets the identity with given database name, cluster id and cluster type from the middleware
 	GetID(dbName string, clusterID int, clusterType int) (int, error)
 	// GetAppIDList gets an app identity list that uses this db
@@ -77,6 +79,8 @@ type DBService interface {
 	GetByEnv(envID int) error
 	// GetByID gets a database of the given id from the middleware
 	GetByID(id int) error
+	// GetByNameAndClusterInfo gets an database of the given db name and cluster info from the middleware
+	GetByNameAndClusterInfo(name string, clusterID, clusterType int) error
 	// GetAppIDList gets an app identity list that uses this db
 	GetAppIDList(id int) error
 	// Create creates a database in the middleware
