@@ -2,11 +2,9 @@ package healthcheck
 
 import (
 	"database/sql/driver"
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -81,11 +79,6 @@ const (
 	dbConfigSlowQueryLogValid              = "ON"
 	dbConfigPerformanceSchemaValid         = "ON"
 )
-
-func byteToFloat64(bytes []byte) float64 {
-	bits := binary.LittleEndian.Uint64(bytes)
-	return math.Float64frombits(bits)
-}
 
 var _ healthcheck.Engine = (*DefaultEngine)(nil)
 
@@ -975,7 +968,7 @@ func (de *DefaultEngine) checkConnectionUsage() error {
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioHigh = byteToFloat64(jsonBytesHigh)
+	de.result.ConnectionUsageHigh = string(jsonBytesHigh)
 
 	// connection usage high score deduction
 	connectionUsageScoreDeductionHigh := (connectionUsageHighSum/float64(connectionUsageHighCount) - connectionUsageConfig.HighWatermark) / connectionUsageConfig.Unit * connectionUsageConfig.ScoreDeductionPerUnitHigh
@@ -1098,13 +1091,11 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	switch de.getPMMVersion() {
 	case 1:
 		query = fmt.Sprintf(`
-		1- (rate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[$interval]) or 
-		irate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[5m]))/
-		((rate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[$interval]) or 
-		irate(mysql_global_status_table_open_cache_hits{instance=~"%s"}[5m]))+
-		(rate(mysql_global_status_table_open_cache_misses{instance=~"%s"}[$interval]) or 
-		irate(mysql_global_status_table_open_cache_misses{instance=~"%s"}[5m])))
-	`, serviceName, serviceName, serviceName, serviceName, serviceName, serviceName)
+		rate(mysql_global_status_innodb_pages_read{instance=~"%s"}[5m]) or 
+		irate(mysql_global_status_innodb_pages_read{instance=~"%s"}[5m])/
+		rate(mysql_global_status_innodb_buffer_pool_read_requests{instance=~"%s"}[5m]) or 
+		irate(mysql_global_status_innodb_buffer_pool_read_requests{instance=~"%s"}[5m])
+	`, serviceName, serviceName, serviceName, serviceName)
 	case 2:
 		query = fmt.Sprintf(`
 		clamp_max((1 - avg by (service_name)(rate(mysql_global_status_table_open_cache_hits{service_name=~"%s"}[5m]) or 
@@ -1161,13 +1152,13 @@ func (de *DefaultEngine) checkCacheMissRatio() error {
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioData = byteToFloat64(jsonBytesTotal)
+	de.result.CacheMissRatioData = string(jsonBytesTotal)
 	// cache miss ratio high
 	jsonBytesHigh, err := json.Marshal(cacheMissRatioHigh)
 	if err != nil {
 		return nil
 	}
-	de.result.CacheMissRatioHigh = byteToFloat64(jsonBytesHigh)
+	de.result.CacheMissRatioHigh = string(jsonBytesHigh)
 
 	// cache miss ratio high score deduction
 	cacheMissRatioScoreDeductionHigh := (cacheMissRatioHighSum/float64(cacheMissRatioHighCount) - cacheMissRatioConfig.HighWatermark) / cacheMissRatioConfig.Unit * cacheMissRatioConfig.ScoreDeductionPerUnitHigh

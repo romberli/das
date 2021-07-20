@@ -33,8 +33,8 @@ type Result struct {
 	AverageActiveSessionNumData  string    `middleware:"average_active_session_num_data" json:"average_active_session_num_data"`
 	AverageActiveSessionNumHigh  string    `middleware:"average_active_session_num_high" json:"average_active_session_num_high"`
 	CacheMissRatioScore          int       `middleware:"cache_miss_ratio_score" json:"cache_miss_ratio_score"`
-	CacheMissRatioData           float64   `middleware:"cache_miss_ratio_data" json:"cache_miss_ratio_data"`
-	CacheMissRatioHigh           float64   `middleware:"cache_miss_ratio_high" json:"cache_miss_ratio_high"`
+	CacheMissRatioData           string    `middleware:"cache_miss_ratio_data" json:"cache_miss_ratio_data"`
+	CacheMissRatioHigh           string    `middleware:"cache_miss_ratio_high" json:"cache_miss_ratio_high"`
 	TableSizeScore               int       `middleware:"table_size_score" json:"table_size_score"`
 	TableSizeData                string    `middleware:"table_size_data" json:"table_size_data"`
 	TableSizeHigh                string    `middleware:"table_size_high" json:"table_size_high"`
@@ -53,7 +53,7 @@ func NewResult(repo healthcheck.Repository, operationID int, weightedAverageScor
 	diskCapacityUsageScore int, diskCapacityUsageData string, diskCapacityUsageHigh string,
 	connectionUsageScore int, connectionUsageData string, connectionUsageHigh string,
 	averageActiveSessionNumScore int, averageActiveSessionNumData string, averageActiveSessionNumHigh string,
-	cacheMissRatioScore int, cacheMissRatioData float64, cacheMissRatioHigh float64,
+	cacheMissRatioScore int, cacheMissRatioData string, cacheMissRatioHigh string,
 	tableSizeScore int, tableSizeData string, tableSizeHigh string,
 	slowQueryScore int, slowQueryData string, slowQueryAdvice string) *Result {
 	return &Result{
@@ -127,8 +127,8 @@ func NewResultWithDefault(operationID int, weightedAverageScore int, dbConfigSco
 		AverageActiveSessionNumData:  constant.DefaultRandomString,
 		AverageActiveSessionNumHigh:  constant.DefaultRandomString,
 		CacheMissRatioScore:          cacheMissRatioScore,
-		CacheMissRatioData:           constant.DefaultRandomFloat,
-		CacheMissRatioHigh:           constant.DefaultRandomFloat,
+		CacheMissRatioData:           constant.DefaultRandomString,
+		CacheMissRatioHigh:           constant.DefaultRandomString,
 		TableSizeScore:               tableSizeScore,
 		TableSizeData:                constant.DefaultRandomString,
 		TableSizeHigh:                constant.DefaultRandomString,
@@ -255,12 +255,12 @@ func (r *Result) GetCacheMissRatioScore() int {
 }
 
 // GetCacheMissRatioData returns the cacheMissRatioData
-func (r *Result) GetCacheMissRatioData() float64 {
+func (r *Result) GetCacheMissRatioData() string {
 	return r.CacheMissRatioData
 }
 
 // GetCacheMissRatioHigh returns the cacheMissRatioHigh
-func (r *Result) GetCacheMissRatioHigh() float64 {
+func (r *Result) GetCacheMissRatioHigh() string {
 	return r.CacheMissRatioHigh
 }
 
